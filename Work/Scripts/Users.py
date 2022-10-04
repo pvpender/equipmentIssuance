@@ -29,3 +29,6 @@ class User(ABC):
 class Admin(User):
     pass
 
+
+class CommonUser(User):
+    pass
