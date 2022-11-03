@@ -4,7 +4,7 @@ from users import *
 class UserCollection:
 
     def __init__(self):
-        self.__objects = []
+        self.__objects = {}
         self.__count = 0
 
     @property
@@ -12,19 +12,21 @@ class UserCollection:
         return self.__count
 
     def append_user(self, user: User):
-        self.__objects.append(user)
+        user.id = self.__count
+        self.__objects.update({self.__count: user})
         self.__count += 1
 
-    def find_user(self, user_id: int):
+    def get_user_by_id(self, user_id: int) -> User:
+        return self.__objects.get(user_id)
+
+    def get_user_by_mail(self, user_mail: str) -> User:
         for i in self.__objects:
-            if i.id == user_id:
-                return i
+            if self.__objects[i].mail == user_mail:
+                return self.__objects[i]
 
     def change_user(self, user_id, user):
-        for i in range(self.__count):
-            if self.__objects[i].id == user_id:
-                self.__objects[i] = user
-                break
+        user.id = user_id
+        self.__objects[user_id] = user
 
     def del_user(self, user_id: int):
         del self.__objects[user_id]
