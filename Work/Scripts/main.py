@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QWidget
-from interface import MainWindow
+from interface import LogWindow
 from users import *
 from user_collections import *
 
@@ -10,6 +10,6 @@ user_list.append_user(zero_admin)
 
 app = QApplication([])
 
-window = MainWindow()
+window = LogWindow(user_list)
 
 app.exec()

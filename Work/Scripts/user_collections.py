@@ -19,7 +19,7 @@ class UserCollection:
     def get_user_by_id(self, user_id: int) -> User:
         return self.__objects.get(user_id)
 
-    def get_user_by_mail(self, user_mail: str) -> User:
+    def get_user_by_mail(self, user_mail: str) -> CommonUser|Admin:
         for i in self.__objects:
             if self.__objects[i].mail == user_mail:
                 return self.__objects[i]
