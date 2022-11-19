@@ -16,6 +16,7 @@ class AdminAccesses(Base):
     can_delete = Column(Boolean)
     can_change = Column(Boolean)
     can_get_request = Column(Boolean)
+    admins = relationship("Admins")
 
     def __repr__(self):
         return f"AdminAccess(id={self.id!r}, can_insert={self.can_insert!r}, can_delete={self.can_delete!r}," \
@@ -27,7 +28,6 @@ class Admins(Base):
     id = Column(Integer, primary_key=True)
     mail = Column(Text)
     access_id = Column(Integer, ForeignKey("admin_accesses.id"))
-    access = relationship("AdminAccesses")
 
     def __repr__(self):
         return f"Admin(id={self.id!r}, mail={self.mail!r})"
