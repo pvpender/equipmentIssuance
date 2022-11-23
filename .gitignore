@@ -157,3 +157,7 @@ dmypy.json
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
+
+# Python version
+.idea/equipmentIssuance.iml
+.idea/misc.xml
