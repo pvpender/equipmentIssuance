@@ -1,6 +1,3 @@
-"""
-Something
-"""
 
 
 class Equipment:

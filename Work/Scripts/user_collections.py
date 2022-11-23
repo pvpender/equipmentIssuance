@@ -11,12 +11,12 @@ class UserCollection:
     def count(self) -> int:
         return self.__count
 
-    def append_user(self, user: CommonUser | Admin):
+    def append_user(self, user: User):
         user.id = self.__count
         self.__objects.update({self.__count: user})
         self.__count += 1
 
-    def get_user_by_id(self, user_id: int) -> CommonUser | Admin:
+    def get_user_by_id(self, user_id: int) -> User:
         return self.__objects.get(user_id)
 
     def get_user_by_mail(self, user_mail: str) -> CommonUser | Admin:
@@ -24,12 +24,10 @@ class UserCollection:
             if self.__objects[i].mail == user_mail:
                 return self.__objects[i]
 
-    def change_user(self, user_id: int, user: CommonUser | Admin):
+    def change_user(self, user_id, user):
         user.id = user_id
         self.__objects[user_id] = user
 
     def del_user(self, user_id: int):
         del self.__objects[user_id]
         self.__count -= 1
-        mas_new_keys = [i for i in range(self.__count + 1)]
-        self.__objects = dict(zip(mas_new_keys, list(self.__objects.values())))
