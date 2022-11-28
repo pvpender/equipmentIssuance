@@ -1,9 +1,9 @@
 from abc import ABC
 
 
-class Access(ABC):
-    def __init__(self, new_id: int, can_get_without_req: list, can_send_req: bool):
-        super().__init__(new_id)
+class Access:
+    def __init__(self, new_id: int, can_get_without_req: bool, can_send_req: bool):
+        self.__id = new_id
         self.__can_get_without_req = can_get_without_req
         self.__can_send_req = can_send_req
 
@@ -16,11 +16,11 @@ class Access(ABC):
         self.__id = new_id
 
     @property
-    def can_get_without_req(self) -> list:
+    def can_get_without_req(self) -> bool:
         return self.__can_get_without_req
 
     @can_get_without_req.setter
-    def can_get_without_req(self, new_list_eq: list):
+    def can_get_without_req(self, new_list_eq: bool):
         self.__can_get_without_req = new_list_eq
 
     @property
@@ -32,9 +32,11 @@ class Access(ABC):
         self.__can_send_req = new_opportunity
 # Переименовать can_get_without_request
 
+
 class AdminAccess(Access):
-    def __init__(self, new_id: int, can_insert: bool, can_delete: bool, can_change: bool, can_get_request: bool, can_get_without_req:list, power: int):
-        super().__init__(new_id)
+    def __init__(self, new_id: int, can_insert: bool, can_delete: bool, can_change: bool, can_get_request: bool,
+                 can_get_without_req:bool, power: int):
+        super().__init__(new_id, can_get_without_req, can_get_request)
         self.__can_insert = can_insert
         self.__can_delete = can_delete
         self.__can_change = can_change

@@ -10,6 +10,9 @@ import pymysql
 engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 Base.metadata.create_all(engine)
 session = Session(engine)
+db = DataBase(session)
+#db.add_user(CommonUser(4532465, "nd@a", Access(12, True, True)))
+#db.update_user(CommonUser(4132465, "nda@a", Access(12, True, True)))
 """access = AdminAccesses(
     can_insert=1,
     can_delete=1,
@@ -24,7 +27,7 @@ super = Admins(
     mail="superuser",
     access_id=ids,
 )
-session.add(super)"""
+session.add(super)
 session.commit()
 zero_admin = Admin(0, "superuser", "superpassword", AdminAccess(True, True, True, True, True))
 
@@ -37,4 +40,4 @@ app = QApplication([])
 
 window = LogWindow(user_list)
 
-app.exec()
+app.exec()"""

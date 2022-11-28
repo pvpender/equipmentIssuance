@@ -60,20 +60,17 @@ class Admin(User):
 
 class CommonUser(User):
 
-    def __init__(self, user_id: int, mail: str, access: UserAccess):
+    def __init__(self, user_id: int, mail: str, access: Access):
         super().__init__(user_id, mail)
         self.__access = access
 
     @property
-    def access(self) -> UserAccess:
+    def access(self) -> Access:
         return self.__access
 
     @access.setter
-    def access(self, new_access: UserAccess):
+    def access(self, new_access: Access):
         self.__access = new_access
 
     def del_user(self):
         del self.__access
-
-
-
