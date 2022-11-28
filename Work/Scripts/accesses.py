@@ -1,7 +1,4 @@
-from abc import ABC
-
-
-class Access(ABC):
+class Access():
     def __init__(self, new_id: int, can_get_without_req: list, can_send_req: bool):
         super().__init__(new_id)
         self.__can_get_without_req = can_get_without_req

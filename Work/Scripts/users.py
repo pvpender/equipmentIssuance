@@ -5,12 +5,12 @@ from accesses import *
 
 class User(ABC):
 
-    def __init__(self, user_id: int, mail: str):
+    def __init__(self, user_id: str, mail: str):
         self.__id = user_id
         self.__mail = mail
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         return self.__id
 
     @property
@@ -18,7 +18,7 @@ class User(ABC):
         return self.__mail
 
     @id.setter
-    def id(self, new_id: int):
+    def id(self, new_id: str):
         self.__id = new_id
 
     @mail.setter
@@ -60,7 +60,7 @@ class Admin(User):
 
 class CommonUser(User):
 
-    def __init__(self, user_id: int, mail: str, access: Access):
+    def __init__(self, user_id: str, mail: str, access: Access):
         super().__init__(user_id, mail)
         self.__access = access
 
