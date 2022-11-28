@@ -22,8 +22,7 @@ class Access():
 # Переименовать can_get_without_request
 
 class AdminAccess(Access):
-    def __init__(self, new_id: int, can_insert: bool, can_delete: bool, can_change: bool, can_get_request: bool, can_get_without_req:list, power: int):
-        super().__init__(new_id)
+    def __init__(self,  can_insert: bool, can_delete: bool, can_change: bool, can_get_request: bool, can_get_without_req:list, power: int):
         self.__can_insert = can_insert
         self.__can_delete = can_delete
         self.__can_change = can_change
