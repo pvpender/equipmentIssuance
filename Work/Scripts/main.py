@@ -26,7 +26,7 @@ super = Admins(
 )
 session.add(super)"""
 session.commit()
-zero_admin = Admin(0, "superuser", "superpassword", AdminAccess(True, True, True, True, True, True, 11))
+zero_admin = Admin(0, "superuser", "superpassword", AdminAccess( True, True, True, True, True, 11))
 
 rez = session.query(Admins, AdminAccesses).join(AdminAccesses).all()
 print(rez[0][0].mail)

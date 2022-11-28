@@ -2,12 +2,13 @@
 
 class Equipment:
 
-    def __init__(self, new_id: int, title: str, description: str, count: int, reserve_count: int):
+    def __init__(self, new_id: int, title: str, description: str, count: int, reserve_count: int, whoToGive: int):
         self.__id = new_id
         self.__title = title
         self.__description = description
         self.__count = count
         self.__reserve_count = reserve_count
+        self.__whoToGive=whoToGive
 
     @property
     def id(self) -> int:
@@ -48,3 +49,10 @@ class Equipment:
     @reserve_count.setter
     def reserve_count(self, new_res_count: int):
         self.__reserve_count = new_res_count
+    @property
+    def whoToGive(self) -> int:
+        return self.__whoToGive
+
+    @whoToGive.setter
+    def whoToGive(self, newWhoToGive: int):
+        self.__whoToGive = newWhoToGive
