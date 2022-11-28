@@ -1,16 +1,8 @@
 class Access():
-    def __init__(self, new_id: int, can_get_without_req: list, can_send_req: bool):
-        super().__init__(new_id)
+    def __init__(self, can_get_without_req: list, can_send_req: bool):
+        super().__init__()
         self.__can_get_without_req = can_get_without_req
         self.__can_send_req = can_send_req
-
-    @property
-    def id(self) -> int:
-        return self.__id
-
-    @id.setter
-    def id(self, new_id: int):
-        self.__id = new_id
 
     @property
     def can_get_without_req(self) -> list:
