@@ -2,13 +2,15 @@
 
 class Equipment:
 
-    def __init__(self, new_id: int, title: str, description: str, count: int, reserve_count: int, whoToGive: int):
+    def __init__(self, new_id: int, title: str, description: str, count: int, reserve_count: int, whoToGive: int, height: int, posFromLeft:int):
         self.__id = new_id
         self.__title = title
         self.__description = description
         self.__count = count
         self.__reserve_count = reserve_count
         self.__whoToGive=whoToGive
+        self.__posFromLeft=posFromLeft
+        self.__height=height
 
     @property
     def id(self) -> int:
@@ -56,3 +58,18 @@ class Equipment:
     @whoToGive.setter
     def whoToGive(self, newWhoToGive: int):
         self.__whoToGive = newWhoToGive
+
+    @property
+    def height(self) -> int:
+        return self.__height
+    @height.setter
+    def height(self, newHeight: int):
+        self.__height = newHeight
+
+    @property
+    def posFromLeft(self) -> int:
+        return self.__posFromLeft
+
+    @posFromLeft.setter
+    def Height(self, newPosFromLeft: int):
+        self.__posFromLeft = newPosFromLeft
