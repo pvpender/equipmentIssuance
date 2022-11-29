@@ -54,7 +54,7 @@ class LogWindow(QMainWindow):
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
         if user and user.password == self.__password_field.text():
             self.hide()
-            self.__main_window = MainWindow(self.__user_list, user)
+            self.__main_window = Ui_MainWindow(self.__user_list, user)
         else:
             self.__label.setText("Введены неверные данные!")
             self.__password_field.setText("")
@@ -79,10 +79,11 @@ class MainWindow(QMainWindow):
                                     "QPushButton:hover { background-color: #000000; color: white;} ")
         self.show()
 class Ui_MainWindow(QMainWindow):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1459, 896)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+    def __init__(self, user_list: UserCollection, current_user):
+        super(Ui_MainWindow, self).__init__()
+        self.setWindowTitle("App")
+        self.setFixedSize(1459, 896)
+        self.centralwidget = QtWidgets.QWidget(Ui_MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setGeometry(QtCore.QRect(0, 0, 1121, 821))
@@ -271,17 +272,18 @@ class Ui_MainWindow(QMainWindow):
         self.hideSecPushButton = QtWidgets.QPushButton(self.groupBox)
         self.hideSecPushButton.setGeometry(QtCore.QRect(410, 40, 31, 28))
         self.hideSecPushButton.setObjectName("hideSecPushButton")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        Ui_MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(Ui_MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1459, 26))
         self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        Ui_MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(Ui_MainWindow)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        Ui_MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslateUi(Ui_MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(Ui_MainWindow)
+        self.show()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
