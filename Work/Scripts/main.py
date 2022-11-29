@@ -26,10 +26,10 @@ super = Admins(
 )
 session.add(super)"""
 session.commit()
-zero_admin = Admin(0, "superuser", "superpassword", AdminAccess( True, True, True, True, True, 11))
+zero_admin = Admin(0, "superuser", "superpassword", AdminAccess( True, True, True, True, True, 11, 10))
 
 rez = session.query(Admins, AdminAccesses).join(AdminAccesses).all()
-print(rez[0][0].mail)
+#print(rez[0][0].mail)
 user_list = UserCollection()
 user_list.append_user(zero_admin)
 
