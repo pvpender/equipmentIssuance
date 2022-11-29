@@ -340,42 +340,44 @@ class MainWindow(QMainWindow):
         self.idSpinBox.setMinimum(0)
         self.ableNowSpinBox.setMinimum(0)
         self.addHuman_groupBox.hide()
-
+        #self.hideButton.clicked.connect(self.showMenuButtons())
         #self.burgerButton.clicked.connect(self.showButtons)
         self.show()
-        def showMenuButtons(self):
-            if self.user_buttons_groupBox.isVisible():
-                self.user_buttons_groupBox.hide()
-            else:
-                self.user_buttons_groupBox.show()
-            return 0
-        def openEqAdder(self):
-            if(self.addSmthBox.isVisible()):
-                self.addHuman_groupBox.hide()
-                self.addSmthBox.setTitle("Добавление инвентаря")
-                self.self.nameOrEmailLabel.setText("ID")
-                self.nameOrEmailLineEdit.hide()
-                self.idSpinBox.setValue(0)
-                self.label_3.setText("Идентификационный номер")
-                self.nameOrEmailLineEdit.setText("")
-                self.inventoryWidgetsGroupBox.show()
-                self.label_3.setText("Идентификационный номер")
-                self.IdCardLineEdit.hide()
-                self.idSpinBox.setValue(0)
-                self.rightsLabel.setText("Кто может получить")
-                self.firstRightsCheckBox.setChecked(False)
-                self.secondRightsCheckBox.setChecked(False)
-                self.thirdRightsCheckBox_3.setChecked(False)
-                self.fourthRightsCheckBox.setChecked(False)
-                self.label_4.setText("Доступное количество")
-                self.ableNowSpinBox.setValue(0)
-                self.label_5.setText("Зарезервированное количество")
-                self.reservedSpinBox.setMinimum(0)
-                self.label_6.setText("Описание")
-                self.descriptionTextEdit.setText("")
-                self.heightSpinBox.setValue(1)
-                self.posFromLeftSpinBox.setValue(1)
-                self.addSmthBox.show()
+    def showMenuButtons(self):
+        if self.user_buttons_groupBox.isVisible():
+            self.user_buttons_groupBox.hide()
+        else:
+            self.user_buttons_groupBox.show()
+        return 0
+    def openEqAdder(self):
+        if(self.addSmthBox.isVisible()):
+            self.addHuman_groupBox.hide()
+            self.addSmthBox.setTitle("Добавление инвентаря")
+            self.nameOrEmailLabel.setText("ID")
+            self.nameOrEmailLineEdit.hide()
+            self.idSpinBox.setValue(0)
+            self.label_3.setText("Идентификационный номер")
+            self.nameOrEmailLineEdit.setText("")
+            self.inventoryWidgetsGroupBox.show()
+            self.label_3.setText("Идентификационный номер")
+            self.IdCardLineEdit.hide()
+            self.idSpinBox.setValue(0)
+            self.rightsLabel.setText("Кто может получить")
+            self.firstRightsCheckBox.setChecked(False)
+            self.secondRightsCheckBox.setChecked(False)
+            self.thirdRightsCheckBox_3.setChecked(False)
+            self.fourthRightsCheckBox.setChecked(False)
+            self.label_4.setText("Доступное количество")
+            self.ableNowSpinBox.setValue(0)
+            self.label_5.setText("Зарезервированное количество")
+            self.reservedSpinBox.setMinimum(0)
+            self.label_6.setText("Описание")
+            self.descriptionTextEdit.setText("")
+            self.heightSpinBox.setValue(1)
+            self.posFromLeftSpinBox.setValue(1)
+            self.addSmthBox.show()
+    def openPeopleAdder(self):
+        self.addHuman_groupBox.show()
+        self.IdCardLineEdit.show()
+        self.nameOrEmailLineEdit.show()
 
-        #def openPeopleAdder
-        #def openPeopleAdder
