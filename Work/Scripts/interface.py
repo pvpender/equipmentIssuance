@@ -1,8 +1,9 @@
-from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame
+from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox
 from PyQt6 import QtCore, QtGui, QtWidgets
 from user_collections import *
-
-
+from equipment import*
+from users import *
+from accesses import *
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
@@ -68,6 +69,8 @@ class MainWindow(QMainWindow):
         self.setStyleSheet("background-color:#F0F8FF;")
         self.__current_user = current_user
         self.__user_list = user_list
+        self.__addingEq=False #либо добавляет оборудование, либо пользователя
+        self.__viewingEq=False #аналогично с просмотром
         # self.__sidePanel = QFrame(self)
         # self.__sidePanel.setFixedSize(200, 720)
         # self.__sidePanel.setStyleSheet("background-color:#FFFFFF;")
@@ -79,7 +82,7 @@ class MainWindow(QMainWindow):
         self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(30, 10, 1141, 921))
+        self.groupBox.setGeometry(QtCore.QRect(0, 0, 1181, 921))
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.addSmthBox = QtWidgets.QGroupBox(self.groupBox)
@@ -122,14 +125,11 @@ class MainWindow(QMainWindow):
         self.label_3 = QtWidgets.QLabel(self.addSmthBox)
         self.label_3.setGeometry(QtCore.QRect(10, 60, 171, 16))
         self.label_3.setObjectName("label_3")
-        self.idSpinBox = QtWidgets.QSpinBox(self.addSmthBox)
-        self.idSpinBox.setGeometry(QtCore.QRect(180, 60, 121, 22))
-        self.idSpinBox.setObjectName("idSpinBox")
         self.IdCardLineEdit = QtWidgets.QLineEdit(self.addSmthBox)
         self.IdCardLineEdit.setGeometry(QtCore.QRect(180, 60, 211, 22))
         self.IdCardLineEdit.setObjectName("IdCardLineEdit")
         self.addHuman_groupBox = QtWidgets.QGroupBox(self.addSmthBox)
-        self.addHuman_groupBox.setGeometry(QtCore.QRect(0, 220, 411, 171))
+        self.addHuman_groupBox.setGeometry(QtCore.QRect(-10, 220, 411, 171))
         self.addHuman_groupBox.setTitle("")
         self.addHuman_groupBox.setObjectName("addHuman_groupBox")
         self.radioButton_User = QtWidgets.QRadioButton(self.addHuman_groupBox)
@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
         self.radioButton_Admin.setGeometry(QtCore.QRect(270, 0, 121, 20))
         self.radioButton_Admin.setObjectName("radioButton_Admin")
         self.adminRightsGroupBox = QtWidgets.QGroupBox(self.addHuman_groupBox)
-        self.adminRightsGroupBox.setGeometry(QtCore.QRect(-20, 40, 411, 131))
+        self.adminRightsGroupBox.setGeometry(QtCore.QRect(-10, 40, 411, 131))
         self.adminRightsGroupBox.setTitle("")
         self.adminRightsGroupBox.setObjectName("adminRightsGroupBox")
         self.verticalLayoutWidget_4 = QtWidgets.QWidget(self.adminRightsGroupBox)
@@ -166,6 +166,40 @@ class MainWindow(QMainWindow):
         self.rightsLabel_2 = QtWidgets.QLabel(self.adminRightsGroupBox)
         self.rightsLabel_2.setGeometry(QtCore.QRect(20, 0, 81, 16))
         self.rightsLabel_2.setObjectName("rightsLabel_2")
+        self.inventoryWidgetsGroupBox = QtWidgets.QGroupBox(self.addSmthBox)
+        self.inventoryWidgetsGroupBox.setGeometry(QtCore.QRect(0, 210, 401, 181))
+        self.inventoryWidgetsGroupBox.setTitle("")
+        self.inventoryWidgetsGroupBox.setObjectName("inventoryWidgetsGroupBox")
+        self.label_5 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
+        self.label_5.setGeometry(QtCore.QRect(10, 40, 201, 16))
+        self.label_5.setObjectName("label_5")
+        self.descriptionTextEdit = QtWidgets.QTextEdit(self.inventoryWidgetsGroupBox)
+        self.descriptionTextEdit.setGeometry(QtCore.QRect(70, 70, 321, 51))
+        self.descriptionTextEdit.setObjectName("descriptionTextEdit")
+        self.ableNowSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
+        self.ableNowSpinBox.setGeometry(QtCore.QRect(240, 10, 151, 22))
+        self.ableNowSpinBox.setObjectName("ableNowSpinBox")
+        self.label_4 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
+        self.label_4.setGeometry(QtCore.QRect(50, 10, 141, 16))
+        self.label_4.setObjectName("label_4")
+        self.reservedSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
+        self.reservedSpinBox.setGeometry(QtCore.QRect(240, 40, 151, 22))
+        self.reservedSpinBox.setObjectName("reservedSpinBox")
+        self.label_6 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
+        self.label_6.setGeometry(QtCore.QRect(10, 70, 61, 16))
+        self.label_6.setObjectName("label_6")
+        self.label_26 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
+        self.label_26.setGeometry(QtCore.QRect(0, 150, 101, 16))
+        self.label_26.setObjectName("label_26")
+        self.label_27 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
+        self.label_27.setGeometry(QtCore.QRect(180, 150, 141, 16))
+        self.label_27.setObjectName("label_27")
+        self.heightSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
+        self.heightSpinBox.setGeometry(QtCore.QRect(110, 150, 61, 22))
+        self.heightSpinBox.setObjectName("heightSpinBox")
+        self.posFromLeftSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
+        self.posFromLeftSpinBox.setGeometry(QtCore.QRect(320, 150, 71, 22))
+        self.posFromLeftSpinBox.setObjectName("posFromLeftSpinBox")
         self.user_buttons_groupBox = QtWidgets.QGroupBox(self.groupBox)
         self.user_buttons_groupBox.setGeometry(QtCore.QRect(0, 40, 371, 211))
         self.user_buttons_groupBox.setTitle("")
@@ -192,7 +226,7 @@ class MainWindow(QMainWindow):
         self.requestsButton.setObjectName("requestsButton")
         self.usersLayout.addWidget(self.requestsButton)
         self.viewInvOrUserBox = QtWidgets.QGroupBox(self.groupBox)
-        self.viewInvOrUserBox.setGeometry(QtCore.QRect(370, 40, 661, 341))
+        self.viewInvOrUserBox.setGeometry(QtCore.QRect(370, 30, 661, 341))
         self.viewInvOrUserBox.setObjectName("viewInvOrUserBox")
         self.listView = QtWidgets.QListView(self.viewInvOrUserBox)
         self.listView.setGeometry(QtCore.QRect(400, 30, 251, 311))
@@ -254,43 +288,6 @@ class MainWindow(QMainWindow):
         self.searchPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox)
         self.searchPushButton.setGeometry(QtCore.QRect(20, 260, 351, 28))
         self.searchPushButton.setObjectName("searchPushButton")
-        self.inventoryWidgetsGroupBox = QtWidgets.QGroupBox(self.viewInvOrUserBox)
-        self.inventoryWidgetsGroupBox.setGeometry(QtCore.QRect(-50, 300, 401, 181))
-        self.inventoryWidgetsGroupBox.setTitle("")
-        self.inventoryWidgetsGroupBox.setObjectName("inventoryWidgetsGroupBox")
-        self.label_5 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
-        self.label_5.setGeometry(QtCore.QRect(10, 40, 201, 16))
-        self.label_5.setObjectName("label_5")
-        self.descriptionTextEdit = QtWidgets.QTextEdit(self.inventoryWidgetsGroupBox)
-        self.descriptionTextEdit.setGeometry(QtCore.QRect(70, 70, 321, 61))
-        self.descriptionTextEdit.setObjectName("descriptionTextEdit")
-        self.ableNowSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
-        self.ableNowSpinBox.setGeometry(QtCore.QRect(240, 10, 151, 22))
-        self.ableNowSpinBox.setObjectName("ableNowSpinBox")
-        self.label_4 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
-        self.label_4.setGeometry(QtCore.QRect(10, 10, 141, 16))
-        self.label_4.setObjectName("label_4")
-        self.reservedSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
-        self.reservedSpinBox.setGeometry(QtCore.QRect(240, 40, 151, 22))
-        self.reservedSpinBox.setObjectName("reservedSpinBox")
-        self.label_6 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
-        self.label_6.setGeometry(QtCore.QRect(10, 70, 61, 16))
-        self.label_6.setObjectName("label_6")
-        self.label_25 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
-        self.label_25.setGeometry(QtCore.QRect(140, 130, 141, 16))
-        self.label_25.setObjectName("label_25")
-        self.label_26 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
-        self.label_26.setGeometry(QtCore.QRect(0, 150, 101, 16))
-        self.label_26.setObjectName("label_26")
-        self.label_27 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
-        self.label_27.setGeometry(QtCore.QRect(180, 150, 141, 16))
-        self.label_27.setObjectName("label_27")
-        self.heightSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
-        self.heightSpinBox.setGeometry(QtCore.QRect(110, 150, 61, 22))
-        self.heightSpinBox.setObjectName("heightSpinBox")
-        self.posFromLeftSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
-        self.posFromLeftSpinBox.setGeometry(QtCore.QRect(320, 150, 71, 22))
-        self.posFromLeftSpinBox.setObjectName("posFromLeftSpinBox")
         self.RequestsGroupBox = QtWidgets.QGroupBox(self.groupBox)
         self.RequestsGroupBox.setGeometry(QtCore.QRect(370, 40, 801, 241))
         self.RequestsGroupBox.setObjectName("RequestsGroupBox")
@@ -342,6 +339,11 @@ class MainWindow(QMainWindow):
         self.admin4RightsCheckBox.setText(_translate("MainWindow", "Удаление или редактирование инвентаря"))
         self.admin5RightsCheckBox.setText(_translate("MainWindow", "Вынесение решений по запросам"))
         self.rightsLabel_2.setText(_translate("MainWindow", "Имеет права:"))
+        self.label_5.setText(_translate("MainWindow", "Зарезервированное  количество"))
+        self.label_4.setText(_translate("MainWindow", "Доступное количество"))
+        self.label_6.setText(_translate("MainWindow", "Описание"))
+        self.label_26.setText(_translate("MainWindow", "Высота(от пола)"))
+        self.label_27.setText(_translate("MainWindow", "Номер от левого края"))
         self.addUserButton.setText(_translate("MainWindow", "Добавить пользователя"))
         self.changeUserInfButton.setText(
             _translate("MainWindow", "Просмотр и редактирование информации о пользователях"))
@@ -361,12 +363,6 @@ class MainWindow(QMainWindow):
         self.label_36.setText(_translate("MainWindow", "Высота(от пола)"))
         self.label_37.setText(_translate("MainWindow", "Номер от левого края"))
         self.searchPushButton.setText(_translate("MainWindow", " Поиск"))
-        self.label_5.setText(_translate("MainWindow", "Зарезервированное  количество"))
-        self.label_4.setText(_translate("MainWindow", "Доступное количество"))
-        self.label_6.setText(_translate("MainWindow", "Описание"))
-        self.label_25.setText(_translate("MainWindow", "Расположение в шкафу"))
-        self.label_26.setText(_translate("MainWindow", "Высота(от пола)"))
-        self.label_27.setText(_translate("MainWindow", "Номер от левого края"))
         self.RequestsGroupBox.setTitle(_translate("MainWindow", "Принятие решений по запросам"))
         self.AcceptReqPushButton.setText(_translate("MainWindow", "Одобрить запрос"))
         self.pushButton_2.setText(_translate("MainWindow", "Отклонить запрос"))
@@ -375,16 +371,11 @@ class MainWindow(QMainWindow):
         self.pushButton.setText(_translate("MainWindow", "Предыдущий"))
         self.pushButton_3.setText(_translate("MainWindow", "Следующий"))
         self.label_8.setText(_translate("MainWindow", "Необработанных:"))
-        self.addSmthBox.hide()
-        self.viewInvOrUserBox.hide()
         self.heightSpinBox.setMinimum(1)
         self.posFromLeftSpinBox.setMinimum(1)
-        self.idSpinBox.setMinimum(0)
         self.ableNowSpinBox.setMinimum(0)
         self.searchByPosFromLeftSpinBox.setMinimum(1)
         self.searchByHeightSpinBox.setMinimum(1)
-        self.addHuman_groupBox.hide()
-        self.RequestsGroupBox.hide()
         self.addInventoryButton.clicked.connect(self.openEqAdder)
         self.changeUserInfButton.clicked.connect(self.openPeopleViewer)
         self.changeInventoryButton.clicked.connect(self.openEqViewer)
@@ -392,10 +383,54 @@ class MainWindow(QMainWindow):
         self.requestsButton.clicked.connect(self.showReqBox)
         self.radioButton_Admin.clicked.connect(self.adminRightsGroupBox.show)
         self.radioButton_User.clicked.connect(self.adminRightsGroupBox.hide)
+        self.addUserOrInvButton.clicked.connect(self.addEqOrUser)
+        self.heightSpinBox.setMinimum(-1)
+        self.posFromLeftSpinBox.setMinimum(-1)
+        self.hideEverything()
         self.show()
+    def addEqOrUser(self):
+        codeError=-1
+        if(self.__addingEq):
+            if self.nameOrEmailLineEdit.text()=="":
+                codeError=1
+            if self.descriptionTextEdit.toPlainText()=="":
+                codeError=3
+            tg = 0
+            if self.firstRightsCheckBox.isChecked():
+                tg+= 1
+            if self.secondRightsCheckBox.isChecked():
+                tg += 10
+            if self.thirdRightsCheckBox_3.isChecked():
+                tg += 100
+            if self.fourthRightsCheckBox.isChecked():
+                tg += 1000
+            if tg==0:
+                codeError=2
+            if codeError==-1:
+                eq =Equipment(-1,self.nameOrEmailLineEdit.text(),self.descriptionTextEdit.toPlainText(),self.ableNowSpinBox.value(),self.reservedSpinBox.value(),tg,self.heightSpinBox.value(),self.posFromLeftSpinBox.value())
+                self.heightSpinBox.setValue(-1)
+                self.posFromLeftSpinBox.setValue(-1)
+                self.firstRightsCheckBox.setChecked(False)
+                self.secondRightsCheckBox.setChecked(False)
+                self.thirdRightsCheckBox_3.setChecked(False)
+                self.fourthRightsCheckBox.setChecked(False)
+                self.nameOrEmailLineEdit.setText("")
+                self.descriptionTextEdit.setText("")
+            else:
+                if codeError==1:
+                    self.showMessage("Ошибка добавления","Введите название")
+                elif codeError==2:
+                    self.showMessage("Ошибка добавления", "Не отмечены требования выдачи")
+                elif codeError==3:
+                    self.showMessage("Ошибка добавления", "отсутствует описание")
+    def showMessage(self, title:str, info:str):
+        msgBox = QMessageBox()
+        msgBox.setText(info)
+        msgBox.setWindowTitle(title)
+        msgBox.exec()
     def hideEverything(self):
         self.addHuman_groupBox.hide()
-        self.idSpinBox.hide()
+        self.label_3.hide()
         self.nameOrEmailLineEdit.hide()
         self.addSmthBox.hide()
         self.inventoryWidgetsGroupBox.hide()
@@ -405,6 +440,7 @@ class MainWindow(QMainWindow):
         self.searchByIdSpinBox.hide()
         self.searchByPosGroupBox.hide()
         self.RequestsGroupBox.hide()
+        self.IdCardLineEdit.hide()
     def showReqBox(self):
         self.hideEverything()
         self.RequestsGroupBox.show()
@@ -415,16 +451,16 @@ class MainWindow(QMainWindow):
             self.user_buttons_groupBox.show()
         return 0
     def openEqAdder(self):
+        self.__addingEq=True
         self.hideEverything()
+        self.label_3.show()
+        self.label_3.setText("ID")
         self.addSmthBox.setTitle("Добавление инвентаря")
         self.nameOrEmailLabel.setText("Название")
         self.nameOrEmailLineEdit.show()
-        self.idSpinBox.setValue(0)
         self.nameOrEmailLineEdit.setText("")
         self.inventoryWidgetsGroupBox.show()
-        self.label_3.setText("ID")
         self.IdCardLineEdit.show()
-        self.idSpinBox.setValue(0)
         self.rightsLabel.setText("Кто может получить")
         self.firstRightsCheckBox.setChecked(False)
         self.secondRightsCheckBox.setChecked(False)
@@ -435,16 +471,22 @@ class MainWindow(QMainWindow):
         self.thirdRightsCheckBox_3.setText("Инженер")
         self.fourthRightsCheckBox.setText("Главный инженер")
         self.label_4.setText("Доступное количество")
-        self.ableNowSpinBox.setValue(0)
+        self.ableNowSpinBox.setMinimum(0)
         self.label_5.setText("Зарезервированное количество")
         self.reservedSpinBox.setMinimum(0)
         self.label_6.setText("Описание")
+        self.heightSpinBox.setValue(-1)
+        self.posFromLeftSpinBox.setValue(-1)
+        self.firstRightsCheckBox.setChecked(False)
+        self.secondRightsCheckBox.setChecked(False)
+        self.thirdRightsCheckBox_3.setChecked(False)
+        self.fourthRightsCheckBox.setChecked(False)
+        self.nameOrEmailLineEdit.setText("")
         self.descriptionTextEdit.setText("")
-        self.heightSpinBox.setValue(1)
-        self.posFromLeftSpinBox.setValue(1)
         self.addSmthBox.show()
 
     def openPeopleAdder(self):
+        self.__addingEq=False
         self.hideEverything()
         self.adminRightsGroupBox.hide()
         self.addHuman_groupBox.show()
@@ -454,6 +496,7 @@ class MainWindow(QMainWindow):
         self.addSmthBox.setTitle("Добавление пользователей и администраторов")
         self.nameOrEmailLabel.setText("Email")
         self.label_3.setText("ID карты пропуска")
+        self.label_3.show()
         self.rightsLabel.setText("Что может получать")
         self.firstRightsCheckBox.setChecked(False)
         self.secondRightsCheckBox.setChecked(False)
@@ -464,6 +507,7 @@ class MainWindow(QMainWindow):
         self.thirdRightsCheckBox_3.setText("Сложное оборуд.")
         self.fourthRightsCheckBox.setText("Любое")
     def openPeopleViewer(self):
+        self.__viewingEq=False
         self.hideEverything()
         self.viewInvOrUserBox.show()
         self.searchByNameOrEmailLineEdit.show()
@@ -480,6 +524,7 @@ class MainWindow(QMainWindow):
         self.searchByThirdRightsCheckBox.setText("Инженер")
         self.searchByFourthRightsCheckBox.setText("Главный инженер")
     def openEqViewer(self):
+        self.__viewingEq=True
         self.hideEverything()
         self.viewInvOrUserBox.show()
         self.searchByPosGroupBox.show()
