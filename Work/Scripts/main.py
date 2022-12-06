@@ -11,8 +11,12 @@ engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql
 Base.metadata.create_all(engine)
 session = Session(engine)
 db = DataBase(session)
-#db.add_user(CommonUser(4532465, "nd@a", Access(12, True, True)))
-#db.update_user(CommonUser(4132465, "nda@a", Access(12, True, True)))
+# db.add_user(CommonUser(43241165, "nd@a", Access(12)))
+# db.delete_user(CommonUser(4532465, "nd@a", Access(12)))
+# eq = Equipment("Mq-101", 1, 0)
+# db.add_equipment(eq)
+# print(eq.id)
+#db.update_user(CommonUser(4132465, "nda@a", Access(12)))
 """access = AdminAccesses(
     can_insert=1,
     can_delete=1,

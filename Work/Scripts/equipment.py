@@ -1,11 +1,10 @@
 
-
 class Equipment:
 
-    def __init__(self, new_id: int, title: str, count: int, reserve_count: int, x: int, y: int):
-        self.__id = new_id
+    def __init__(self, title: str, count: int, reserve_count: int, x: int = -1, y: int = -1):
         self.__title = title
-        #self.__description = description
+        # self.__description = description
+        self.__id = -1
         self.__count = count
         self.__reserve_count = reserve_count
         self.__x = x
@@ -45,7 +44,7 @@ class Equipment:
 
     @property
     def reserve_count(self) -> int:
-        return self.reserve_count
+        return self.__reserve_count
 
     @reserve_count.setter
     def reserve_count(self, new_res_count: int):
