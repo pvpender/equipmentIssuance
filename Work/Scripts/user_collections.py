@@ -31,6 +31,7 @@ class UserCollection:
     def del_user(self, user_id: str):
         del self.__objects[user_id]
         self.__count -= 1
+
     def get_user_by_rights(self, rights: int) -> CommonUser | Admin:
         for i in self.__objects:
             if self.__objects[i].access.rightsToItems == rights:

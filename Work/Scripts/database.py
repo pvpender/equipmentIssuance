@@ -253,3 +253,6 @@ class DataBase:
     def get_all_equipment(self):
         return self.__session.query(Equipments).all()
 
+    def get_equipment_by_coordinates(self, x: int, y: int):
+        return self.__session.query(Equipments).filter(Equipments.x == x, Equipments.y == y).first()
+
