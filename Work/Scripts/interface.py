@@ -1,9 +1,11 @@
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox
 from PyQt6 import QtCore, QtGui, QtWidgets
 from user_collections import *
-from equipment import*
+from equipment import *
 from users import *
 from accesses import *
+
+
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
@@ -69,8 +71,8 @@ class MainWindow(QMainWindow):
         self.setStyleSheet("background-color:#F0F8FF;")
         self.__current_user = current_user
         self.__user_list = user_list
-        self.__addingEq=False #либо добавляет оборудование, либо пользователя
-        self.__viewingEq=False #аналогично с просмотром
+        self.__addingEq = False  # либо добавляет оборудование, либо пользователя
+        self.__viewingEq = False  # аналогично с просмотром
         # self.__sidePanel = QFrame(self)
         # self.__sidePanel.setFixedSize(200, 720)
         # self.__sidePanel.setStyleSheet("background-color:#FFFFFF;")
@@ -320,8 +322,8 @@ class MainWindow(QMainWindow):
         self.label_8.setObjectName("label_8")
         self.setCentralWidget(self.centralwidget)
         _translate = QtCore.QCoreApplication.translate
-        #MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        #self.burgerButton.setText(_translate("MainWindow", "Меню"))
+        # MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        # self.burgerButton.setText(_translate("MainWindow", "Меню"))
         self.addSmthBox.setTitle(_translate("MainWindow", "Добавление инвентаря"))
         self.nameOrEmailLabel.setText(_translate("MainWindow", "Название"))
         self.rightsLabel.setText(_translate("MainWindow", "Кто может получить "))
@@ -388,26 +390,29 @@ class MainWindow(QMainWindow):
         self.posFromLeftSpinBox.setMinimum(-1)
         self.hideEverything()
         self.show()
+
     def addEqOrUser(self):
-        codeError=-1
-        if(self.__addingEq):
-            if self.nameOrEmailLineEdit.text()=="":
-                codeError=1
-            if self.descriptionTextEdit.toPlainText()=="":
-                codeError=3
+        codeError = -1
+        if (self.__addingEq):
+            if self.nameOrEmailLineEdit.text() == "":
+                codeError = 1
+            if self.descriptionTextEdit.toPlainText() == "":
+                codeError = 3
             tg = 0
             if self.firstRightsCheckBox.isChecked():
-                tg+= 1
+                tg += 1
             if self.secondRightsCheckBox.isChecked():
                 tg += 10
             if self.thirdRightsCheckBox_3.isChecked():
                 tg += 100
             if self.fourthRightsCheckBox.isChecked():
                 tg += 1000
-            if tg==0:
-                codeError=2
-            if codeError==-1:
-                eq =Equipment(-1,self.nameOrEmailLineEdit.text(),self.descriptionTextEdit.toPlainText(),self.ableNowSpinBox.value(),self.reservedSpinBox.value(),tg,self.heightSpinBox.value(),self.posFromLeftSpinBox.value())
+            if tg == 0:
+                codeError = 2
+            if codeError == -1:
+                eq = Equipment(-1, self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
+                               self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg,
+                               self.heightSpinBox.value(), self.posFromLeftSpinBox.value())
                 self.heightSpinBox.setValue(-1)
                 self.posFromLeftSpinBox.setValue(-1)
                 self.firstRightsCheckBox.setChecked(False)
@@ -417,129 +422,185 @@ class MainWindow(QMainWindow):
                 self.nameOrEmailLineEdit.setText("")
                 self.descriptionTextEdit.setText("")
             else:
-                if codeError==1:
-                    self.showMessage("Ошибка добавления","Введите название")
-                elif codeError==2:
+                if codeError == 1:
+                    self.showMessage("Ошибка добавления", "Введите название")
+                elif codeError == 2:
                     self.showMessage("Ошибка добавления", "Не отмечены требования выдачи")
-                elif codeError==3:
+                elif codeError == 3:
                     self.showMessage("Ошибка добавления", "отсутствует описание")
-    def showMessage(self, title:str, info:str):
-        msgBox = QMessageBox()
-        msgBox.setText(info)
-        msgBox.setWindowTitle(title)
-        msgBox.exec()
-    def hideEverything(self):
-        self.addHuman_groupBox.hide()
-        self.label_3.hide()
-        self.nameOrEmailLineEdit.hide()
-        self.addSmthBox.hide()
-        self.inventoryWidgetsGroupBox.hide()
-        self.searchByIdSpinBox.hide()
-        self.searchByNameOrEmailLineEdit.hide()
-        self.viewInvOrUserBox.hide()
-        self.searchByIdSpinBox.hide()
-        self.searchByPosGroupBox.hide()
-        self.RequestsGroupBox.hide()
-        self.IdCardLineEdit.hide()
-    def showReqBox(self):
-        self.hideEverything()
-        self.RequestsGroupBox.show()
-    def showMenuButtons(self):
-        if self.user_buttons_groupBox.isVisible():
-            self.user_buttons_groupBox.hide()
-        else:
-            self.user_buttons_groupBox.show()
-        return 0
-    def openEqAdder(self):
-        self.__addingEq=True
-        self.hideEverything()
-        self.label_3.show()
-        self.label_3.setText("ID")
-        self.addSmthBox.setTitle("Добавление инвентаря")
-        self.nameOrEmailLabel.setText("Название")
-        self.nameOrEmailLineEdit.show()
-        self.nameOrEmailLineEdit.setText("")
-        self.inventoryWidgetsGroupBox.show()
-        self.IdCardLineEdit.show()
-        self.rightsLabel.setText("Кто может получить")
-        self.firstRightsCheckBox.setChecked(False)
-        self.secondRightsCheckBox.setChecked(False)
-        self.thirdRightsCheckBox_3.setChecked(False)
-        self.fourthRightsCheckBox.setChecked(False)
-        self.firstRightsCheckBox.setText("Любой пользователь")
-        self.secondRightsCheckBox.setText("Редактор-модератор")
-        self.thirdRightsCheckBox_3.setText("Инженер")
-        self.fourthRightsCheckBox.setText("Главный инженер")
-        self.label_4.setText("Доступное количество")
-        self.ableNowSpinBox.setMinimum(0)
-        self.label_5.setText("Зарезервированное количество")
-        self.reservedSpinBox.setMinimum(0)
-        self.label_6.setText("Описание")
-        self.heightSpinBox.setValue(-1)
-        self.posFromLeftSpinBox.setValue(-1)
-        self.firstRightsCheckBox.setChecked(False)
-        self.secondRightsCheckBox.setChecked(False)
-        self.thirdRightsCheckBox_3.setChecked(False)
-        self.fourthRightsCheckBox.setChecked(False)
-        self.nameOrEmailLineEdit.setText("")
-        self.descriptionTextEdit.setText("")
-        self.addSmthBox.show()
 
-    def openPeopleAdder(self):
-        self.__addingEq=False
-        self.hideEverything()
-        self.adminRightsGroupBox.hide()
-        self.addHuman_groupBox.show()
-        self.IdCardLineEdit.show()
-        self.nameOrEmailLineEdit.show()
-        self.addSmthBox.show()
-        self.addSmthBox.setTitle("Добавление пользователей и администраторов")
-        self.nameOrEmailLabel.setText("Email")
-        self.label_3.setText("ID карты пропуска")
-        self.label_3.show()
-        self.rightsLabel.setText("Что может получать")
-        self.firstRightsCheckBox.setChecked(False)
-        self.secondRightsCheckBox.setChecked(False)
-        self.thirdRightsCheckBox_3.setChecked(False)
-        self.fourthRightsCheckBox.setChecked(False)
-        self.firstRightsCheckBox.setText("Простейшее оборудование")
-        self.secondRightsCheckBox.setText("Только в рамках проекта")
-        self.thirdRightsCheckBox_3.setText("Сложное оборуд.")
-        self.fourthRightsCheckBox.setText("Любое")
-    def openPeopleViewer(self):
-        self.__viewingEq=False
-        self.hideEverything()
-        self.viewInvOrUserBox.show()
-        self.searchByNameOrEmailLineEdit.show()
-        self.viewInvOrUserBox.setTitle("Просмотр и поиск пользователей")
-        self.listLabel.setText("Все пользователи")
-        self.searchByEmailOrNameLabel.setText("Email")
-        self.SearchByRightsLabel.setText("Статус")
-        self.searchByFirstRightsCheckBox.setChecked(False)
-        self.searchBySecondRightsCheckBox.setChecked(False)
-        self.searchByThirdRightsCheckBox.setChecked(False)
-        self.searchByFourthRightsCheckBox.setChecked(False)
-        self.searchByFirstRightsCheckBox.setText("Любой пользователь")
-        self.searchBySecondRightsCheckBox.setText("Редактор-модератор")
-        self.searchByThirdRightsCheckBox.setText("Инженер")
-        self.searchByFourthRightsCheckBox.setText("Главный инженер")
-    def openEqViewer(self):
-        self.__viewingEq=True
-        self.hideEverything()
-        self.viewInvOrUserBox.show()
-        self.searchByPosGroupBox.show()
-        self.viewInvOrUserBox.setTitle("Просмотр и поиск инвентаря")
-        self.listLabel.setText("Весь инвентарь")
-        self.searchByIdSpinBox.show()
-        self.searchByEmailOrNameLabel.setText("Название")
-        self.SearchByRightsLabel.setText("Кому выдавать")
-        self.searchByFirstRightsCheckBox.setChecked(False)
-        self.searchBySecondRightsCheckBox.setChecked(False)
-        self.searchByThirdRightsCheckBox.setChecked(False)
-        self.searchByFourthRightsCheckBox.setChecked(False)
-        self.searchByFirstRightsCheckBox.setText("Всем пользователям")
-        self.searchBySecondRightsCheckBox.setText("Искл. в рамках проекта")
-        self.searchByThirdRightsCheckBox.setText("только инженерам")
-        self.searchByFourthRightsCheckBox.setText("главным инженерам")
-        self.searchByPosFromLeftSpinBox.setValue(1)
-        self.searchByHeightSpinBox.setValue(1)
+    def addEqOrUser(self):
+        codeError = -1
+        if self.nameOrEmailLineEdit.text() == "":
+            codeError = 1
+        if self.descriptionTextEdit.toPlainText() == "":
+            codeError = 3
+        if not self.__addingEq:
+            if self.IdCardLineEdit=="":
+                codeError=-4
+        tg = 0
+        if self.firstRightsCheckBox.isChecked():
+            tg += 1
+        if self.secondRightsCheckBox.isChecked():
+            tg += 10
+        if self.thirdRightsCheckBox_3.isChecked():
+            tg += 100
+        if self.fourthRightsCheckBox.isChecked():
+            tg += 1000
+        if tg == 0:
+            codeError = 2
+        if codeError == -1:
+            if(self.__addingEq):
+                eq = Equipment(-1, self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
+                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, self.heightSpinBox.value(),
+                           self.posFromLeftSpinBox.value())
+            self.heightSpinBox.setValue(-1)
+            self.posFromLeftSpinBox.setValue(-1)
+            self.firstRightsCheckBox.setChecked(False)
+            self.secondRightsCheckBox.setChecked(False)
+            self.thirdRightsCheckBox_3.setChecked(False)
+            self.fourthRightsCheckBox.setChecked(False)
+            self.nameOrEmailLineEdit.setText("")
+            self.descriptionTextEdit.setText("")
+        else:
+            if codeError == 1:
+                self.showMessage("Ошибка добавления", "Введите название")
+            elif codeError == 2:
+                self.showMessage("Ошибка добавления", "Не отмечены требования выдачи")
+            elif codeError == 3:
+                self.showMessage("Ошибка добавления", "отсутствует описание")
+
+
+def showMessage(self, title: str, info: str):
+    msgBox = QMessageBox()
+    msgBox.setText(info)
+    msgBox.setWindowTitle(title)
+    msgBox.exec()
+
+
+def hideEverything(self):
+    self.addHuman_groupBox.hide()
+    self.label_3.hide()
+    self.nameOrEmailLineEdit.hide()
+    self.addSmthBox.hide()
+    self.inventoryWidgetsGroupBox.hide()
+    self.searchByIdSpinBox.hide()
+    self.searchByNameOrEmailLineEdit.hide()
+    self.viewInvOrUserBox.hide()
+    self.searchByIdSpinBox.hide()
+    self.searchByPosGroupBox.hide()
+    self.RequestsGroupBox.hide()
+    self.IdCardLineEdit.hide()
+
+
+def showReqBox(self):
+    self.hideEverything()
+    self.RequestsGroupBox.show()
+
+
+def showMenuButtons(self):
+    if self.user_buttons_groupBox.isVisible():
+        self.user_buttons_groupBox.hide()
+    else:
+        self.user_buttons_groupBox.show()
+    return 0
+
+
+def openEqAdder(self):
+    self.__addingEq = True
+    self.hideEverything()
+    self.label_3.show()
+    self.label_3.setText("ID")
+    self.addSmthBox.setTitle("Добавление инвентаря")
+    self.nameOrEmailLabel.setText("Название")
+    self.nameOrEmailLineEdit.show()
+    self.nameOrEmailLineEdit.setText("")
+    self.inventoryWidgetsGroupBox.show()
+    self.IdCardLineEdit.show()
+    self.rightsLabel.setText("Кто может получить")
+    self.firstRightsCheckBox.setChecked(False)
+    self.secondRightsCheckBox.setChecked(False)
+    self.thirdRightsCheckBox_3.setChecked(False)
+    self.fourthRightsCheckBox.setChecked(False)
+    self.firstRightsCheckBox.setText("Любой пользователь")
+    self.secondRightsCheckBox.setText("Редактор-модератор")
+    self.thirdRightsCheckBox_3.setText("Инженер")
+    self.fourthRightsCheckBox.setText("Главный инженер")
+    self.label_4.setText("Доступное количество")
+    self.ableNowSpinBox.setMinimum(0)
+    self.label_5.setText("Зарезервированное количество")
+    self.reservedSpinBox.setMinimum(0)
+    self.label_6.setText("Описание")
+    self.heightSpinBox.setValue(-1)
+    self.posFromLeftSpinBox.setValue(-1)
+    self.firstRightsCheckBox.setChecked(False)
+    self.secondRightsCheckBox.setChecked(False)
+    self.thirdRightsCheckBox_3.setChecked(False)
+    self.fourthRightsCheckBox.setChecked(False)
+    self.nameOrEmailLineEdit.setText("")
+    self.descriptionTextEdit.setText("")
+    self.addSmthBox.show()
+
+
+def openPeopleAdder(self):
+    self.__addingEq = False
+    self.hideEverything()
+    self.adminRightsGroupBox.hide()
+    self.addHuman_groupBox.show()
+    self.IdCardLineEdit.show()
+    self.nameOrEmailLineEdit.show()
+    self.addSmthBox.show()
+    self.addSmthBox.setTitle("Добавление пользователей и администраторов")
+    self.nameOrEmailLabel.setText("Email")
+    self.label_3.setText("ID карты пропуска")
+    self.label_3.show()
+    self.rightsLabel.setText("Что может получать")
+    self.firstRightsCheckBox.setChecked(False)
+    self.secondRightsCheckBox.setChecked(False)
+    self.thirdRightsCheckBox_3.setChecked(False)
+    self.fourthRightsCheckBox.setChecked(False)
+    self.firstRightsCheckBox.setText("Простейшее оборудование")
+    self.secondRightsCheckBox.setText("Только в рамках проекта")
+    self.thirdRightsCheckBox_3.setText("Сложное оборуд.")
+    self.fourthRightsCheckBox.setText("Любое")
+
+
+def openPeopleViewer(self):
+    self.__viewingEq = False
+    self.hideEverything()
+    self.viewInvOrUserBox.show()
+    self.searchByNameOrEmailLineEdit.show()
+    self.viewInvOrUserBox.setTitle("Просмотр и поиск пользователей")
+    self.listLabel.setText("Все пользователи")
+    self.searchByEmailOrNameLabel.setText("Email")
+    self.SearchByRightsLabel.setText("Статус")
+    self.searchByFirstRightsCheckBox.setChecked(False)
+    self.searchBySecondRightsCheckBox.setChecked(False)
+    self.searchByThirdRightsCheckBox.setChecked(False)
+    self.searchByFourthRightsCheckBox.setChecked(False)
+    self.searchByFirstRightsCheckBox.setText("Любой пользователь")
+    self.searchBySecondRightsCheckBox.setText("Редактор-модератор")
+    self.searchByThirdRightsCheckBox.setText("Инженер")
+    self.searchByFourthRightsCheckBox.setText("Главный инженер")
+
+
+def openEqViewer(self):
+    self.__viewingEq = True
+    self.hideEverything()
+    self.viewInvOrUserBox.show()
+    self.searchByPosGroupBox.show()
+    self.viewInvOrUserBox.setTitle("Просмотр и поиск инвентаря")
+    self.listLabel.setText("Весь инвентарь")
+    self.searchByIdSpinBox.show()
+    self.searchByEmailOrNameLabel.setText("Название")
+    self.SearchByRightsLabel.setText("Кому выдавать")
+    self.searchByFirstRightsCheckBox.setChecked(False)
+    self.searchBySecondRightsCheckBox.setChecked(False)
+    self.searchByThirdRightsCheckBox.setChecked(False)
+    self.searchByFourthRightsCheckBox.setChecked(False)
+    self.searchByFirstRightsCheckBox.setText("Всем пользователям")
+    self.searchBySecondRightsCheckBox.setText("Искл. в рамках проекта")
+    self.searchByThirdRightsCheckBox.setText("только инженерам")
+    self.searchByFourthRightsCheckBox.setText("главным инженерам")
+    self.searchByPosFromLeftSpinBox.setValue(1)
+    self.searchByHeightSpinBox.setValue(1)
