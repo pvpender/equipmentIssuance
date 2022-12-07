@@ -72,7 +72,7 @@ class DataBase:
     def add_user(self, user: CommonUser):
         exist = self.__session.query(Users.id).filter(Users.mail == user.mail, Users.pass_number == user.id).first()
         if exist:
-            raise Exception("This user already exists!")
+            raise ValueError("This user already exists!")
         access = user.access
         access_id = self.__session.query(Accesses.id).filter(
             Accesses.power == access.power,
@@ -94,7 +94,7 @@ class DataBase:
         self.__session.add(db_user)
         self.__session.commit()
 
-    def update_user(self, user: CommonUser):
+    def update_user(self, old_id: int, old_mail: str, user: CommonUser):
         access = user.access
         access_id = self.__session.query(Accesses.id).filter(
             Accesses.power == access.power
@@ -108,7 +108,7 @@ class DataBase:
             access_id = self.__session.query(Accesses.id).filter(
                 Accesses.power == access.power
             ).one()
-        self.__session.query(Users).filter(Users.mail == user.mail, Users.pass_number == user.id).update(
+        self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
             {"pass_number": user.id, "mail": user.mail, "access_id": access_id[0]}
         )
         self.__session.commit()
@@ -118,19 +118,19 @@ class DataBase:
         self.__session.commit()
 
     def get_user_by_id(self, pass_number: int):
-        return self.__session.query(Users).filter(Users.pass_number == pass_number).first()
+        return self.__session.query(Users, Accesses).join(Accesses).filter(Users.pass_number == pass_number).first()
 
     def get_user_by_mail(self, mail: str):
-        return self.__session.query(Users).filter(Users.mail == mail).first()
+        return self.__session.query(Users, Accesses).join(Accesses).filter(Users.mail == mail).first()
 
     def get_all_users(self):
-        return self.__session.query(Users).all()
+        return self.__session.query(Users, Accesses).join(Accesses).all()
 
     def add_admin(self, admin: Admin):
         exist = self.__session.query(Admins.id).filter(Admins.mail == admin.mail,
                                                        Admins.pass_number == admin.id).first()
         if exist:
-            raise Exception("This admin already exists!")
+            raise ValueError("This admin already exists!")
         access = admin.access
         access_id = self.__session.query(AdminAccesses.id).filter(
             AdminAccesses.power == access.power,
@@ -168,7 +168,7 @@ class DataBase:
         self.__session.add(db_admin)
         self.__session.commit()
 
-    def update_admin(self, admin: Admin):
+    def update_admin(self, old_id: int, old_mail: str, admin: Admin):
         access = admin.access
         access_id = self.__session.query(AdminAccesses.id).filter(
             AdminAccesses.can_add_users == access.can_add_users,
@@ -197,7 +197,7 @@ class DataBase:
                 AdminAccesses.can_get_request == access.can_get_request,
                 AdminAccesses.power == access.power
             ).one()
-        self.__session.query(Admins).filter(Admins.mail == admin.mail, Admins.pass_number == admin.id).update(
+        self.__session.query(Admins).filter(Admins.mail == old_mail, Admins.pass_number == old_id).update(
             {"pass_number": admin.id, "mail": admin.mail, "password": admin.password, "access_id": access_id[0]}
         )
         self.__session.commit()
@@ -207,18 +207,18 @@ class DataBase:
         self.__session.commit()
 
     def get_admin_by_id(self, pass_number: int):
-        return self.__session.query(Admins).filter(Admins.pass_number == pass_number).first()
+        return self.__session.query(Admins, AdminAccesses).join(AdminAccesses).filter(Admins.pass_number == pass_number).first()
 
     def get_admin_by_mail(self, mail: str):
-        return self.__session.query(Admins).filter(Admins.mail == mail).first()
+        return self.__session.query(Admins, AdminAccesses).join(AdminAccesses).filter(Admins.mail == mail).first()
 
     def get_all_admins(self):
-        return self.__session.query(Admins).all()
+        return self.__session.query(Admins, AdminAccesses).join(AdminAccesses).all()
 
     def add_equipment(self, equipment: Equipment):
         exist = self.__session.query(Equipments.id).filter(Equipments.title == equipment.title).first()
         if exist:
-            raise Exception("This equipment already exists!")
+            raise ValueError("This equipment already exists!")
         db_equipment = Equipments(
             title=equipment.title,
             count=equipment.count,
@@ -231,14 +231,14 @@ class DataBase:
         self.__session.commit()
         equipment.id = self.get_equipment_by_title(equipment.title).id
 
-    def update_equipment(self, equipment: Equipment):
+    def update_equipment(self,  old_id: int, equipment: Equipment):
         if not (equipment.x and equipment.y):
             exist = self.__session.query(Equipments).filter(
                 Equipments.x == equipment.x, Equipments.y == equipment.y
             ).first()
             if exist:
-                raise Exception("This cell is occupied!")
-        self.__session.query(Equipments).filter(Equipments.title == equipment.title).update(
+                raise ValueError("This cell is occupied!")
+        self.__session.query(Equipments).filter(Equipments.id == old_id).update(
             {"title": equipment.title, "count": equipment.count, "reserve_count": equipment.reserve_count,
              "access": equipment.access, "x": equipment.x, "y": equipment.y}
         )
@@ -252,4 +252,7 @@ class DataBase:
 
     def get_all_equipment(self):
         return self.__session.query(Equipments).all()
+
+    def get_equipment_by_coordinates(self, x: int, y: int):
+        return self.__session.query(Equipments).filter(Equipments.x == x, Equipments.y == y).first()
 
