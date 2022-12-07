@@ -437,7 +437,7 @@ class MainWindow(QMainWindow):
             codeError = 3
         if not self.__addingEq:
             if self.IdCardLineEdit=="":
-                codeError=-4
+                codeError= 4
         tg = 0
         if self.firstRightsCheckBox.isChecked():
             tg += 1
