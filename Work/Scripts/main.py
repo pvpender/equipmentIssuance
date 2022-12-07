@@ -16,7 +16,7 @@ Base.metadata.create_all(engine)
 session = Session(engine)
 db = DataBase(session)
 
-zero_admin = Admin(0, "superuser", "superpassword", AdminAccess( True, True, True, True, True, 11, 10))
+zero_admin = Admin(0, "superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
 user_list = UserCollection()
 user_list.append_user(zero_admin)
 
@@ -24,4 +24,4 @@ app = QApplication([])
 
 window = LogWindow(user_list)
 
-app.exec()"""
+app.exec()

@@ -1,6 +1,6 @@
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
+from sqlalchemy import Integer, BigInteger
 from sqlalchemy import Boolean
 from sqlalchemy import Text
 from sqlalchemy.orm import declarative_base, Session, relationship
@@ -36,7 +36,7 @@ class AdminAccesses(Base):
 class Users(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    pass_number = Column(Integer)
+    pass_number = Column(BigInteger)
     mail = Column(Text)
     access_id = Column(Integer, ForeignKey("user_accesses.id"))
 
@@ -44,7 +44,7 @@ class Users(Base):
 class Admins(Base):
     __tablename__ = "admins"
     id = Column(Integer, primary_key=True)
-    pass_number = Column(Integer)
+    pass_number = Column(BigInteger)
     mail = Column(Text)
     password = Column(Text)
     access_id = Column(Integer, ForeignKey("admin_accesses.id"))
@@ -59,6 +59,7 @@ class Equipments(Base):
     title = Column(Text)
     count = Column(Integer)
     reserve_count = Column(Integer)
+    access = Column(Integer)
     x = Column(Integer)
     y = Column(Integer)
 
@@ -222,6 +223,7 @@ class DataBase:
             title=equipment.title,
             count=equipment.count,
             reserve_count=equipment.reserve_count,
+            access=equipment.access,
             x=equipment.x,
             y=equipment.y
         )
@@ -238,7 +240,7 @@ class DataBase:
                 raise Exception("This cell is occupied!")
         self.__session.query(Equipments).filter(Equipments.title == equipment.title).update(
             {"title": equipment.title, "count": equipment.count, "reserve_count": equipment.reserve_count,
-             "x": equipment.x, "y": equipment.y}
+             "access": equipment.access, "x": equipment.x, "y": equipment.y}
         )
 
     def delete_equipment(self, equipment: Equipment):
