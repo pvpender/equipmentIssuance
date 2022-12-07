@@ -1,16 +1,14 @@
 
-
 class Equipment:
 
-    def __init__(self, new_id: int, title: str, description: str, count: int, reserve_count: int, whoToGive: int, height: int, posFromLeft:int):
-        self.__id = new_id
+    def __init__(self, title: str, count: int, reserve_count: int, x: int = -1, y: int = -1):
         self.__title = title
-        self.__description = description
+        # self.__description = description
+        self.__id = -1
         self.__count = count
         self.__reserve_count = reserve_count
-        self.__whoToGive=whoToGive
-        self.__posFromLeft=posFromLeft
-        self.__height=height
+        self.__x = x
+        self.__y = y
 
     @property
     def id(self) -> int:
@@ -28,13 +26,13 @@ class Equipment:
     def title(self, title: str):
         self.__title = title
 
-    @property
+    """@property
     def description(self) -> str:
         return self.__description
 
     @description.setter
     def description(self, new_description: str):
-        self.__description = new_description
+        self.__description = new_description"""
 
     @property
     def count(self) -> int:
@@ -46,30 +44,24 @@ class Equipment:
 
     @property
     def reserve_count(self) -> int:
-        return self.reserve_count
+        return self.__reserve_count
 
     @reserve_count.setter
     def reserve_count(self, new_res_count: int):
         self.__reserve_count = new_res_count
-    @property
-    def whoToGive(self) -> int:
-        return self.__whoToGive
-
-    @whoToGive.setter
-    def whoToGive(self, newWhoToGive: int):
-        self.__whoToGive = newWhoToGive
 
     @property
-    def height(self) -> int:
-        return self.__height
-    @height.setter
-    def height(self, newHeight: int):
-        self.__height = newHeight
+    def x(self) -> int:
+        return self.__x
+
+    @x.setter
+    def x(self, new_x: int):
+        self.__x = new_x
 
     @property
-    def posFromLeft(self) -> int:
-        return self.__posFromLeft
+    def y(self) -> int:
+        return self.__y
 
-    @posFromLeft.setter
-    def Height(self, newPosFromLeft: int):
-        self.__posFromLeft = newPosFromLeft
+    @y.setter
+    def y(self, new_y: int):
+        self.__y = new_y

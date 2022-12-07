@@ -60,7 +60,7 @@ class Admin(User):
 
 class CommonUser(User):
 
-    def __init__(self, user_id: str, mail: str, access: Access):
+    def __init__(self, user_id: int, mail: str, access: Access):
         super().__init__(user_id, mail)
         self.__access = access
 
@@ -74,6 +74,3 @@ class CommonUser(User):
 
     def del_user(self):
         del self.__access
-
-
-
