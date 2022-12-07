@@ -1238,7 +1238,7 @@ class MainWindow(QMainWindow):
             if self.admin5RightsCheckBox.isChecked():
                 getReq= True
             if (not addUs) and (not chEq) and (not chUs)and (addEq) and (getReq):
-                codeError=6
+                codeError=5
         if self.radioButton_User.isChecked():
             addUs = False
             chUs = False
@@ -1255,7 +1255,7 @@ class MainWindow(QMainWindow):
             tg += 1000
         if tg == 0:
             codeError = 2
-        if not self.__addingEq:
+        """if not self.__addingEq:
             if self.__db.get_user_by_id(int([self.IdCardLineEdit.text()][16])) or self.__db.get_admin_by_id(int([self.IdCardLineEdit.text()][16])):
                 codeError=7
                 self.IdCardLineEdit.setText("")
@@ -1264,7 +1264,7 @@ class MainWindow(QMainWindow):
                 self.nameOrEmailLineEdit.setText("")
         else:
             if self.__db.get_equipment_by_title(str(self.nameOrEmailLineEdit.text())):
-                codeError=8
+                codeError=8"""
         if codeError == -1:
             if(self.__addingEq):
                 eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
