@@ -24,4 +24,4 @@ app = QApplication([])
 
 window = LogWindow(user_list)
 
-app.exec()"""
+app.exec()
