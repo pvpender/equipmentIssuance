@@ -410,7 +410,7 @@ class MainWindow(QMainWindow):
             if tg == 0:
                 codeError = 2
             if codeError == -1:
-                eq = Equipment(-1, self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
+                eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
                                self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg,
                                self.heightSpinBox.value(), self.posFromLeftSpinBox.value())
                 self.heightSpinBox.setValue(-1)
@@ -451,7 +451,7 @@ class MainWindow(QMainWindow):
             codeError = 2
         if codeError == -1:
             if(self.__addingEq):
-                eq = Equipment(-1, self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
+                eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
                            self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, self.heightSpinBox.value(),
                            self.posFromLeftSpinBox.value())
             self.heightSpinBox.setValue(-1)
