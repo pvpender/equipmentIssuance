@@ -628,7 +628,74 @@ def openEqViewer(self):
     self.searchByThirdRightsCheckBox.setText("только инженерам")
     self.searchByFourthRightsCheckBox.setText("главным инженерам")
     self.searchByPosFromLeftSpinBox.setValue(1)
-    self.searchByHeightSpinBox.setValue(1)"""
+    self.searchByHeightSpinBox.setValue(1)
+        def addEqOrUser(self):
+        codeError = -1
+        ar=0
+        tg = 0
+        if self.nameOrEmailLineEdit.text() == "":
+            codeError = 1
+        if self.descriptionTextEdit.toPlainText() == "":
+            codeError = 3
+        if not self.__addingEq:
+            if self.IdCardLineEdit == "":
+                codeError = 4
+        if not self.radioButton_User.isChecked() and (not self.radioButton_Admin.isChecked()):
+            codeError = 5
+        if self.radioButton_Admin.isChecked():
+            if self.adminRightsCheckBox.isChecked():
+                ar += 1
+            if self.admin2RightsCheckBox.isChecked():
+                ar += 10
+            if self.admin3RightsCheckBox.isChecked():
+                ar += 100
+            if self.admin4RightsCheckBox.isChecked():
+                ar += 1000
+            if tg == 0:
+                codeError = 5
+        if self.firstRightsCheckBox.isChecked():
+            tg += 1
+        if self.secondRightsCheckBox.isChecked():
+            tg += 10
+        if self.thirdRightsCheckBox_3.isChecked():
+            tg += 100
+        if self.fourthRightsCheckBox.isChecked():
+            tg += 1000
+        if tg == 0:
+            codeError = 2
+        if codeError == -1:
+            if(self.__addingEq):
+                eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
+                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, self.heightSpinBox.value(),
+                           self.posFromLeftSpinBox.value())
+            self.heightSpinBox.setValue(-1)
+            self.posFromLeftSpinBox.setValue(-1)
+            self.firstRightsCheckBox.setChecked(False)
+            self.secondRightsCheckBox.setChecked(False)
+            self.thirdRightsCheckBox_3.setChecked(False)
+            self.fourthRightsCheckBox.setChecked(False)
+            self.nameOrEmailLineEdit.setText("")
+            self.descriptionTextEdit.setText("")
+            self.IdCardLineEdit.setText("")
+
+        else:
+            if codeError == 1:
+                if self.__addingEq:
+                    self.showMessage("Ошибка добавления", "Введите название")
+                else:
+                    self.showMessage("Ошибка добавления", "Введите Email")
+            elif codeError == 2:
+                if self.__addingEq:
+                    self.showMessage("Ошибка добавления", "Не отмечены требования выдачи")
+                else:
+                    self.showMessage("Ошибка добавления", "Не отмечены права на получение")
+            elif codeError == 3:
+                self.showMessage("Ошибка добавления", "отсутствует описание")
+            elif codeError ==4:
+                self.showMessage("Ошибка добавления","не введен ID карты сотрудника")
+            elif codeError==5:
+                self.showMessage("Ошибка добавления", "не добавлены права администратора")
+"""
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox
 from PyQt6 import QtCore, QtGui, QtWidgets
 from user_collections import *
@@ -640,9 +707,8 @@ from accesses import *
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
-    def __init__(self, user_list: UserCollection, db: DataBase):
+    def __init__(self, user_list: UserCollection):
         super(LogWindow, self).__init__()
-        self.__db=DataBase
         self.__main_window = MainWindow
         self.__user_list = user_list
         self.setFixedSize(720, 480)
@@ -689,16 +755,15 @@ class LogWindow(QMainWindow):
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
         if user and user.password == self.__password_field.text():
             self.hide()
-            self.__main_window = MainWindow(self.__user_list, user, self.__db)
+            self.__main_window = MainWindow(self.__user_list, user)
         else:
             self.__label.setText("Введены неверные данные!")
             self.__password_field.setText("")
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, user_list: UserCollection, current_user, db: DataBase):
+    def __init__(self, user_list: UserCollection, current_user):
         super(MainWindow, self).__init__()
-        self.__db=DataBase
         self.setWindowTitle("App")
         self.setFixedSize(1280, 720)
         self.setStyleSheet("background-color:#F0F8FF;")
@@ -1023,73 +1088,6 @@ class MainWindow(QMainWindow):
         self.posFromLeftSpinBox.setMinimum(-1)
         self.hideEverything()
         self.show()
-    def addEqOrUser(self):
-        codeError = -1
-        ar=0
-        tg = 0
-        if self.nameOrEmailLineEdit.text() == "":
-            codeError = 1
-        if self.descriptionTextEdit.toPlainText() == "":
-            codeError = 3
-        if not self.__addingEq:
-            if self.IdCardLineEdit == "":
-                codeError = 4
-        if not self.radioButton_User.isChecked() and (not self.radioButton_Admin.isChecked()):
-            codeError = 5
-        if self.radioButton_Admin.isChecked():
-            if self.adminRightsCheckBox.isChecked():
-                ar += 1
-            if self.admin2RightsCheckBox.isChecked():
-                ar += 10
-            if self.admin3RightsCheckBox.isChecked():
-                ar += 100
-            if self.admin4RightsCheckBox.isChecked():
-                ar += 1000
-            if tg == 0:
-                codeError = 5
-        if self.firstRightsCheckBox.isChecked():
-            tg += 1
-        if self.secondRightsCheckBox.isChecked():
-            tg += 10
-        if self.thirdRightsCheckBox_3.isChecked():
-            tg += 100
-        if self.fourthRightsCheckBox.isChecked():
-            tg += 1000
-        if tg == 0:
-            codeError = 2
-        if codeError == -1:
-            if(self.__addingEq):
-                eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
-                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, self.heightSpinBox.value(),
-                           self.posFromLeftSpinBox.value())
-            self.heightSpinBox.setValue(-1)
-            self.posFromLeftSpinBox.setValue(-1)
-            self.firstRightsCheckBox.setChecked(False)
-            self.secondRightsCheckBox.setChecked(False)
-            self.thirdRightsCheckBox_3.setChecked(False)
-            self.fourthRightsCheckBox.setChecked(False)
-            self.nameOrEmailLineEdit.setText("")
-            self.descriptionTextEdit.setText("")
-            self.IdCardLineEdit.setText("")
-
-        else:
-            if codeError == 1:
-                if self.__addingEq:
-                    self.showMessage("Ошибка добавления", "Введите название")
-                else:
-                    self.showMessage("Ошибка добавления", "Введите Email")
-            elif codeError == 2:
-                if self.__addingEq:
-                    self.showMessage("Ошибка добавления", "Не отмечены требования выдачи")
-                else:
-                    self.showMessage("Ошибка добавления", "Не отмечены права на получение")
-            elif codeError == 3:
-                self.showMessage("Ошибка добавления", "отсутствует описание")
-            elif codeError ==4:
-                self.showMessage("Ошибка добавления","не введен ID карты сотрудника")
-            elif codeError==5:
-                self.showMessage("Ошибка добавления", "не добавлены права администратора")
-
     def showMessage(self, title:str, info:str):
         msgBox = QMessageBox()
         msgBox.setText(info)
@@ -1255,16 +1253,16 @@ class MainWindow(QMainWindow):
             tg += 1000
         if tg == 0:
             codeError = 2
-        """if not self.__addingEq:
-            if self.__db.get_user_by_id(int([self.IdCardLineEdit.text()][16])) or self.__db.get_admin_by_id(int([self.IdCardLineEdit.text()][16])):
+        if not self.__addingEq:
+            if self.__user_list.get_user_by_id(int([self.IdCardLineEdit.text()][16])) or self.__user_list.get_admin_by_id(int([self.IdCardLineEdit.text()][16])):
                 codeError=7
                 self.IdCardLineEdit.setText("")
-            if self.__db.get_user_by_mail(str(self.nameOrEmailLineEdit.text())) or self.__db.get_admin_by_mail(str(self.nameOrEmailLineEdit.text())):
+            if self.__user_list.get_user_by_mail(str(self.nameOrEmailLineEdit.text())) or self.__user_list.get_admin_by_mail(str(self.nameOrEmailLineEdit.text())):
                 codeError=8
                 self.nameOrEmailLineEdit.setText("")
         else:
             if self.__db.get_equipment_by_title(str(self.nameOrEmailLineEdit.text())):
-                codeError=8"""
+                codeError=8
         if codeError == -1:
             if(self.__addingEq):
                 eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),

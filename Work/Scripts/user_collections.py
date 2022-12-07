@@ -41,11 +41,21 @@ class UserCollection:
     def get_user_by_id(self, user_id: int) -> CommonUser | Admin:
         return self.__objects.get(user_id)
 
+    def check_user_by_id(self, user_id: int) -> bool:
+        if self.__objects.get(user_id):
+            return True
+        else:
+            return False
+
     def get_user_by_mail(self, user_mail: str) -> CommonUser | Admin:
         for i in self.__objects.values():
             if i.mail == user_mail:
                 return i
-
+    def check_user_by_mail(self, user_mail: str) -> bool:
+        for i in self.__objects.values():
+            if i.mail == user_mail:
+                return True
+        return False
     def change_user(self, user_id: int, mail: str, user: CommonUser | Admin):
         if type(user) == type(CommonUser):
             self.__db.update_user(user_id, mail, user)
