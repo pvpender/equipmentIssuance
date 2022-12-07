@@ -5,12 +5,12 @@ from accesses import *
 
 class User(ABC):
 
-    def __init__(self, user_id: str, mail: str):
+    def __init__(self, user_id: int, mail: str):
         self.__id = user_id
         self.__mail = mail
 
     @property
-    def id(self) -> str:
+    def id(self) -> int:
         return self.__id
 
     @property
@@ -18,7 +18,7 @@ class User(ABC):
         return self.__mail
 
     @id.setter
-    def id(self, new_id: str):
+    def id(self, new_id: int):
         self.__id = new_id
 
     @mail.setter

@@ -16,7 +16,7 @@ Base.metadata.create_all(engine)
 session = Session(engine)
 db = DataBase(session)
 
-zero_admin = Admin("superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
+zero_admin = Admin(1, "superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
 user_list = UserCollection()
 user_list.append_user(zero_admin)
 
