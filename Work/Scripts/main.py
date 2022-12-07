@@ -15,13 +15,17 @@ engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql
 Base.metadata.create_all(engine)
 session = Session(engine)
 db = DataBase(session)
+m = db.get_all_users()
+print(m[0][1].power)
+#zero_admin = Admin(1, "superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
+user_list = UserCollection(db)
+#user_list.append_user(zero_admin)
 
-zero_admin = Admin(1, "superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
-user_list = UserCollection()
-user_list.append_user(zero_admin)
+mas = user_list.get_user_list()
+print(user_list.count)
 
-app = QApplication([])
+#app = QApplication([])
 
-window = LogWindow(user_list)
+#window = LogWindow(user_list)
 
-app.exec()
+#app.exec()
