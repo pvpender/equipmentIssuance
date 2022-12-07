@@ -16,7 +16,7 @@ class UserCollection:
         self.__objects.update({self.__count: user})
         self.__count += 1
 
-    def get_user_by_id(self, user_id: int) -> User:
+    def get_user_by_id(self, user_id: str) -> User:
         return self.__objects.get(user_id)
 
     def get_user_by_mail(self, user_mail: str) -> CommonUser | Admin:
@@ -28,6 +28,10 @@ class UserCollection:
         user.id = user_id
         self.__objects[user_id] = user
 
-    def del_user(self, user_id: int):
+    def del_user(self, user_id: str):
         del self.__objects[user_id]
         self.__count -= 1
+    def get_user_by_rights(self, rights: int) -> CommonUser | Admin:
+        for i in self.__objects:
+            if self.__objects[i].access.rightsToItems == rights:
+                return self.__objects[i]
