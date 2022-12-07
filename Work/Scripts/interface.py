@@ -1024,40 +1024,72 @@ class MainWindow(QMainWindow):
         self.hideEverything()
         self.show()
     def addEqOrUser(self):
-        codeError=-1
-        if(self.__addingEq):
-            if self.nameOrEmailLineEdit.text()=="":
-                codeError=1
-            if self.__addingEq and self.descriptionTextEdit.toPlainText()=="":
-                codeError=3
-            tg = 0
-            if self.firstRightsCheckBox.isChecked():
-                tg+= 1
-            if self.secondRightsCheckBox.isChecked():
-                tg += 10
-            if self.thirdRightsCheckBox_3.isChecked():
-                tg += 100
-            if self.fourthRightsCheckBox.isChecked():
-                tg += 1000
-            if tg==0:
-                codeError=2
-            if codeError==-1:
-                eq =Equipment(-1,self.nameOrEmailLineEdit.text(),self.descriptionTextEdit.toPlainText(),self.ableNowSpinBox.value(),self.reservedSpinBox.value(),tg,self.heightSpinBox.value(),self.posFromLeftSpinBox.value())
-                self.heightSpinBox.setValue(-1)
-                self.posFromLeftSpinBox.setValue(-1)
-                self.firstRightsCheckBox.setChecked(False)
-                self.secondRightsCheckBox.setChecked(False)
-                self.thirdRightsCheckBox_3.setChecked(False)
-                self.fourthRightsCheckBox.setChecked(False)
-                self.nameOrEmailLineEdit.setText("")
-                self.descriptionTextEdit.setText("")
-            else:
-                if codeError==1:
-                    self.showMessage("Ошибка добавления","Введите название")
-                elif codeError==2:
+        codeError = -1
+        ar=0
+        tg = 0
+        if self.nameOrEmailLineEdit.text() == "":
+            codeError = 1
+        if self.descriptionTextEdit.toPlainText() == "":
+            codeError = 3
+        if not self.__addingEq:
+            if self.IdCardLineEdit == "":
+                codeError = 4
+        if not self.radioButton_User.isChecked() and (not self.radioButton_Admin.isChecked()):
+            codeError = 5
+        if self.radioButton_Admin.isChecked():
+            if self.adminRightsCheckBox.isChecked():
+                ar += 1
+            if self.admin2RightsCheckBox.isChecked():
+                ar += 10
+            if self.admin3RightsCheckBox.isChecked():
+                ar += 100
+            if self.admin4RightsCheckBox.isChecked():
+                ar += 1000
+            if tg == 0:
+                codeError = 5
+        if self.firstRightsCheckBox.isChecked():
+            tg += 1
+        if self.secondRightsCheckBox.isChecked():
+            tg += 10
+        if self.thirdRightsCheckBox_3.isChecked():
+            tg += 100
+        if self.fourthRightsCheckBox.isChecked():
+            tg += 1000
+        if tg == 0:
+            codeError = 2
+        if codeError == -1:
+            if(self.__addingEq):
+                eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
+                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, self.heightSpinBox.value(),
+                           self.posFromLeftSpinBox.value())
+            self.heightSpinBox.setValue(-1)
+            self.posFromLeftSpinBox.setValue(-1)
+            self.firstRightsCheckBox.setChecked(False)
+            self.secondRightsCheckBox.setChecked(False)
+            self.thirdRightsCheckBox_3.setChecked(False)
+            self.fourthRightsCheckBox.setChecked(False)
+            self.nameOrEmailLineEdit.setText("")
+            self.descriptionTextEdit.setText("")
+            self.IdCardLineEdit.setText("")
+
+        else:
+            if codeError == 1:
+                if self.__addingEq:
+                    self.showMessage("Ошибка добавления", "Введите название")
+                else:
+                    self.showMessage("Ошибка добавления", "Введите Email")
+            elif codeError == 2:
+                if self.__addingEq:
                     self.showMessage("Ошибка добавления", "Не отмечены требования выдачи")
-                elif codeError==3:
-                    self.showMessage("Ошибка добавления", "отсутствует описание")
+                else:
+                    self.showMessage("Ошибка добавления", "Не отмечены права на получение")
+            elif codeError == 3:
+                self.showMessage("Ошибка добавления", "отсутствует описание")
+            elif codeError ==4:
+                self.showMessage("Ошибка добавления","не введен ID карты сотрудника")
+            elif codeError==5:
+                self.showMessage("Ошибка добавления", "не добавлены права администратора")
+
     def showMessage(self, title:str, info:str):
         msgBox = QMessageBox()
         msgBox.setText(info)
