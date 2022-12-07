@@ -22,6 +22,6 @@ user_list.append_user(zero_admin)
 
 app = QApplication([])
 
-window = LogWindow(user_list)
+window = LogWindow(user_list, db)
 
 app.exec()
