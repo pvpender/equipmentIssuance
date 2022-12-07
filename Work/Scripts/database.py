@@ -254,5 +254,8 @@ class DataBase:
         return self.__session.query(Equipments).all()
 
     def get_equipment_by_coordinates(self, x: int, y: int):
-        return self.__session.query(Equipments).filter(Equipments.x == x, Equipments.y == y).first()
+        if x!=-1 and y!=-1:
+            return self.__session.query(Equipments).filter(Equipments.x == x, Equipments.y == y).first()
+        else:
+            return None
 
