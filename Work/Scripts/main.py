@@ -24,8 +24,10 @@ user_list = UserCollection(db)
 mas = user_list.get_user_list()
 print(user_list.count)
 
+
 #app = QApplication([])
 
-#window = LogWindow(user_list)
 
-#app.exec()
+window = LogWindow(user_list, db)
+
+app.exec()
