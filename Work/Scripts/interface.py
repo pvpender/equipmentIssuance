@@ -707,9 +707,10 @@ from accesses import *
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
-    def __init__(self, user_list: UserCollection):
+    def __init__(self, user_list: UserCollection, db:DataBase):
         super(LogWindow, self).__init__()
         self.__main_window = MainWindow
+        self.__db=db
         self.__user_list = user_list
         self.setFixedSize(720, 480)
         self.setWindowTitle("Log in")
@@ -753,22 +754,23 @@ class LogWindow(QMainWindow):
 
     def login(self):
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
-        if user and user.password == self.__password_field.text():
-            self.hide()
-            self.__main_window = MainWindow(self.__user_list, user)
-        else:
-            self.__label.setText("Введены неверные данные!")
-            self.__password_field.setText("")
+        #if user and user.password == self.__password_field.text():
+        self.hide()
+        self.__main_window = MainWindow(self.__user_list, user, self.__db)
+        #else:
+            #self.__label.setText("Введены неверные данные!")
+            #self.__password_field.setText("")
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, user_list: UserCollection, current_user):
+    def __init__(self, user_list: UserCollection, current_user, db: DataBase):
         super(MainWindow, self).__init__()
         self.setWindowTitle("App")
         self.setFixedSize(1280, 720)
         self.setStyleSheet("background-color:#F0F8FF;")
         self.__current_user = current_user
         self.__user_list = user_list
+        self.__db=db
         self.__addingEq=False #либо добавляет оборудование, либо пользователя
         self.__viewingEq=False #аналогично с просмотром
         # self.__sidePanel = QFrame(self)
@@ -1083,7 +1085,7 @@ class MainWindow(QMainWindow):
         self.requestsButton.clicked.connect(self.showReqBox)
         self.radioButton_Admin.clicked.connect(self.adminRightsGroupBox.show)
         self.radioButton_User.clicked.connect(self.adminRightsGroupBox.hide)
-        self.addUserOrInvButton.clicked.connect(self.addEqOrUser2)
+        self.addUserOrInvButton.clicked.connect(self.addEqOrUser)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.hideEverything()
@@ -1118,14 +1120,11 @@ class MainWindow(QMainWindow):
     def openEqAdder(self):
         self.__addingEq=True
         self.hideEverything()
-        self.label_3.show()
-        self.label_3.setText("ID")
         self.addSmthBox.setTitle("Добавление инвентаря")
         self.nameOrEmailLabel.setText("Название")
         self.nameOrEmailLineEdit.show()
         self.nameOrEmailLineEdit.setText("")
         self.inventoryWidgetsGroupBox.show()
-        self.IdCardLineEdit.show()
         self.rightsLabel.setText("Кто может получить")
         self.firstRightsCheckBox.setChecked(False)
         self.secondRightsCheckBox.setChecked(False)
@@ -1208,23 +1207,23 @@ class MainWindow(QMainWindow):
         self.searchByFourthRightsCheckBox.setText("главным инженерам")
         self.searchByPosFromLeftSpinBox.setValue(1)
         self.searchByHeightSpinBox.setValue(1)
-    def addEqOrUser2(self):
+    def addEqOrUser(self):
         codeError = -1
         tg = 0
-        if self.nameOrEmailLineEdit.text() == "":
+        addUs = False
+        chUs = False
+        addEq = False
+        chEq = False
+        getReq = False
+        if codeError==-1 and self.nameOrEmailLineEdit.text() == "":
             codeError = 1
-        if self.__addingEq and self.descriptionTextEdit.toPlainText() == "":
+        if codeError==-1 and self.__addingEq and self.descriptionTextEdit.toPlainText() == "":
             codeError = 3
-        if not self.__addingEq and self.IdCardLineEdit.text() == "":
+        if codeError==-1 and not self.__addingEq and self.IdCardLineEdit.text() == "":
             codeError = 4
-        if not self.radioButton_User.isChecked() and (not self.radioButton_Admin.isChecked()):
+        if codeError==-1 and (not self.radioButton_User.isChecked()) and (not self.radioButton_Admin.isChecked()) and (not self.__addingEq):
             codeError = 6
-        addUs=False
-        chUs=False
-        addEq=False
-        chEq=False
-        getReq=False
-        if self.radioButton_Admin.isChecked():
+        if codeError==-1 and self.radioButton_Admin.isChecked():
             if self.adminRightsCheckBox.isChecked():
                 addUs=True
             if self.admin2RightsCheckBox.isChecked():
@@ -1237,47 +1236,49 @@ class MainWindow(QMainWindow):
                 getReq= True
             if (not addUs) and (not chEq) and (not chUs)and (addEq) and (getReq):
                 codeError=5
-        if self.radioButton_User.isChecked():
+        if codeError==-1 and self.radioButton_User.isChecked():
             addUs = False
             chUs = False
             addEq = False
             chEq = False
             getReq = False
-        if self.firstRightsCheckBox.isChecked():
+        if codeError==-1 and self.firstRightsCheckBox.isChecked():
             tg += 1
-        if self.secondRightsCheckBox.isChecked():
+        if codeError==-1 and self.secondRightsCheckBox.isChecked():
             tg += 10
-        if self.thirdRightsCheckBox_3.isChecked():
+        if codeError==-1 and self.thirdRightsCheckBox_3.isChecked():
             tg += 100
-        if self.fourthRightsCheckBox.isChecked():
+        if codeError==-1 and self.fourthRightsCheckBox.isChecked():
             tg += 1000
-        if tg == 0:
+        if codeError==-1 and tg == 0:
             codeError = 2
-        if not self.__addingEq:
-            if self.__user_list.get_user_by_id(int([self.IdCardLineEdit.text()][16])) or self.__user_list.get_admin_by_id(int([self.IdCardLineEdit.text()][16])):
+        """if codeError==-1 and not self.__addingEq:
+            if codeError==-1 and self.__user_list.check_user_by_id(int(self.IdCardLineEdit.text(),16)):
                 codeError=7
+                print("codeerror 7")
                 self.IdCardLineEdit.setText("")
-            if self.__user_list.get_user_by_mail(str(self.nameOrEmailLineEdit.text())) or self.__user_list.get_admin_by_mail(str(self.nameOrEmailLineEdit.text())):
+            if codeError==-1 and self.__user_list.check_user_by_mail(self.nameOrEmailLineEdit.text()):
                 codeError=8
+                print("codeerror 8")
                 self.nameOrEmailLineEdit.setText("")
         else:
-            if self.__db.get_equipment_by_title(str(self.nameOrEmailLineEdit.text())):
-                codeError=8
+            if codeError==-1 and self.__db.get_equipment_by_title(self.nameOrEmailLineEdit.text()):
+                codeError=8"""
         if codeError == -1:
             if(self.__addingEq):
                 eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
                            self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, self.heightSpinBox.value(),
                            self.posFromLeftSpinBox.value())
-                #self.__db.add_equipment(eq)
+                self.__db.add_equipment(eq)
             else:
                 if self.radioButton_User.isChecked():
                     ac = Access(tg)
-                    us = CommonUser(int([self.IdCardLineEdit.text()][16]), str(self.nameOrEmailLineEdit.text()), ac)
-                    #self.__db.add_user(us)
+                    us = CommonUser(int(self.IdCardLineEdit.text(),16), str(self.nameOrEmailLineEdit.text()), ac)
+                    self.__user_list.append_user(us)
                 if self.radioButton_Admin.isChecked():
                     ac =AdminAccess(tg,addUs,chUs,addEq,chEq, getReq)
-                    adm=Admin(int([self.IdCardLineEdit.text()][16]), str(self.nameOrEmailLineEdit.text()),"", ac)
-                    #self.__db.add_admin(adm)
+                    adm=Admin(int(self.IdCardLineEdit.text(),16), str(self.nameOrEmailLineEdit.text()),"", ac)
+                    self.__user_list.append_user(adm)
             self.heightSpinBox.setValue(-1)
             self.posFromLeftSpinBox.setValue(-1)
             self.firstRightsCheckBox.setChecked(False)
@@ -1287,7 +1288,6 @@ class MainWindow(QMainWindow):
             self.nameOrEmailLineEdit.setText("")
             self.descriptionTextEdit.setText("")
             self.IdCardLineEdit.setText("")
-
         else:
             if codeError == 1:
                 if self.__addingEq:
@@ -1314,3 +1314,10 @@ class MainWindow(QMainWindow):
                     self.showMessage("Ошибка добавления","Оборудование с таким названием уже есть в базе")
                 else:
                     self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
+    def viewEqOrUser(self):
+        if self.__viewingEq:
+            allEq=self.__db.get_all_equipment()
+            listText=""
+            for i in allEq:
+                listText+="ID: "+i.id+"; название: "+i.title+"; доступно: "+i.count+"; В резерве: "+i.reserve_count +\
+                          " \nКод требований для получ.: "+i.access+"\n Расположение(от левого края, от пола) :("+ i.x+","+i.y+")\n \n"

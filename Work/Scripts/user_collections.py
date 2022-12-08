@@ -42,10 +42,11 @@ class UserCollection:
         return self.__objects.get(user_id)
 
     def check_user_by_id(self, user_id: int) -> bool:
-        if self.__objects.get(user_id):
-            return True
-        else:
-            return False
+        for i in self.__objects.values():
+            if i.id == user_id:
+                return True
+            else:
+                return False
 
     def get_user_by_mail(self, user_mail: str) -> CommonUser | Admin:
         for i in self.__objects.values():

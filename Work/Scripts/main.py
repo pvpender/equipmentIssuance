@@ -17,15 +17,15 @@ session = Session(engine)
 db = DataBase(session)
 m = db.get_all_users()
 print(m[0][1].power)
-#zero_admin = Admin(1, "superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
+zero_admin = Admin(1, "superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
 user_list = UserCollection(db)
-#user_list.append_user(zero_admin)
+user_list.append_user(zero_admin)
 
 mas = user_list.get_user_list()
 print(user_list.count)
 
 
-#app = QApplication([])
+app = QApplication([])
 
 
 window = LogWindow(user_list, db)
