@@ -1321,3 +1321,12 @@ class MainWindow(QMainWindow):
             for i in allEq:
                 listText+="ID: "+i.id+"; название: "+i.title+"; доступно: "+i.count+"; В резерве: "+i.reserve_count +\
                           " \nКод требований для получ.: "+i.access+"\n Расположение(от левого края, от пола) :("+ i.x+","+i.y+")\n \n"
+        else:
+            listText=""
+            for i in self.__user_list.get_user_list():
+                listText += "ID: " + i.id + "; Почта: " + i.email + "; Права на получение оборудования: " + i.access.power + ";  \n"
+                if i.access.can_add_users or i.access.can_get_request or i.access.can_add_inventory or i.access.can_change_users or i.access.can_change_inventory:
+                    listText+="Право на добавление инвентаря: " +i.access.can_add_inventory + "\n Право на редактирование инвентаря: " + i.access.can_change_inventory +\
+                    "\n Право на добавление пользователей: " + i.access.can_add_users + "Право на редактирование пользователей: " + i.access.can_change_users +\
+                    "\n Право на обработку запросов: " + i.access.can_get_request+" \n"
+
