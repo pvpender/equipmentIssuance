@@ -1326,14 +1326,15 @@ class MainWindow(QMainWindow):
             allEq=self.__db.get_all_equipment()
             listText=""
             for i in allEq:
-                listText+="ID: "+i.id+"; название: "+i.title+"; доступно: "+i.count+"; В резерве: "+i.reserve_count +\
-                          " \nКод требований для получ.: "+i.access+"\n Расположение(от левого края, от пола) :("+ i.x+","+i.y+")\n \n"
+                listText+="ID: "+str(i.id)+"; название: "+str(i.title)+"; доступно: "+str(i.count)+"; В резерве: "+str(i.reserve_count) +\
+                          " \nКод требований для получ.: "+str(i.access)+"\n Расположение(от левого края, от пола) :("+ str(i.x)+","+str(i.y)+")\n \n"
             self.listView.setText(listText)
         else:
             listText=""
+            ref=AdminAccess
             for i in self.__user_list.get_user_list():
-                listText += "ID: " + str(i.id) + "; Почта: " + str(i.mail) + "; Права на получение оборудования: " + str(i.access.power) + ";  \n"
-                if i.access.can_add_users or i.access.can_get_request or i.access.can_add_inventory or i.access.can_change_users or i.access.can_change_inventory:
+                listText += "ID: " + str(hex(i.id)) + "; Почта: " + i.mail + "; Права на получение оборудования: " + str(i.access.power) + ";  \n"
+                if type(i.access)==type(ref):
                     listText+="Право на добавление инвентаря: " +str(i.access.can_add_inventory) + "\n Право на редактирование инвентаря: " + str(i.access.can_change_inventory) +\
                     "\n Право на добавление пользователей: " + str(i.access.can_add_users) + "Право на редактирование пользователей: " + str(i.access.can_change_users) +\
                     "\n Право на обработку запросов: " + str(i.access.can_get_request)+" \n"
