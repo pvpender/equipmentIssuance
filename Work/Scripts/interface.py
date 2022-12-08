@@ -1332,10 +1332,10 @@ class MainWindow(QMainWindow):
         else:
             listText=""
             for i in self.__user_list.get_user_list():
-                listText += "ID: " + i.id + "; Почта: " + i.email + "; Права на получение оборудования: " + i.access.power + ";  \n"
+                listText += "ID: " + str(i.id) + "; Почта: " + str(i.mail) + "; Права на получение оборудования: " + str(i.access.power) + ";  \n"
                 if i.access.can_add_users or i.access.can_get_request or i.access.can_add_inventory or i.access.can_change_users or i.access.can_change_inventory:
-                    listText+="Право на добавление инвентаря: " +i.access.can_add_inventory + "\n Право на редактирование инвентаря: " + i.access.can_change_inventory +\
-                    "\n Право на добавление пользователей: " + i.access.can_add_users + "Право на редактирование пользователей: " + i.access.can_change_users +\
-                    "\n Право на обработку запросов: " + i.access.can_get_request+" \n"
+                    listText+="Право на добавление инвентаря: " +str(i.access.can_add_inventory) + "\n Право на редактирование инвентаря: " + str(i.access.can_change_inventory) +\
+                    "\n Право на добавление пользователей: " + str(i.access.can_add_users) + "Право на редактирование пользователей: " + str(i.access.can_change_users) +\
+                    "\n Право на обработку запросов: " + str(i.access.can_get_request)+" \n"
             self.listView.setText(listText)
 

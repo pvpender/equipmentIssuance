@@ -29,7 +29,7 @@ class UserCollection:
 
     def append_user(self, user: CommonUser | Admin):
         try:
-            if type(user) == type(CommonUser):
+            if isinstance(user, CommonUser):
                 self.__db.add_user(user)
             else:
                 self.__db.add_admin(user)
@@ -52,13 +52,15 @@ class UserCollection:
         for i in self.__objects.values():
             if i.mail == user_mail:
                 return i
+
     def check_user_by_mail(self, user_mail: str) -> bool:
         for i in self.__objects.values():
             if i.mail == user_mail:
                 return True
         return False
+
     def change_user(self, user_id: int, mail: str, user: CommonUser | Admin):
-        if type(user) == type(CommonUser):
+        if isinstance(user, CommonUser):
             self.__db.update_user(user_id, mail, user)
         else:
             self.__db.update_admin(user_id, mail, user)
@@ -66,7 +68,7 @@ class UserCollection:
         self.__objects.update({user.id: user})
 
     def del_user(self, user_id: str):
-        if type(self.__objects[user_id]) == type(CommonUser):
+        if isinstance(self.__objects[user_id], CommonUser):
             self.__db.delete_user(self.__objects[user_id])
         else:
             self.__db.delete_admin(self.__objects[user_id])
