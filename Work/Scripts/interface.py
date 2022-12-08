@@ -784,7 +784,7 @@ class MainWindow(QMainWindow):
         self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(0, 0, 1181, 921))
+        self.groupBox.setGeometry(QtCore.QRect(0, 0, 1571, 921))
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.addSmthBox = QtWidgets.QGroupBox(self.groupBox)
@@ -869,7 +869,7 @@ class MainWindow(QMainWindow):
         self.rightsLabel_2.setGeometry(QtCore.QRect(20, 0, 81, 16))
         self.rightsLabel_2.setObjectName("rightsLabel_2")
         self.inventoryWidgetsGroupBox = QtWidgets.QGroupBox(self.addSmthBox)
-        self.inventoryWidgetsGroupBox.setGeometry(QtCore.QRect(0, 210, 401, 181))
+        self.inventoryWidgetsGroupBox.setGeometry(QtCore.QRect(0, 220, 401, 181))
         self.inventoryWidgetsGroupBox.setTitle("")
         self.inventoryWidgetsGroupBox.setObjectName("inventoryWidgetsGroupBox")
         self.label_5 = QtWidgets.QLabel(self.inventoryWidgetsGroupBox)
@@ -902,6 +902,9 @@ class MainWindow(QMainWindow):
         self.posFromLeftSpinBox = QtWidgets.QSpinBox(self.inventoryWidgetsGroupBox)
         self.posFromLeftSpinBox.setGeometry(QtCore.QRect(320, 150, 71, 22))
         self.posFromLeftSpinBox.setObjectName("posFromLeftSpinBox")
+        self.radioButton_setPos = QtWidgets.QRadioButton(self.inventoryWidgetsGroupBox)
+        self.radioButton_setPos.setGeometry(QtCore.QRect(100, 130, 221, 20))
+        self.radioButton_setPos.setObjectName("radioButton_setPos")
         self.user_buttons_groupBox = QtWidgets.QGroupBox(self.groupBox)
         self.user_buttons_groupBox.setGeometry(QtCore.QRect(0, 40, 371, 211))
         self.user_buttons_groupBox.setTitle("")
@@ -928,11 +931,8 @@ class MainWindow(QMainWindow):
         self.requestsButton.setObjectName("requestsButton")
         self.usersLayout.addWidget(self.requestsButton)
         self.viewInvOrUserBox = QtWidgets.QGroupBox(self.groupBox)
-        self.viewInvOrUserBox.setGeometry(QtCore.QRect(370, 30, 661, 341))
+        self.viewInvOrUserBox.setGeometry(QtCore.QRect(370, 30, 751, 381))
         self.viewInvOrUserBox.setObjectName("viewInvOrUserBox")
-        self.listView = QtWidgets.QListView(self.viewInvOrUserBox)
-        self.listView.setGeometry(QtCore.QRect(400, 30, 251, 311))
-        self.listView.setObjectName("listView")
         self.searchByIdLabel = QtWidgets.QLabel(self.viewInvOrUserBox)
         self.searchByIdLabel.setGeometry(QtCore.QRect(10, 30, 21, 16))
         self.searchByIdLabel.setObjectName("searchByIdLabel")
@@ -990,8 +990,11 @@ class MainWindow(QMainWindow):
         self.searchPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox)
         self.searchPushButton.setGeometry(QtCore.QRect(20, 260, 351, 28))
         self.searchPushButton.setObjectName("searchPushButton")
+        self.listView = QtWidgets.QTextBrowser(self.viewInvOrUserBox)
+        self.listView.setGeometry(QtCore.QRect(400, 30, 351, 351))
+        self.listView.setObjectName("listView")
         self.RequestsGroupBox = QtWidgets.QGroupBox(self.groupBox)
-        self.RequestsGroupBox.setGeometry(QtCore.QRect(370, 40, 801, 241))
+        self.RequestsGroupBox.setGeometry(QtCore.QRect(370, 20, 801, 241))
         self.RequestsGroupBox.setObjectName("RequestsGroupBox")
         self.textBrowser = QtWidgets.QTextBrowser(self.RequestsGroupBox)
         self.textBrowser.setGeometry(QtCore.QRect(20, 50, 341, 111))
@@ -1046,6 +1049,7 @@ class MainWindow(QMainWindow):
         self.label_6.setText(_translate("MainWindow", "Описание"))
         self.label_26.setText(_translate("MainWindow", "Высота(от пола)"))
         self.label_27.setText(_translate("MainWindow", "Номер от левого края"))
+        self.radioButton_setPos.setText(_translate("MainWindow", "Указать расположение в шкафу"))
         self.addUserButton.setText(_translate("MainWindow", "Добавить пользователя"))
         self.changeUserInfButton.setText(
             _translate("MainWindow", "Просмотр и редактирование информации о пользователях"))
@@ -1108,6 +1112,7 @@ class MainWindow(QMainWindow):
         self.searchByPosGroupBox.hide()
         self.RequestsGroupBox.hide()
         self.IdCardLineEdit.hide()
+        self.listView.clear()
     def showReqBox(self):
         self.hideEverything()
         self.RequestsGroupBox.show()
@@ -1187,6 +1192,7 @@ class MainWindow(QMainWindow):
         self.searchBySecondRightsCheckBox.setText("Редактор-модератор")
         self.searchByThirdRightsCheckBox.setText("Инженер")
         self.searchByFourthRightsCheckBox.setText("Главный инженер")
+        self.viewEqOrUser()
     def openEqViewer(self):
         self.__viewingEq=True
         self.hideEverything()
@@ -1207,6 +1213,7 @@ class MainWindow(QMainWindow):
         self.searchByFourthRightsCheckBox.setText("главным инженерам")
         self.searchByPosFromLeftSpinBox.setValue(1)
         self.searchByHeightSpinBox.setValue(1)
+        self.viewEqOrUser()
     def addEqOrUser(self):
         codeError = -1
         tg = 0
@@ -1321,6 +1328,7 @@ class MainWindow(QMainWindow):
             for i in allEq:
                 listText+="ID: "+i.id+"; название: "+i.title+"; доступно: "+i.count+"; В резерве: "+i.reserve_count +\
                           " \nКод требований для получ.: "+i.access+"\n Расположение(от левого края, от пола) :("+ i.x+","+i.y+")\n \n"
+            self.listView.setText(listText)
         else:
             listText=""
             for i in self.__user_list.get_user_list():
@@ -1329,4 +1337,5 @@ class MainWindow(QMainWindow):
                     listText+="Право на добавление инвентаря: " +i.access.can_add_inventory + "\n Право на редактирование инвентаря: " + i.access.can_change_inventory +\
                     "\n Право на добавление пользователей: " + i.access.can_add_users + "Право на редактирование пользователей: " + i.access.can_change_users +\
                     "\n Право на обработку запросов: " + i.access.can_get_request+" \n"
+            self.listView.setText(listText)
 
