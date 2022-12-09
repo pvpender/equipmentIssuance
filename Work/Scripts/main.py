@@ -14,12 +14,12 @@ import pymysql
 
 engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 Base.metadata.create_all(engine)
-sqlalchemy.pool_recycle = 299
+sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
 session = Session(engine)
 db = DataBase(session)
 m = db.get_all_users()
-print(m[0][1].power)
+#print(m[0][1].power)
 zero_admin = Admin(1, "superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
 user_list = UserCollection(db)
 user_list.append_user(zero_admin)
