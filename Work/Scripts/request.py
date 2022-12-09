@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from accesses import*
 class Request():
-    def __init__(self, senderId:str, what:str, howMany:int, purpose:str):
+    def __init__(self, senderId:str, what:str, howMany:int, purpose:str, time:datetime):
         super().__init__()
         self.__what=what
         self.__howMany=howMany
@@ -10,6 +12,7 @@ class Request():
         self.__isRejected=False
         self.__whoApprovedId=""
         self.__purpose=purpose
+        self.__time=time
 
     @property
     def isSolved(self)-> bool:
@@ -32,6 +35,9 @@ class Request():
     @property
     def howMany(self)-> int:
         return self.__howMany
+    @property
+    def when(self)-> datetime:
+        return self.__time
     def Approved(self, adminsId: str):
         self.__isSolved = True
         self.__isApproved=True
