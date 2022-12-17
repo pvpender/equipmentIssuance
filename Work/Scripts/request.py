@@ -1,8 +1,6 @@
-from accesses import*
-
 
 class Request:
-    def __init__(self, sender_id: str, what: str, count: int, purpose: str):
+    def __init__(self, sender_id: int, what: str, count: int, purpose: str):
         super().__init__()
         self.__what = what
         self.__count = count
@@ -10,7 +8,7 @@ class Request:
         self.__solved = False
         self.__approved = False
         self.__rejected = False
-        self.__approved_id = ""
+        self.__approved_id = 0
         self.__purpose = purpose
 
     @property
@@ -34,7 +32,7 @@ class Request:
         return self.__purpose
 
     @property
-    def sender_id(self) -> str:
+    def sender_id(self) -> int:
         return self.__sender_id
 
     @property
@@ -50,3 +48,5 @@ class Request:
         self.__solved = True
         self.__rejected = True
         self.__approved_id = admin_id
+
+

@@ -704,6 +704,8 @@ from database import*
 from accesses import*
 from users import *
 from accesses import *
+
+
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
@@ -754,25 +756,26 @@ class LogWindow(QMainWindow):
 
     def login(self):
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
-        #if user and user.password == self.__password_field.text():
-        self.hide()
-        self.__main_window = MainWindow(self.__user_list, user, self.__db)
-        #else:
-            #self.__label.setText("Введены неверные данные!")
-            #self.__password_field.setText("")
+        if isinstance(user, Admin) and user.password == self.__password_field.text():
+            self.hide()
+            self.__main_window = MainWindow(self.__user_list, user, self.__db, user.access)
+        else:
+            self.__label.setText("Введены неверные данные!")
+            self.__password_field.setText("")
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, user_list: UserCollection, current_user, db: DataBase):
+    def __init__(self, user_list: UserCollection, current_user, db: DataBase, admin_access: AdminAccess):
         super(MainWindow, self).__init__()
         self.setWindowTitle("App")
         self.setFixedSize(1280, 720)
         self.setStyleSheet("background-color:#F0F8FF;")
         self.__current_user = current_user
         self.__user_list = user_list
-        self.__db=db
-        self.__addingEq=False #либо добавляет оборудование, либо пользователя
-        self.__viewingEq=False #аналогично с просмотром
+        self.__db = db
+        self.__addingEq = False         # либо добавляет оборудование, либо пользователя
+        self.__viewingEq = False        # аналогично с просмотром
+        self.__admin_access = admin_access       # Права админа, зашедшего в приложение
         # self.__sidePanel = QFrame(self)
         # self.__sidePanel.setFixedSize(200, 720)
         # self.__sidePanel.setStyleSheet("background-color:#FFFFFF;")
