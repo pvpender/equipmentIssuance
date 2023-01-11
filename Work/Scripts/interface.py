@@ -697,6 +697,10 @@ def openEqViewer(self):
                 self.showMessage("Ошибка добавления", "не добавлены права администратора")
 """
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox
+
+from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex
+from PySide6.QtGui import QColor
+
 from PyQt6 import QtCore, QtGui, QtWidgets
 from user_collections import *
 from equipment import*
@@ -993,9 +997,12 @@ class MainWindow(QMainWindow):
         self.searchPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox)
         self.searchPushButton.setGeometry(QtCore.QRect(20, 260, 351, 28))
         self.searchPushButton.setObjectName("searchPushButton")
-        self.listView = QtWidgets.QTextBrowser(self.viewInvOrUserBox)
-        self.listView.setGeometry(QtCore.QRect(400, 30, 351, 351))
-        self.listView.setObjectName("listView")
+        # self.listView = QtWidgets.QTextBrowser(self.viewInvOrUserBox)
+        # self.listView.setGeometry(QtCore.QRect(400, 30, 351, 351))
+        # self.listView.setObjectName("listView")
+        self.tableView = QtWidgets.QTableView(self.viewInvOrUserBox)
+        self.tableView.setGeometry(QtCore.QRect(400, 30, 351, 351))
+        self.tableView.setObjectName("tableView")
         self.RequestsGroupBox = QtWidgets.QGroupBox(self.groupBox)
         self.RequestsGroupBox.setGeometry(QtCore.QRect(370, 20, 801, 241))
         self.RequestsGroupBox.setObjectName("RequestsGroupBox")
@@ -1115,7 +1122,7 @@ class MainWindow(QMainWindow):
         self.searchByPosGroupBox.hide()
         self.RequestsGroupBox.hide()
         self.IdCardLineEdit.hide()
-        self.listView.clear()
+        #self.listView.clear()
     def showReqBox(self):
         self.hideEverything()
         self.RequestsGroupBox.show()
@@ -1327,19 +1334,60 @@ class MainWindow(QMainWindow):
     def viewEqOrUser(self):
         if self.__viewingEq:
             allEq=self.__db.get_all_equipment()
-            listText=""
+            data = []
             for i in allEq:
-                listText+="ID: "+str(i.id)+"; название: "+str(i.title)+"; доступно: "+str(i.count)+"; В резерве: "+str(i.reserve_count) +\
-                          " \nКод требований для получ.: "+str(i.access)+"\n Расположение(от левого края, от пола) :("+ str(i.x)+","+str(i.y)+")\n \n"
-            self.listView.setText(listText)
+                # listText+="ID: "+str(i.id)+"; название: "+str(i.title)+"; доступно: "+str(i.count)+"; В резерве: "+str(i.reserve_count) +\
+                #           " \nКод требований для получ.: "+str(i.access)+"\n Расположение(от левого края, от пола) :("+ str(i.x)+","+str(i.y)+")\n \n"
+                data.append([
+                    str(i.id),
+                    str(i.title),
+                    str(i.count),
+                    str(i.reserve_count),
+                    str(i.access),
+                    str(i.x),
+                    str(i.y)
+                ])
+            #self.listView.setText(listText)
+            model = TableModel(data)
+            self.tableView.setModel(model)
         else:
             listText=""
             ref=AdminAccess
+            data = []
             for i in self.__user_list.get_user_list():
-                listText += "ID: " + str(hex(i.id)) + "; Почта: " + i.mail + "; Права на получение оборудования: " + str(i.access.power) + ";  \n"
-                if type(i.access)==type(ref):
-                    listText+="Право на добавление инвентаря: " +str(i.access.can_add_inventory) + "\n Право на редактирование инвентаря: " + str(i.access.can_change_inventory) +\
-                    "\n Право на добавление пользователей: " + str(i.access.can_add_users) + "Право на редактирование пользователей: " + str(i.access.can_change_users) +\
-                    "\n Право на обработку запросов: " + str(i.access.can_get_request)+" \n"
-            self.listView.setText(listText)
+                data.append([
+                    str(hex(i.id)),
+                    i.mail,
+                    i.access.power
+                ])
+                #listText += "ID: " + str(hex(i.id)) + "; Почта: " + i.mail + "; Права на получение оборудования: " + str(i.access.power) + ";  \n"
+                #if type(i.access)==type(ref):
+                    # listText+="Право на добавление инвентаря: " +str(i.access.can_add_inventory) + "\n Право на редактирование инвентаря: " + str(i.access.can_change_inventory) +\
+                    # "\n Право на добавление пользователей: " + str(i.access.can_add_users) + "Право на редактирование пользователей: " + str(i.access.can_change_users) +\
+                    # "\n Право на обработку запросов: " + str(i.access.can_get_request)+" \n"
+            #self.listView.setText(listText)
+            model = TableModel(data)
+            self.tableView.setModel(model)
+
+
+class TableModel(QtCore.QAbstractTableModel):
+    def __init__(self, data):
+        super(TableModel, self).__init__()
+        self._data = data
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            # See below for the nested-list data structure.
+            # .row() indexes into the outer list,
+            # .column() indexes into the sub-list
+            return self._data[index.row()][index.column()]
+
+    def rowCount(self, index):
+        # The length of the outer list.
+        return len(self._data)
+
+    def columnCount(self, index):
+        # The following takes the first sub-list, and returns
+        # the length (only works if all rows are an equal length)
+        return len(self._data[0])
 
