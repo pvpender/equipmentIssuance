@@ -1,48 +1,52 @@
-from datetime import datetime
 
-from accesses import*
-class Request():
-    def __init__(self, senderId:str, what:str, howMany:int, purpose:str, time:datetime):
+class Request:
+    def __init__(self, sender_id: int, what: str, count: int, purpose: str):
         super().__init__()
-        self.__what=what
-        self.__howMany=howMany
-        self.__senderid=senderId
-        self.__isSolved=False
-        self.__isApproved=False
-        self.__isRejected=False
-        self.__whoApprovedId=""
-        self.__purpose=purpose
-        self.__time=time
+        self.__what = what
+        self.__count = count
+        self.__sender_id = sender_id
+        self.__solved = False
+        self.__approved = False
+        self.__rejected = False
+        self.__approved_id = 0
+        self.__purpose = purpose
 
     @property
-    def isSolved(self)-> bool:
-        return self.isSolved
+    def solved(self) -> bool:
+        return self.__solved
+
     @property
-    def isApproved(self)-> bool:
-        return self.__isApproved
+    def approved(self) -> bool:
+        return self.__approved
+
     @property
-    def isRejected(self)->bool:
-        return self.__isRejected
+    def rejected(self) -> bool:
+        return self.__rejected
+
     @property
-    def what(self)-> str:
+    def what(self) -> str:
         return self.__what
+
     @property
     def purpose(self) -> str:
         return self.__purpose
+
     @property
-    def senderId(self) -> str:
-        return self.__senderid
+    def sender_id(self) -> int:
+        return self.__sender_id
+
     @property
-    def howMany(self)-> int:
-        return self.__howMany
-    @property
-    def when(self)-> datetime:
-        return self.__time
-    def Approved(self, adminsId: str):
-        self.__isSolved = True
-        self.__isApproved=True
-        self.__whoApproved=adminsId
-    def Rejected(self, adminsId: str):
-        self.__isSolved = True
-        self.__isRejected=True
-        self.__whoApproved=adminsId
+    def count(self) -> int:
+        return self.__count
+
+    def approve(self, admin_id: str):
+        self.__solved = True
+        self.__approved = True
+        self.__approved_id = admin_id
+
+    def reject(self, admin_id: str):
+        self.__solved = True
+        self.__rejected = True
+        self.__approved_id = admin_id
+
+
