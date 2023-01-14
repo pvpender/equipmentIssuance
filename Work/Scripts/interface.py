@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
     def __init__(self, user_list: UserCollection, current_user, db: DataBase, admin_access: AdminAccess):
         super(MainWindow, self).__init__()
         self.setWindowTitle("App")
-        self.setFixedSize(1500, 1000)
+        self.setFixedSize(1550, 1000)
         self.setStyleSheet("background-color:#F0F8FF;")
         self.__current_user = current_user
         self.__user_list = user_list
@@ -297,7 +297,7 @@ class MainWindow(QMainWindow):
         self.searchPushButton.setGeometry(QtCore.QRect(20, 260, 351, 28))
         self.searchPushButton.setObjectName("searchPushButton")
         self.tableView = QtWidgets.QTableView(self.viewInvOrUserBox)
-        self.tableView.setGeometry(QtCore.QRect(450, 30, 701, 571))
+        self.tableView.setGeometry(QtCore.QRect(450, 30, 650, 571))
         self.tableView.setObjectName("tableView")
         self.RequestsGroupBox = QtWidgets.QGroupBox(self.groupBox)
         self.RequestsGroupBox.setGeometry(QtCore.QRect(440, 30, 1401, 621))
@@ -327,7 +327,7 @@ class MainWindow(QMainWindow):
         self.label_8.setGeometry(QtCore.QRect(540, 110, 131, 16))
         self.label_8.setObjectName("label_8")
         self.tableView2 = QtWidgets.QTableView(self.RequestsGroupBox)
-        self.tableView2.setGeometry(QtCore.QRect(690, 50, 711, 551))
+        self.tableView2.setGeometry(QtCore.QRect(660, 50, 430, 551))
         self.tableView2.setObjectName("tableView2")
         self.setCentralWidget(self.centralwidget)
         _translate = QtCore.QCoreApplication.translate
@@ -444,7 +444,7 @@ class MainWindow(QMainWindow):
         model.setHeaderData(3, Qt.Orientation.Horizontal, "Цель")
         model.setHeaderData(4, Qt.Orientation.Horizontal, "ID запросившего")
         model.setHeaderData(5, Qt.Orientation.Horizontal, "EMAIL запросившего")
-     #   self.tableView2.setModel(model)
+        self.tableView2.setModel(model)
         self.RequestsGroupBox.show()
     def showMenuButtons(self):
         if self.user_buttons_groupBox.isVisible():
@@ -541,8 +541,8 @@ class MainWindow(QMainWindow):
         self.searchBySecondRightsCheckBox.setText("Искл. в рамках проекта")
         self.searchByThirdRightsCheckBox.setText("только инженерам")
         self.searchByFourthRightsCheckBox.setText("главным инженерам")
-        self.searchByPosFromLeftSpinBox.setValue(1)
-        self.searchByHeightSpinBox.setValue(1)
+        self.searchByPosFromLeftSpinBox.setValue(-1)
+        self.searchByHeightSpinBox.setValue(-1)
         self.viewEqOrUser()
     def addEqOrUser(self):
         codeError = -1
@@ -591,9 +591,15 @@ class MainWindow(QMainWindow):
             codeError = 2
         if codeError == -1:
             if(self.__addingEq):
+                fromLeft=self.posFromLeftSpinBox.value()
+                if self.posFromLeftSpinBox.value()==0 or self.posFromLeftSpinBox.value()==-1:
+                    fromLeft=-1
+                height=self.heightSpinBox.value()
+                if self.heightSpinBox.value()==0 or self.heightSpinBox.value()==-1:
+                    height=-1
                 eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
-                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, self.heightSpinBox.value(),
-                           self.posFromLeftSpinBox.value())
+                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, height,
+                           fromLeft)
                 self.__db.add_equipment(eq)
             else:
                 if self.radioButton_User.isChecked():
@@ -723,3 +729,20 @@ class TableModel(QtCore.QAbstractTableModel):
         # The following takes the first sub-list, and returns
         # the length (only works if all rows are an equal length)
         return len(self._data[0])
+    def search(self, s):
+        pass
+        """
+        # Clear current selection.
+        self.setCurrentItem(None)
+
+        if not s:
+            # Empty string, don't search.
+            return
+
+        matching_items = self.table.findItems(s, Qt.MatchContains)
+        if matching_items:
+            # We have found something.
+            for item in matching_items:
+                item.setSelected(True)
+
+"""
