@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox
-from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex
-from PySide6.QtGui import QColor
+from PyQt6.QtCore import Qt
 from PyQt6 import QtCore, QtGui, QtWidgets
 from user_collections import *
 from equipment import*
@@ -8,6 +7,7 @@ from database import*
 from accesses import*
 from users import *
 from accesses import *
+import pandas as pd
 
 
 class LogWindow(QMainWindow):
@@ -433,17 +433,14 @@ class MainWindow(QMainWindow):
                 str(i.title),
                 str(i.count),
                 str(i.purpose),
-                str(hex(i.sender_id)),
-                #str(self.__db.get_user_by_id(i.sender_id).mail)
+                str(hex(i.sender_tg_id)),
+                str(i.sender_mail)
             ])
-        model = TableModel(data)
-        model.horizontalHeaders = [''] * 6
-        model.setHeaderData(0, Qt.Orientation.Horizontal, "ID")
-        model.setHeaderData(1, Qt.Orientation.Horizontal, "Что")
-        model.setHeaderData(2, Qt.Orientation.Horizontal, "Сколько")
-        model.setHeaderData(3, Qt.Orientation.Horizontal, "Цель")
-        model.setHeaderData(4, Qt.Orientation.Horizontal, "ID запросившего")
-        model.setHeaderData(5, Qt.Orientation.Horizontal, "EMAIL запросившего")
+        data_frame = pd.DataFrame(data,
+                                  columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
+                                  index=[i for i in range(len(data))]
+                                  )
+        model = TableModel(data_frame)
         self.tableView2.setModel(model)
         self.RequestsGroupBox.show()
     def showMenuButtons(self):
@@ -669,19 +666,15 @@ class MainWindow(QMainWindow):
                     x,
                     y
                 ])
-            model = TableModel(data)
-            model.horizontalHeaders = [''] * 3
-            model.setHeaderData(0, Qt.Orientation.Horizontal, "ID")
-            model.setHeaderData(1, Qt.Orientation.Horizontal, "Название")
-            model.setHeaderData(2, Qt.Orientation.Horizontal, "Количество")
-            model.setHeaderData(3, Qt.Orientation.Horizontal, "Зарезервировано")
-            model.setHeaderData(4, Qt.Orientation.Horizontal, "Доступ")
-            model.setHeaderData(5, Qt.Orientation.Horizontal, "От стены")
-            model.setHeaderData(6, Qt.Orientation.Horizontal, "От пола")
+            data_frame = pd.DataFrame(data,
+                                      columns=["ID", "Название", "Количество", "Зарезервировано",
+                                               "Доступ", "От стены", "От пола"],
+                                      index=[i for i in range(len(data))])
+            model = TableModel(data_frame)
             self.tableView.setModel(model)
         else:
-            listText=""
-            ref=AdminAccess
+            listText = ""
+            ref = AdminAccess
             data = []
             for i in self.__user_list.get_user_list():
                 data.append([
@@ -689,60 +682,33 @@ class MainWindow(QMainWindow):
                     i.mail,
                     i.access.power
                 ])
-            model = TableModel(data)
-            model.horizontalHeaders = [''] * 3
-            model.setHeaderData(0, Qt.Orientation.Horizontal, "ID карты")
-            model.setHeaderData(1, Qt.Orientation.Horizontal, "Почта")
-            model.setHeaderData(2, Qt.Orientation.Horizontal, "Доступ")
+            data_frame = pd.DataFrame(data, columns=["ID карты", "Почта", "Доступ"],
+                                      index=[i for i in range(len(data))])
+            model = TableModel(data_frame)
             self.tableView.setModel(model)
+
+
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
-    def setHeaderData(self, section, orientation, data, role=Qt.EditRole):
-        if orientation == Qt.Orientation.Horizontal and role in (Qt.DisplayRole, Qt.EditRole):
-            try:
-                self.horizontalHeaders[section] = data
-                return True
-            except:
-                return False
-        return super().setHeaderData(section, orientation, data, role)
-    def headerData(self, section, orientation, role=Qt.DisplayRole):
-        if orientation == Qt.Orientation.Horizontal and role == Qt.DisplayRole:
-            try:
-                return self.horizontalHeaders[section]
-            except:
-                pass
-        return super().headerData(section, orientation, role)
+
     def data(self, index, role):
-        if role == Qt.DisplayRole:
-            # See below for the nested-list data structure.
-            # .row() indexes into the outer list,
-            # .column() indexes into the sub-list
-            return self._data[index.row()][index.column()]
+        if role == Qt.ItemDataRole.DisplayRole:
+            value = self._data.iloc[index.row(), index.column()]
+            return str(value)
 
     def rowCount(self, index):
-        # The length of the outer list.
-        return len(self._data)
+        return self._data.shape[0]
 
     def columnCount(self, index):
-        # The following takes the first sub-list, and returns
-        # the length (only works if all rows are an equal length)
-        return len(self._data[0])
-    def search(self, s):
-        pass
-        """
-        # Clear current selection.
-        self.setCurrentItem(None)
+        return self._data.shape[1]
 
-        if not s:
-            # Empty string, don't search.
-            return
+    def headerData(self, section, orientation, role):
+        # section is the index of the column/row.
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
+                return str(self._data.columns[section])
 
-        matching_items = self.table.findItems(s, Qt.MatchContains)
-        if matching_items:
-            # We have found something.
-            for item in matching_items:
-                item.setSelected(True)
-
-"""
+            if orientation == Qt.Orientation.Vertical:
+                return str(self._data.index[section])

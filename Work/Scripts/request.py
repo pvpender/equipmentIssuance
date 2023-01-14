@@ -1,10 +1,11 @@
 
 class Request:
-    def __init__(self, sender_id: int, what: str, count: int, purpose: str):
+    def __init__(self, sender_tg_id: int, sender_mail: str, what: str, count: int, purpose: str):
         super().__init__()
         self.__what = what
         self.__count = count
-        self.__sender_id = sender_id
+        self.__sender_id = sender_tg_id
+        self.__sender_mail = sender_mail
         self.__solved = False
         self.__approved = False
         self.__rejected = False
@@ -32,8 +33,12 @@ class Request:
         return self.__purpose
 
     @property
-    def sender_id(self) -> int:
+    def sender_tg_id(self) -> int:
         return self.__sender_id
+
+    @property
+    def sender_mail(self) -> str:
+        return self.__sender_mail
 
     @property
     def count(self) -> int:

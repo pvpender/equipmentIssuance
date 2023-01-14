@@ -71,6 +71,7 @@ class TelegramLogins(Base):
     __tablename__ = "telegram_logins"
     id = Column(Integer, primary_key=True)
     user_id = Column(BigInteger)
+    mail = Column(Text)
     power = Column(Integer)
 
 
@@ -87,7 +88,8 @@ class UserRequests(Base):
     title = Column(Text)
     count = Column(Integer)
     purpose = Column(Text)
-    sender_id = Column(Integer)
+    sender_tg_id = Column(Integer)
+    sender_mail = Column(Text)
     solved = Column(Boolean)
     approved = Column(Boolean)
     approved_id = Column(Integer)
@@ -336,23 +338,25 @@ class DataBase:
         return self.__session.query(TelegramLogins).filter(TelegramLogins.user_id == user_id).first()
 
     @__restart_if_except
-    def add_tg_user(self, user_id, power):
+    def add_tg_user(self, user_id, mail, power):
         db_user = TelegramLogins(
             user_id=user_id,
+            mail=mail,
             power=power
         )
         if not self.get_tg_user(user_id):
             self.__session.add(db_user)
         else:
             self.__session.query(TelegramLogins).filter(TelegramLogins.user_id == user_id).update(
-                {"power": power}
+                {"mail": mail, "power": power}
             )
         self.__session.commit()
 
     @__restart_if_except
     def add_request(self, request: req.Request):
         db_request = UserRequests(
-            sender_id=request.sender_id,
+            sender_id=request.sender_tg_id,
+            sender_mail=request.sender_mail,
             title=request.what,
             count=request.count,
             purpose=request.purpose
