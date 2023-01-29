@@ -381,8 +381,10 @@ class DataBase:
     @__restart_if_except
     def get_unsolved_requests(self):
         return self.__session.query(UserRequests).filter(UserRequests.solved is False).all()
+
     def get_first_unsolved_request(self):
         return self.__session.query(UserRequests).filter(UserRequests.solved is False).first()
+
     @__restart_if_except
     def add_last_request(self, user_id: int, title: str, description: str):
         self.__session.query(LastRequest).filter(LastRequest.user_id == user_id).delete()
@@ -398,12 +400,12 @@ class DataBase:
         return self.__session.query(LastRequest).filter(LastRequest.user_id == user_id).first()
 
     @__restart_if_except
-    def update_request(self, request: req.Request):
-        self.__session.query(Equipments).filter(UserRequests.sender_tg_id == request.sender_tg_id,
-                                                UserRequests.title == request.what,
-                                                UserRequests.solved is False).update(
+    def update_request(self, request: UserRequests):
+        self.__session.query(UserRequests).filter(UserRequests.sender_tg_id == request.sender_tg_id,
+                                                  UserRequests.title == request.title,
+                                                  UserRequests.solved is False).update(
             {
-            "solved": True,
-            "approved": request.approved,
-            "approved_id": request.approved_id
+                "solved": True,
+                "approved": request.approved,
+                "approved_id": request.approved_id
             })
