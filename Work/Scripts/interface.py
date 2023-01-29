@@ -79,6 +79,8 @@ class MainWindow(QMainWindow):
         self.__addingEq = False         # либо добавляет оборудование, либо пользователя
         self.__viewingEq = False        # аналогично с просмотром
         self.__admin_access = admin_access       # Права админа, зашедшего в приложение
+        self.__reqs=self.__db.get_unsolved_requests()
+        self.__reqnum=0
         # self.__sidePanel = QFrame(self)
         # self.__sidePanel.setFixedSize(200, 720)
         # self.__sidePanel.setStyleSheet("background-color:#FFFFFF;")
@@ -379,7 +381,7 @@ class MainWindow(QMainWindow):
         self.AcceptReqPushButton.setText(_translate("MainWindow", "Одобрить запрос"))
         self.pushButton_2.setText(_translate("MainWindow", "Отклонить запрос"))
         self.label_2.setText(_translate("MainWindow", "Информация по запросу"))
-        self.label_7.setText(_translate("MainWindow", "Информация из базы данных"))
+        self.label_7.setText(_translate("MainWindow", "Все запросы"))
         self.pushButton.setText(_translate("MainWindow", "Предыдущий"))
         self.pushButton_3.setText(_translate("MainWindow", "Следующий"))
         self.label_8.setText(_translate("MainWindow", "Необработанных:"))
@@ -394,6 +396,8 @@ class MainWindow(QMainWindow):
         self.radioButton_Admin.clicked.connect(self.adminRightsGroupBox.show)
         self.radioButton_User.clicked.connect(self.adminRightsGroupBox.hide)
         self.addUserOrInvButton.clicked.connect(self.addEqOrUser)
+        self.pushButton.clicked.connect(self.prevReq)
+        self.pushButton_3.clicked.connect(self.nextReq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.hideEverything()
@@ -427,6 +431,9 @@ class MainWindow(QMainWindow):
         self.hideEverything()
         allReq = self.__db.get_all_requests()
         data = []
+        #self.__reqs = self.__db.get_unsolved_requests()
+        self.__reqs=allReq
+        self.__reqnum = 0
         for i in allReq:
             data.append([
                 str(i.id),
@@ -442,7 +449,22 @@ class MainWindow(QMainWindow):
                                   )
         model = TableModel(data_frame)
         self.tableView2.setModel(model)
+        self.label_8.setText("Необработанных: "+ str(len(self.__reqs)))
+        self.getReq()
         self.RequestsGroupBox.show()
+    def prevReq(self):
+        if(self.__reqnum>0):
+            self.__reqnum=self.__reqnum-1
+            self.getReq()
+        else:
+            self.showMessage("Ошибка", "Запрос уже первый в списке")
+
+    def nextReq(self):
+        if(self.__reqnum<len(self.__reqs)):
+            self.__reqnum=self.__reqnum+1
+            self.getReq()
+        else:
+            self.showMessage("Ошибка", "Запрос последний в списке")
     def showMenuButtons(self):
         if self.user_buttons_groupBox.isVisible():
             self.user_buttons_groupBox.hide()
@@ -642,6 +664,14 @@ class MainWindow(QMainWindow):
                     self.showMessage("Ошибка добавления","Оборудование с таким названием уже есть в базе")
                 else:
                     self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
+    #def searchUsOrEq(self):
+    def getReq(self):
+        if(self.__reqnum<len(self.__reqs)):
+            self.textBrowser.setText("EMAIL: "+ str(self.__reqs[self.__reqnum].__sender_mail)+
+                                                    "\n ID запросившего: "+str(self.__reqs[self.__reqnum].__sender_id)+
+                                                    "\n Что запрашивается: "+str(self.__reqs[self.__reqnum].__what)+
+                                                    "\n Сколько: "+str(self.__reqs[self.__reqnum].__count)+
+                                                    "\n Цель: "+str(self.__reqs[self.__reqnum].__purpose))
     def viewEqOrUser(self):
         if self.__viewingEq:
             allEq=self.__db.get_all_equipment()
@@ -686,7 +716,6 @@ class MainWindow(QMainWindow):
                                       index=[i for i in range(len(data))])
             model = TableModel(data_frame)
             self.tableView.setModel(model)
-
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):

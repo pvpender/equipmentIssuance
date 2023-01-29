@@ -377,6 +377,11 @@ class DataBase:
         return self.__session.query(UserRequests).filter(UserRequests.solved is True).all()
 
     @__restart_if_except
+    def get_unsolved_requests(self):
+        return self.__session.query(UserRequests).filter(UserRequests.solved is False).all()
+    def get_first_unsolved_request(self):
+        return self.__session.query(UserRequests).filter(UserRequests.solved is False).first()
+    @__restart_if_except
     def add_last_request(self, user_id: int, title: str, description: str):
         self.__session.query(LastRequest).filter(LastRequest.user_id == user_id).delete()
         last_request = LastRequest(
