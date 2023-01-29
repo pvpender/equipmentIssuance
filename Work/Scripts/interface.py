@@ -398,6 +398,8 @@ class MainWindow(QMainWindow):
         self.addUserOrInvButton.clicked.connect(self.addEqOrUser)
         self.pushButton.clicked.connect(self.prevReq)
         self.pushButton_3.clicked.connect(self.nextReq)
+        self.AcceptReqPushButton.clicked.connect(self.appReq)
+        self.pushButton_2.clicked.connect(self.disReq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.hideEverything()
@@ -431,10 +433,12 @@ class MainWindow(QMainWindow):
         self.hideEverything()
         allReq = self.__db.get_all_requests()
         data = []
-        #self.__reqs = self.__db.get_unsolved_requests()
+        self.__reqs = self.__db.get_unapproved_requests()
+        if(len(self.__reqs))==0:
+            print("0 requests")
         self.__reqs=allReq
         self.__reqnum = 0
-        for i in allReq:
+        for i in self.__reqs:
             data.append([
                 str(i.id),
                 str(i.title),
@@ -465,6 +469,19 @@ class MainWindow(QMainWindow):
             self.getReq()
         else:
             self.showMessage("Ошибка", "Запрос последний в списке")
+    def disReq(self):
+        self.reqDecision(False)
+    def appReq(self):
+        self.reqDecision(True)
+    def reqDecision(self,decision):
+        self.__reqs[self.__reqnum].approved=decision
+        self.__reqs[self.__reqnum].approved_id=self.__current_user.user_id
+        self.__db.update_request(self.__reqs[self.__reqnum])
+        self.__reqs.remove(self.__reqs[self.__reqnum])
+        self.tableView.model().removeRow(self.__reqnum)
+        self.label_8.setText("Необработанных: "+ str(len(self.__reqs)))
+
+
     def showMenuButtons(self):
         if self.user_buttons_groupBox.isVisible():
             self.user_buttons_groupBox.hide()
@@ -667,11 +684,10 @@ class MainWindow(QMainWindow):
     #def searchUsOrEq(self):
     def getReq(self):
         if(self.__reqnum<len(self.__reqs)):
-            self.textBrowser.setText("EMAIL: "+ str(self.__reqs[self.__reqnum].__sender_mail)+
-                                                    "\n ID запросившего: "+str(self.__reqs[self.__reqnum].__sender_id)+
-                                                    "\n Что запрашивается: "+str(self.__reqs[self.__reqnum].__what)+
-                                                    "\n Сколько: "+str(self.__reqs[self.__reqnum].__count)+
-                                                    "\n Цель: "+str(self.__reqs[self.__reqnum].__purpose))
+            a="EMAIL: "+ str(self.__reqs[self.__reqnum].sender_mail)+"\n ID запросившего: "+str(self.__reqs[self.__reqnum].sender_tg_id)+"\n Что запрашивается: "+str(self.__reqs[self.__reqnum].title)+"\n Сколько: "+str(self.__reqs[self.__reqnum].count)+"\n Цель: "+str(self.__reqs[self.__reqnum].purpose)
+            self.textBrowser.setText(a)
+        else:
+            self.showMessage("Сообщение", "Запросов нет")
     def viewEqOrUser(self):
         if self.__viewingEq:
             allEq=self.__db.get_all_equipment()
