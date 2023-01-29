@@ -44,6 +44,10 @@ class Request:
     def count(self) -> int:
         return self.__count
 
+    @property
+    def approved_id(self) -> int:
+        return self.__approved_id
+
     def approve(self, admin_id: str):
         self.__solved = True
         self.__approved = True

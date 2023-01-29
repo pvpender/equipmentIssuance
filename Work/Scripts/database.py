@@ -109,6 +109,7 @@ class DataBase:
             except OperationalError:
                 self.__session.rollback()
                 return function(*args, **kwargs)
+
         return check
 
     @__restart_if_except
@@ -263,7 +264,8 @@ class DataBase:
 
     @__restart_if_except
     def get_admin_by_id(self, pass_number: int):
-        return self.__session.query(Admins, AdminAccesses).join(AdminAccesses).filter(Admins.pass_number == pass_number).first()
+        return self.__session.query(Admins, AdminAccesses).join(AdminAccesses).filter(
+            Admins.pass_number == pass_number).first()
 
     @__restart_if_except
     def get_admin_by_mail(self, mail: str):
@@ -292,7 +294,7 @@ class DataBase:
         equipment.id = self.get_equipment_by_title(equipment.title).id
 
     @__restart_if_except
-    def update_equipment(self,  old_id: int, equipment: Equipment):
+    def update_equipment(self, old_id: int, equipment: Equipment):
         if not (equipment.x and equipment.y):
             exist = self.__session.query(Equipments).filter(
                 Equipments.x == equipment.x, Equipments.y == equipment.y
@@ -320,7 +322,7 @@ class DataBase:
 
     @__restart_if_except
     def get_equipment_by_coordinates(self, x: int, y: int):
-        if x!=-1 and y!=-1:
+        if x != -1 and y != -1:
             return self.__session.query(Equipments).filter(Equipments.x == x, Equipments.y == y).first()
         else:
             return None
@@ -355,7 +357,7 @@ class DataBase:
     @__restart_if_except
     def add_request(self, request: req.Request):
         db_request = UserRequests(
-            sender_id=request.sender_tg_id,
+            sender_tg_id=request.sender_tg_id,
             sender_mail=request.sender_mail,
             title=request.what,
             count=request.count,
@@ -394,3 +396,14 @@ class DataBase:
     @__restart_if_except
     def get_last_request(self, user_id):
         return self.__session.query(LastRequest).filter(LastRequest.user_id == user_id).first()
+
+    @__restart_if_except
+    def update_request(self, request: req.Request):
+        self.__session.query(Equipments).filter(UserRequests.sender_tg_id == request.sender_tg_id,
+                                                UserRequests.title == request.what,
+                                                UserRequests.solved is False).update(
+            {
+            "solved": True,
+            "approved": request.approved,
+            "approved_id": request.approved_id
+            })
