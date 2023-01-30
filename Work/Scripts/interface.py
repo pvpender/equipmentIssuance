@@ -688,6 +688,7 @@ class MainWindow(QMainWindow):
             a="EMAIL: "+ str(self.__reqs[self.__reqnum].sender_mail)+"\n ID запросившего: "+str(self.__reqs[self.__reqnum].sender_tg_id)+"\n Что запрашивается: "+str(self.__reqs[self.__reqnum].title)+"\n Сколько: "+str(self.__reqs[self.__reqnum].count)+"\n Цель: "+str(self.__reqs[self.__reqnum].purpose)
             self.textBrowser.setText(a)
         else:
+            self.__reqnum -= 1
             self.showMessage("Сообщение", "Запросов нет")
     def viewEqOrUser(self):
         if self.__viewingEq:
