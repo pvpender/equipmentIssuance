@@ -5,12 +5,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from user_collections import *
 from database import *
-import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from database import *
 import sqlalchemy
 import pymysql
+
 
 engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 Base.metadata.create_all(engine)

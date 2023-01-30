@@ -81,7 +81,6 @@ class MainWindow(QMainWindow):
         self.__admin_access = admin_access       # Права админа, зашедшего в приложение
         self.__reqs=self.__db.get_unsolved_requests()
         self.__reqnum=0
-        self.__tmodel = None
         # self.__sidePanel = QFrame(self)
         # self.__sidePanel.setFixedSize(200, 720)
         # self.__sidePanel.setStyleSheet("background-color:#FFFFFF;")
@@ -453,7 +452,6 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(data))]
                                   )
         model = TableModel(data_frame)
-        self.__tmodel = model
         self.tableView2.setModel(model)
         self.label_8.setText("Необработанных: "+ str(len(self.__reqs)))
         self.getReq()
@@ -476,12 +474,12 @@ class MainWindow(QMainWindow):
     def appReq(self):
         self.reqDecision(True)
     def reqDecision(self,decision):
-        c = self.tableView
         self.__reqs[self.__reqnum].approved=decision
         self.__reqs[self.__reqnum].approved_id=self.__current_user.id
         self.__db.update_request(self.__reqs[self.__reqnum])
         self.__reqs.remove(self.__reqs[self.__reqnum])
-        self.__tmodel.removeRow(self.__reqnum)
+        self.tableView2.model().removeRow(self.__reqnum)
+        self.tableView2.update()
         self.label_8.setText("Необработанных: "+ str(len(self.__reqs)))
 
 
@@ -735,6 +733,7 @@ class MainWindow(QMainWindow):
                                       index=[i for i in range(len(data))])
             model = TableModel(data_frame)
             self.tableView.setModel(model)
+            #self.tableView.model().removeRow()
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
@@ -759,4 +758,11 @@ class TableModel(QtCore.QAbstractTableModel):
                 return str(self._data.columns[section])
 
             if orientation == Qt.Orientation.Vertical:
+                if len(self._data.index) <= section:
+                    return ""
                 return str(self._data.index[section])
+
+    def removeRow(self, row: int) -> bool:
+        self._data.drop(row, inplace=True)
+        self._data.reset_index(drop=True, inplace=True)
+
