@@ -380,10 +380,11 @@ class DataBase:
 
     @__restart_if_except
     def get_unsolved_requests(self):
-        return self.__session.query(UserRequests).filter(UserRequests.solved is False).all()
-
+        return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
+                                                         (UserRequests.solved.is_(None))).all()
     def get_first_unsolved_request(self):
-        return self.__session.query(UserRequests).filter(UserRequests.solved is False).first()
+        return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
+                                                         (UserRequests.solved.is_(None))).first()
 
     @__restart_if_except
     def add_last_request(self, user_id: int, title: str, description: str):

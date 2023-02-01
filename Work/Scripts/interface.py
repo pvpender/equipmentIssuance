@@ -433,7 +433,7 @@ class MainWindow(QMainWindow):
         self.hideEverything()
         allReq = self.__db.get_all_requests()
         data = []
-        self.__reqs = self.__db.get_unsolved_requests()
+        mas = self.__reqs = self.__db.get_unsolved_requests()
         if(len(self.__reqs))==0:
             print("0 requests")
         self.__reqs=allReq
