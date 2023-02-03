@@ -2,9 +2,9 @@ from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame,
 from PyQt6.QtCore import Qt
 from PyQt6 import QtCore, QtGui, QtWidgets
 from user_collections import *
-from equipment import*
-from database import*
-from accesses import*
+from equipment import *
+from database import *
+from accesses import *
 from users import *
 from accesses import *
 import pandas as pd
@@ -12,10 +12,11 @@ import pandas as pd
 
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
-    def __init__(self, user_list: UserCollection, db:DataBase):
+
+    def __init__(self, user_list: UserCollection, db: DataBase):
         super(LogWindow, self).__init__()
         self.__main_window = MainWindow
-        self.__db=db
+        self.__db = db
         self.__user_list = user_list
         self.setFixedSize(720, 480)
         self.setWindowTitle("Log in")
@@ -77,11 +78,11 @@ class MainWindow(QMainWindow):
         self.__current_user = current_user
         self.__user_list = user_list
         self.__db = db
-        self.__addingEq = False         # либо добавляет оборудование, либо пользователя
-        self.__viewingEq = False        # аналогично с просмотром
-        self.__admin_access = admin_access       # Права админа, зашедшего в приложение
-        self.__reqs=self.__db.get_unsolved_requests()
-        self.__reqnum=0
+        self.__addingEq = False  # либо добавляет оборудование, либо пользователя
+        self.__viewingEq = False  # аналогично с просмотром
+        self.__admin_access = admin_access  # Права админа, зашедшего в приложение
+        self.__reqs = self.__db.get_unsolved_requests()
+        self.__reqnum = 0
         # self.__sidePanel = QFrame(self)
         # self.__sidePanel.setFixedSize(200, 720)
         # self.__sidePanel.setStyleSheet("background-color:#FFFFFF;")
@@ -334,8 +335,8 @@ class MainWindow(QMainWindow):
         self.tableView2.setObjectName("tableView2")
         self.setCentralWidget(self.centralwidget)
         _translate = QtCore.QCoreApplication.translate
-        #MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        #self.burgerButton.setText(_translate("MainWindow", "Меню"))
+        #   MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        #   self.burgerButton.setText(_translate("MainWindow", "Меню"))
         self.addSmthBox.setTitle(_translate("MainWindow", "Добавление инвентаря"))
         self.nameOrEmailLabel.setText(_translate("MainWindow", "Название"))
         self.rightsLabel.setText(_translate("MainWindow", "Кто может получить "))
@@ -411,11 +412,13 @@ class MainWindow(QMainWindow):
         if not admin_access.can_add_inventory:
             self.addInventoryButton.hide()
         self.show()
-    def showMessage(self, title:str, info:str):
-        msgBox = QMessageBox()
-        msgBox.setText(info)
-        msgBox.setWindowTitle(title)
-        msgBox.exec()
+
+    def showMessage(self, title: str, info: str):
+        msg_box = QMessageBox()
+        msg_box.setText(info)
+        msg_box.setWindowTitle(title)
+        msg_box.exec()
+
     def hideEverything(self):
         self.addHuman_groupBox.hide()
         self.label_3.hide()
@@ -429,15 +432,16 @@ class MainWindow(QMainWindow):
         self.searchByPosGroupBox.hide()
         self.RequestsGroupBox.hide()
         self.IdCardLineEdit.hide()
-        #self.listView.clear()
+        #   self.listView.clear()
+
     def showReqBox(self):
         self.hideEverything()
-        allReq = self.__db.get_all_requests()
+        all_req = self.__db.get_all_requests()
         data = []
         mas = self.__reqs = self.__db.get_unsolved_requests()
-        if(len(self.__reqs))==0:
+        if (len(self.__reqs)) == 0:
             print("0 requests")
-        self.__reqs=allReq
+        self.__reqs = all_req
         self.__reqnum = 0
         for i in self.__reqs:
             data.append([
@@ -454,35 +458,38 @@ class MainWindow(QMainWindow):
                                   )
         model = TableModel(data_frame)
         self.tableView2.setModel(model)
-        self.label_8.setText("Необработанных: "+ str(len(self.__reqs)))
+        self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         self.getReq()
         self.RequestsGroupBox.show()
+
     def prevReq(self):
-        if(self.__reqnum>0):
-            self.__reqnum=self.__reqnum-1
+        if self.__reqnum > 0:
+            self.__reqnum = self.__reqnum - 1
             self.getReq()
         else:
             self.showMessage("Ошибка", "Запрос уже первый в списке")
 
     def nextReq(self):
-        if(self.__reqnum<len(self.__reqs)):
-            self.__reqnum=self.__reqnum+1
+        if self.__reqnum < len(self.__reqs):
+            self.__reqnum = self.__reqnum + 1
             self.getReq()
         else:
             self.showMessage("Ошибка", "Запрос последний в списке")
+
     def disReq(self):
         self.reqDecision(False)
+
     def appReq(self):
         self.reqDecision(True)
-    def reqDecision(self,decision):
-        self.__reqs[self.__reqnum].approved=decision
-        self.__reqs[self.__reqnum].approved_id=self.__current_user.id
+
+    def reqDecision(self, decision):
+        self.__reqs[self.__reqnum].approved = decision
+        self.__reqs[self.__reqnum].approved_id = self.__current_user.id
         self.__db.update_request(self.__reqs[self.__reqnum])
         self.__reqs.remove(self.__reqs[self.__reqnum])
         self.tableView2.model().removeRow(self.__reqnum)
         self.tableView2.update()
-        self.label_8.setText("Необработанных: "+ str(len(self.__reqs)))
-
+        self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
 
     def showMenuButtons(self):
         if self.user_buttons_groupBox.isVisible():
@@ -490,8 +497,9 @@ class MainWindow(QMainWindow):
         else:
             self.user_buttons_groupBox.show()
         return 0
+
     def openEqAdder(self):
-        self.__addingEq=True
+        self.__addingEq = True
         self.hideEverything()
         self.addSmthBox.setTitle("Добавление инвентаря")
         self.nameOrEmailLabel.setText("Название")
@@ -523,7 +531,7 @@ class MainWindow(QMainWindow):
         self.addSmthBox.show()
 
     def openPeopleAdder(self):
-        self.__addingEq=False
+        self.__addingEq = False
         self.hideEverything()
         self.adminRightsGroupBox.hide()
         self.addHuman_groupBox.show()
@@ -543,8 +551,9 @@ class MainWindow(QMainWindow):
         self.secondRightsCheckBox.setText("Только в рамках проекта")
         self.thirdRightsCheckBox_3.setText("Сложное оборуд.")
         self.fourthRightsCheckBox.setText("Любое")
+
     def openPeopleViewer(self):
-        self.__viewingEq=False
+        self.__viewingEq = False
         self.hideEverything()
         self.viewInvOrUserBox.show()
         self.searchByNameOrEmailLineEdit.show()
@@ -561,8 +570,9 @@ class MainWindow(QMainWindow):
         self.searchByThirdRightsCheckBox.setText("Инженер")
         self.searchByFourthRightsCheckBox.setText("Главный инженер")
         self.viewEqOrUser()
+
     def openEqViewer(self):
-        self.__viewingEq=True
+        self.__viewingEq = True
         self.hideEverything()
         self.viewInvOrUserBox.show()
         self.searchByPosGroupBox.show()
@@ -582,6 +592,7 @@ class MainWindow(QMainWindow):
         self.searchByPosFromLeftSpinBox.setValue(-1)
         self.searchByHeightSpinBox.setValue(-1)
         self.viewEqOrUser()
+
     def addEqOrUser(self):
         codeError = -1
         tg = 0
@@ -590,63 +601,65 @@ class MainWindow(QMainWindow):
         addEq = False
         chEq = False
         getReq = False
-        if codeError==-1 and self.nameOrEmailLineEdit.text() == "":
+        if codeError == -1 and self.nameOrEmailLineEdit.text() == "":
             codeError = 1
-        if codeError==-1 and self.__addingEq and self.descriptionTextEdit.toPlainText() == "":
+        if codeError == -1 and self.__addingEq and self.descriptionTextEdit.toPlainText() == "":
             codeError = 3
-        if codeError==-1 and not self.__addingEq and self.IdCardLineEdit.text() == "":
+        if codeError == -1 and not self.__addingEq and self.IdCardLineEdit.text() == "":
             codeError = 4
-        if codeError==-1 and (not self.radioButton_User.isChecked()) and (not self.radioButton_Admin.isChecked()) and (not self.__addingEq):
+        if codeError == -1 and (not self.radioButton_User.isChecked()) and (
+        not self.radioButton_Admin.isChecked()) and (not self.__addingEq):
             codeError = 6
-        if codeError==-1 and self.radioButton_Admin.isChecked():
+        if codeError == -1 and self.radioButton_Admin.isChecked():
             if self.adminRightsCheckBox.isChecked():
-                addUs=True
+                addUs = True
             if self.admin2RightsCheckBox.isChecked():
-                chUs=True
+                chUs = True
             if self.admin3RightsCheckBox.isChecked():
-                addEq=True
+                addEq = True
             if self.admin4RightsCheckBox.isChecked():
-                chEq=True
+                chEq = True
             if self.admin5RightsCheckBox.isChecked():
-                getReq= True
-            if (not addUs) and (not chEq) and (not chUs)and (addEq) and (getReq):
-                codeError=5
-        if codeError==-1 and self.radioButton_User.isChecked():
+                getReq = True
+            if (not addUs) and (not chEq) and (not chUs) and (addEq) and (getReq):
+                codeError = 5
+        if codeError == -1 and self.radioButton_User.isChecked():
             addUs = False
             chUs = False
             addEq = False
             chEq = False
             getReq = False
-        if codeError==-1 and self.firstRightsCheckBox.isChecked():
+        if codeError == -1 and self.firstRightsCheckBox.isChecked():
             tg += 1
-        if codeError==-1 and self.secondRightsCheckBox.isChecked():
+        if codeError == -1 and self.secondRightsCheckBox.isChecked():
             tg += 10
-        if codeError==-1 and self.thirdRightsCheckBox_3.isChecked():
+        if codeError == -1 and self.thirdRightsCheckBox_3.isChecked():
             tg += 100
-        if codeError==-1 and self.fourthRightsCheckBox.isChecked():
+        if codeError == -1 and self.fourthRightsCheckBox.isChecked():
             tg += 1000
-        if codeError==-1 and tg == 0:
+        if codeError == -1 and tg == 0:
             codeError = 2
         if codeError == -1:
-            if(self.__addingEq):
-                fromLeft=self.posFromLeftSpinBox.value()
-                if self.posFromLeftSpinBox.value()==0 or self.posFromLeftSpinBox.value()==-1:
-                    fromLeft=-1
-                height=self.heightSpinBox.value()
-                if self.heightSpinBox.value()==0 or self.heightSpinBox.value()==-1:
-                    height=-1
-                eq = Equipment(self.nameOrEmailLineEdit.text(), self.descriptionTextEdit.toPlainText(),
-                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, height,
-                           fromLeft)
+            if (self.__addingEq):
+                fromLeft = self.posFromLeftSpinBox.value()
+                if self.posFromLeftSpinBox.value() == 0 or self.posFromLeftSpinBox.value() == -1:
+                    fromLeft = -1
+                height = self.heightSpinBox.value()
+                if self.heightSpinBox.value() == 0 or self.heightSpinBox.value() == -1:
+                    height = -1
+                eq = Equipment(self.nameOrEmailLineEdit.text(),
+                               self.descriptionTextEdit.toPlainText(),
+                               self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, height,
+                               fromLeft)
                 self.__db.add_equipment(eq)
             else:
                 if self.radioButton_User.isChecked():
                     ac = Access(tg)
-                    us = CommonUser(int(self.IdCardLineEdit.text(),16), str(self.nameOrEmailLineEdit.text()), ac)
+                    us = CommonUser(int(self.IdCardLineEdit.text(), 16), str(self.nameOrEmailLineEdit.text()), ac)
                     self.__user_list.append_user(us)
                 if self.radioButton_Admin.isChecked():
-                    ac =AdminAccess(tg,addUs,chUs,addEq,chEq, getReq)
-                    adm=Admin(int(self.IdCardLineEdit.text(),16), str(self.nameOrEmailLineEdit.text()),"", ac)
+                    ac = AdminAccess(tg, addUs, chUs, addEq, chEq, getReq)
+                    adm = Admin(int(self.IdCardLineEdit.text(), 16), str(self.nameOrEmailLineEdit.text()), "", ac)
                     self.__user_list.append_user(adm)
             self.heightSpinBox.setValue(-1)
             self.posFromLeftSpinBox.setValue(-1)
@@ -670,42 +683,47 @@ class MainWindow(QMainWindow):
                     self.showMessage("Ошибка добавления", "Не отмечены права на получение")
             elif codeError == 3:
                 self.showMessage("Ошибка добавления", "отсутствует описание")
-            elif codeError ==4:
-                self.showMessage("Ошибка добавления","не введен ID карты сотрудника")
-            elif codeError==5:
+            elif codeError == 4:
+                self.showMessage("Ошибка добавления", "не введен ID карты сотрудника")
+            elif codeError == 5:
                 self.showMessage("Ошибка добавления", "не выбраны права администратора")
-            elif codeError==6:
+            elif codeError == 6:
                 self.showMessage("Ошибка добавления", "Не выбран тип пользователя")
-            elif codeError==7:
+            elif codeError == 7:
                 self.showMessage("Ошибка добавления", "пользователь с такой картой уже добавлен")
-            elif codeError==8:
+            elif codeError == 8:
                 if self.__addingEq:
-                    self.showMessage("Ошибка добавления","Оборудование с таким названием уже есть в базе")
+                    self.showMessage("Ошибка добавления", "Оборудование с таким названием уже есть в базе")
                 else:
                     self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
-    #def searchUsOrEq(self):
+
+    # def searchUsOrEq(self):
     def getReq(self):
-        if(self.__reqnum<len(self.__reqs)):
-            a="EMAIL: "+ str(self.__reqs[self.__reqnum].sender_mail)+"\n ID запросившего: "+str(self.__reqs[self.__reqnum].sender_tg_id)+"\n Что запрашивается: "+str(self.__reqs[self.__reqnum].title)+"\n Сколько: "+str(self.__reqs[self.__reqnum].count)+"\n Цель: "+str(self.__reqs[self.__reqnum].purpose)
+        if self.__reqnum < len(self.__reqs):
+            a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
+                self.__reqs[self.__reqnum].sender_tg_id) + "\n Что запрашивается: " + str(
+                self.__reqs[self.__reqnum].title) + "\n Сколько: " + str(
+                self.__reqs[self.__reqnum].count) + "\n Цель: " + str(self.__reqs[self.__reqnum].purpose)
             self.textBrowser.setText(a)
         else:
             self.__reqnum -= 1
             self.showMessage("Сообщение", "Запросов нет")
+
     def viewEqOrUser(self):
         if self.__viewingEq:
-            allEq=self.__db.get_all_equipment()
+            allEq = self.__db.get_all_equipment()
             data = []
             for i in allEq:
-                x=""
-                y=""
-                if i.x==-1:
-                    x="--"
+                x = ""
+                y = ""
+                if i.x == -1:
+                    x = "--"
                 else:
-                    x=str(i.x)
-                if i.y==-1:
-                    y="--"
+                    x = str(i.x)
+                if i.y == -1:
+                    y = "--"
                 else:
-                    y=str(i.y)
+                    y = str(i.y)
                 data.append([
                     str(i.id),
                     str(i.title),
@@ -735,7 +753,8 @@ class MainWindow(QMainWindow):
                                       index=[i for i in range(len(data))])
             model = TableModel(data_frame)
             self.tableView.setModel(model)
-            #self.tableView.model().removeRow()
+            # self.tableView.model().removeRow()
+
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
@@ -750,10 +769,10 @@ class TableModel(QtCore.QAbstractTableModel):
     def rowCount(self, index):
         return self._data.shape[0]
 
-    def columnCount(self, index):
+    def columnCount(self, parent: QtCore.QModelIndex) -> int:
         return self._data.shape[1]
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section: int, orientation, role: int):
         # section is the index of the column/row.
         if role == Qt.ItemDataRole.DisplayRole:
             if orientation == Qt.Orientation.Horizontal:
@@ -764,7 +783,6 @@ class TableModel(QtCore.QAbstractTableModel):
                     return ""
                 return str(self._data.index[section])
 
-    def removeRow(self, row: int) -> bool:
+    def removeRow(self, row: int, parent=None):
         self._data.drop(row, inplace=True)
         self._data.reset_index(drop=True, inplace=True)
-
