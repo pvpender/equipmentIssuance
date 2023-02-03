@@ -32,6 +32,7 @@ class LogWindow(QMainWindow):
                                 (self.frameGeometry().height() - self.__login_field.height()) // 2 -
                                 self.__login_field.height() // 2)
         self.__password_field = QLineEdit(self)
+        self.__password_field.setEchoMode(QLineEdit.EchoMode.Password)
         self.__password_field.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.__password_field.setFixedWidth(200)
         self.__password_field.move((self.frameGeometry().width() - self.__login_field.width()) // 2,
