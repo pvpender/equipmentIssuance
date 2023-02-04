@@ -154,7 +154,7 @@ class DataBase:
                 Accesses.power == access.power
             ).one()
         self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
-            {"pass_number": user.id, "mail": user.mail, "access_id": access_id[0]}
+            {"pass_number": user.id, "mail": user.mail, "access_id": access_id[0]}, synchronize_session=False
         )
         self.__session.commit()
 
@@ -253,7 +253,8 @@ class DataBase:
                 AdminAccesses.power == access.power
             ).one()
         self.__session.query(Admins).filter(Admins.mail == old_mail, Admins.pass_number == old_id).update(
-            {"pass_number": admin.id, "mail": admin.mail, "password": admin.password, "access_id": access_id[0]}
+            {"pass_number": admin.id, "mail": admin.mail, "password": admin.password, "access_id": access_id[0]},
+            synchronize_session=False
         )
         self.__session.commit()
 
@@ -304,7 +305,7 @@ class DataBase:
         self.__session.query(Equipments).filter(Equipments.id == old_id).update(
             {"title": equipment.title, "description": equipment.description,
              "count": equipment.count, "reserve_count": equipment.reserve_count,
-             "access": equipment.access, "x": equipment.x, "y": equipment.y}
+             "access": equipment.access, "x": equipment.x, "y": equipment.y}, synchronize_session=False
         )
 
     @__restart_if_except
@@ -350,7 +351,7 @@ class DataBase:
             self.__session.add(db_user)
         else:
             self.__session.query(TelegramLogins).filter(TelegramLogins.user_id == user_id).update(
-                {"mail": mail, "power": power}
+                {"mail": mail, "power": power}, synchronize_session=False
             )
         self.__session.commit()
 
