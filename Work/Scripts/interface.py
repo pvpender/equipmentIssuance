@@ -756,7 +756,6 @@ class MainWindow(QMainWindow):
             self.tableView.setModel(model)
             # self.tableView.model().removeRow()
 
-
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
         super(TableModel, self).__init__()

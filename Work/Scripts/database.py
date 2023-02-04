@@ -169,14 +169,17 @@ class DataBase:
 
     @__restart_if_except
     def get_user_by_id(self, pass_number: int):
+        self.__session.commit()
         return self.__session.query(Users, Accesses).join(Accesses).filter(Users.pass_number == pass_number).first()
 
     @__restart_if_except
     def get_user_by_mail(self, mail: str):
+        self.__session.commit()
         return self.__session.query(Users, Accesses).join(Accesses).filter(Users.mail == mail).first()
 
     @__restart_if_except
     def get_all_users(self):
+        self.__session.commit()
         return self.__session.query(Users, Accesses).join(Accesses).all()
 
     @__restart_if_except
@@ -265,15 +268,18 @@ class DataBase:
 
     @__restart_if_except
     def get_admin_by_id(self, pass_number: int):
+        self.__session.commit()
         return self.__session.query(Admins, AdminAccesses).join(AdminAccesses).filter(
             Admins.pass_number == pass_number).first()
 
     @__restart_if_except
     def get_admin_by_mail(self, mail: str):
+        self.__session.commit()
         return self.__session.query(Admins, AdminAccesses).join(AdminAccesses).filter(Admins.mail == mail).first()
 
     @__restart_if_except
     def get_all_admins(self):
+        self.__session.commit()
         return self.__session.query(Admins, AdminAccesses).join(AdminAccesses).all()
 
     @__restart_if_except
@@ -315,14 +321,17 @@ class DataBase:
 
     @__restart_if_except
     def get_equipment_by_title(self, title: str):
+        self.__session.commit()
         return self.__session.query(Equipments).filter(Equipments.title == title).first()
 
     @__restart_if_except
     def get_all_equipment(self):
+        self.__session.commit()
         return self.__session.query(Equipments).all()
 
     @__restart_if_except
     def get_equipment_by_coordinates(self, x: int, y: int):
+        self.__session.commit()
         if x != -1 and y != -1:
             return self.__session.query(Equipments).filter(Equipments.x == x, Equipments.y == y).first()
         else:
@@ -330,14 +339,17 @@ class DataBase:
 
     @__restart_if_except
     def get_equipment_by_id(self, eq_id: int):
+        self.__session.commit()
         return self.__session.query(Equipments).filter(Equipments.id == eq_id).first()
 
     @__restart_if_except
     def get_all_equipment(self):
+        self.__session.commit()
         return self.__session.query(Equipments).all()
 
     @__restart_if_except
     def get_tg_user(self, user_id):
+        self.__session.commit()
         return self.__session.query(TelegramLogins).filter(TelegramLogins.user_id == user_id).first()
 
     @__restart_if_except
@@ -362,7 +374,8 @@ class DataBase:
             sender_mail=request.sender_mail,
             title=request.what,
             count=request.count,
-            purpose=request.purpose
+            purpose=request.purpose,
+            solved=False
         )
         print(request.what)
         eq = self.get_equipment_by_title(request.what)
@@ -373,17 +386,22 @@ class DataBase:
 
     @__restart_if_except
     def get_all_requests(self):
+        self.__session.commit()
         return self.__session.query(UserRequests).all()
 
     @__restart_if_except
     def get_solved_requests(self):
+        self.__session.commit()
         return self.__session.query(UserRequests).filter(UserRequests.solved is True).all()
 
     @__restart_if_except
     def get_unsolved_requests(self):
+        self.__session.commit()
         return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
                                                          (UserRequests.solved.is_(None))).all()
+
     def get_first_unsolved_request(self):
+        self.__session.commit()
         return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
                                                          (UserRequests.solved.is_(None))).first()
 
@@ -399,6 +417,7 @@ class DataBase:
 
     @__restart_if_except
     def get_last_request(self, user_id):
+        self.__session.commit()
         return self.__session.query(LastRequest).filter(LastRequest.user_id == user_id).first()
 
     @__restart_if_except
