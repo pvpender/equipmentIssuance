@@ -483,13 +483,17 @@ class MainWindow(QMainWindow):
         self.reqDecision(True)
 
     def reqDecision(self, decision):
-        self.__reqs[self.__reqnum].approved = decision
-        self.__reqs[self.__reqnum].approved_id = self.__current_user.id
-        self.__db.update_request(self.__reqs[self.__reqnum])
-        self.__reqs.remove(self.__reqs[self.__reqnum])
-        self.tableView2.model().removeRow(self.__reqnum)
-        self.tableView2.update()
-        self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
+        if len(self.__reqs)!=0:
+            self.__reqs[self.__reqnum].approved = decision
+            print(self.__reqnum)
+            self.__reqs[self.__reqnum].approved_id = self.__current_user.id
+            self.__db.update_request(self.__reqs[self.__reqnum])
+            self.__reqs.remove(self.__reqs[self.__reqnum])
+            self.tableView2.model().removeRow(self.__reqnum)
+            self.tableView2.update()
+            self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
+        else:
+            self.showMessage("Ошибка", "Запросов нет")
 
     def showMenuButtons(self):
         if self.user_buttons_groupBox.isVisible():
@@ -698,7 +702,8 @@ class MainWindow(QMainWindow):
                     self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
 
 
-    # def searchUsOrEq(self):
+    #def searchUsOrEq(self):
+
     def getReq(self):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
@@ -768,7 +773,6 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def rowCount(self, index):
         return self._data.shape[0]
-
     def columnCount(self, parent: QtCore.QModelIndex) -> int:
         return self._data.shape[1]
 
