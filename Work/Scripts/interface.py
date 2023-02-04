@@ -402,6 +402,7 @@ class MainWindow(QMainWindow):
         self.pushButton_3.clicked.connect(self.nextReq)
         self.AcceptReqPushButton.clicked.connect(self.appReq)
         self.pushButton_2.clicked.connect(self.disReq)
+        self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.hideEverything()
@@ -697,7 +698,10 @@ class MainWindow(QMainWindow):
                 else:
                     self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
 
-    # def searchUsOrEq(self):
+    def searchUsOrEq(self):
+        if self.__viewingEq:
+            if self.searchByNameOrEmailLineEdit.text!="":
+                self.find(self.searchByNameOrEmailLineEdit.text,0)
     def getReq(self):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
@@ -754,7 +758,17 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.tableView.setModel(model)
             # self.tableView.model().removeRow()
-
+    def find(self, text, column=0):
+        model = self.tableView.model()
+        start = model.index(0, column)
+        matches = model.match(
+            start, QtCore.Qt.DisplayRole,
+            text, 1, QtCore.Qt.MatchContains)
+        if matches:
+            index = matches[0]
+            # index.row(), index.column()
+            self.tableView.selectionModel().select(
+                index, QtGui.QItemSelectionModel.Select)
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
