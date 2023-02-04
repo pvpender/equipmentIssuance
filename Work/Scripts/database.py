@@ -376,14 +376,14 @@ class DataBase:
 
     @__restart_if_except
     def get_solved_requests(self):
-        return self.__session.query(UserRequests).filter(UserRequests.solved.is_(True)).all()
+        return self.__session.query(UserRequests).filter(UserRequests.solved is True).all()
 
     @__restart_if_except
     def get_unsolved_requests(self):
-        return self.__session.query(UserRequests).filter((UserRequests.solved.is_(False)) or
+        return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
                                                          (UserRequests.solved.is_(None))).all()
     def get_first_unsolved_request(self):
-        return self.__session.query(UserRequests).filter((UserRequests.solved.is_(False)) or
+        return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
                                                          (UserRequests.solved.is_(None))).first()
 
     @__restart_if_except
@@ -409,4 +409,4 @@ class DataBase:
                 "solved": True,
                 "approved": request.approved,
                 "approved_id": request.approved_id
-            })
+            }, synchronize_session=False)
