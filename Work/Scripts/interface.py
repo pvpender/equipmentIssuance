@@ -697,6 +697,7 @@ class MainWindow(QMainWindow):
                 else:
                     self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
 
+
     # def searchUsOrEq(self):
     def getReq(self):
         if self.__reqnum < len(self.__reqs):
@@ -711,9 +712,9 @@ class MainWindow(QMainWindow):
 
     def viewEqOrUser(self):
         if self.__viewingEq:
-            allEq = self.__db.get_all_equipment()
+            all_eq = self.__db.get_all_equipment()
             data = []
-            for i in allEq:
+            for i in all_eq:
                 x = ""
                 y = ""
                 if i.x == -1:
