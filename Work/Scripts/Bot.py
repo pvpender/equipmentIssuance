@@ -167,7 +167,7 @@ scrolling_group = ScrollingGroup(
 )
 
 main_window = Window(
-    Const("Список оборудования, которое есть в наличии:"),
+    Const("Список оборудования, которое есть в наличии: (Я работаю)!!!"),
     scrolling_group,
     Button(Const("Отмена"), id="34", on_click=end),
     state=MySG.main,
