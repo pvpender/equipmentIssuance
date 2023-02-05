@@ -1,4 +1,1 @@
 # equipmentIssuance
-
-
-k
