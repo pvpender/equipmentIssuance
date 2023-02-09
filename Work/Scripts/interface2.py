@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox
 from PyQt6.QtCore import Qt
 from PyQt6 import QtCore, QtGui, QtWidgets
+
+from Work.Scripts.interface import TableModel
 from user_collections import *
 from equipment import *
 from database import *
@@ -78,9 +80,9 @@ class MainWindow(QMainWindow):
         self.__current_user = current_user
         self.__user_list = user_list
         self.__db = db
-        self.__tableContents=[]
-        self.__addingEq = False  # либо добавляет оборудование, либо пользователя
-        self.__viewingEq = False  # аналогично с просмотром
+        self.__eqTableContents=[]
+        self.__usTableContents = []
+        self.__reqTableContents = []
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
@@ -490,10 +492,10 @@ class MainWindow(QMainWindow):
         self.usradioButton_User.clicked.connect(self.adminRightsGroupBox_2.hide)
         self.eqaddUserOrInvButton.clicked.connect(self.addEq)
         self.usaddUserOrInvButton.clicked.connect(self.addUser)
-        #self.pushButton.clicked.connect(self.prevReq)
-        #self.pushButton_3.clicked.connect(self.nextReq)
-        #self.AcceptReqPushButton.clicked.connect(self.appReq)
-        #self.pushButton_2.clicked.connect(self.disReq)
+        self.pushButton.clicked.connect(self.prevReq)
+        self.pushButton_3.clicked.connect(self.nextReq)
+        self.AcceptReqPushButton.clicked.connect(self.appReq)
+        self.pushButton_2.clicked.connect(self.disReq)
        # self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
@@ -505,6 +507,7 @@ class MainWindow(QMainWindow):
         #if not admin_access.can_add_inventory:
          #   self.addInventoryButton.hide()
         self.adminRightsGroupBox_2.hide()
+        self.refreshReqTable()
         self.show()
 
     def addEq(self):
@@ -643,9 +646,107 @@ class MainWindow(QMainWindow):
                 self.showMessage("Ошибка добавления", "пользователь с такой картой уже добавлен")
             elif codeError == 8:
                 self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
+    def refreshReqTable(self):
+        #self.__reqs = self.__db.get_unsolved_requests()
+        self.__reqs=self.__db.get_all_requests()
+        if (len(self.__reqs)) == 0:
+            print("0 requests")
+        self.__reqnum = 0
+        self.__reqTableContents.clear()
+        for i in self.__reqs:
+            self.__reqTableContents.append([
+                str(i.id),
+                str(i.title),
+                str(i.count),
+                str(i.purpose),
+                str(hex(i.sender_tg_id)),
+                str(i.sender_mail)
+            ])
+        data_frame = pd.DataFrame(self.__reqTableContents,
+                                  columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
+                                  index=[i for i in range(len(self.__reqTableContents))]
+                                  )
+        model = TableModel(data_frame)
+
+        self.tableView2.setModel(model)
+        self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
+        self.getReq()
+    def getReq(self):
+        if self.__reqnum < len(self.__reqs):
+            a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
+                self.__reqs[self.__reqnum].sender_tg_id) + "\n Что запрашивается: " + str(
+                self.__reqs[self.__reqnum].title) + "\n Сколько: " + str(
+                self.__reqs[self.__reqnum].count) + "\n Цель: " + str(self.__reqs[self.__reqnum].purpose)
+            self.textBrowser.setText(a)
+        else:
+            self.__reqnum -= 1
+            self.showMessage("Сообщение", "Запросов нет")
+    def prevReq(self):
+        if self.__reqnum > 0:
+            self.__reqnum = self.__reqnum - 1
+            self.getReq()
+        else:
+            self.showMessage("Ошибка", "Запрос уже первый в списке")
+
+    def nextReq(self):
+        if self.__reqnum < len(self.__reqs):
+            self.__reqnum = self.__reqnum + 1
+            self.getReq()
+        else:
+            self.showMessage("Ошибка", "Запрос последний в списке")
+
+    def disReq(self):
+        self.reqDecision(False)
+
+    def appReq(self):
+        self.reqDecision(True)
+
+    def reqDecision(self, decision):
+        if len(self.__reqs)!=0:
+            self.__reqs[self.__reqnum].approved = decision
+            print(self.__reqnum)
+            self.__reqs[self.__reqnum].approved_id = self.__current_user.id
+            self.__db.update_request(self.__reqs[self.__reqnum])
+            self.__reqs.remove(self.__reqs[self.__reqnum])
+            self.tableView2.model().removeRow(self.__reqnum)
+            self.tableView2.update()
+            self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
+        else:
+            self.showMessage("Ошибка", "Запросов нет")
 
     def showMessage(self, title: str, info: str):
         msg_box = QMessageBox()
         msg_box.setText(info)
         msg_box.setWindowTitle(title)
         msg_box.exec()
+
+    class TableModel(QtCore.QAbstractTableModel):
+        def __init__(self, data):
+            super(TableModel, self).__init__()
+            self._data = data
+
+        def data(self, index, role):
+            if role == Qt.ItemDataRole.DisplayRole:
+                value = self._data.iloc[index.row(), index.column()]
+                return str(value)
+
+        def rowCount(self, index):
+            return self._data.shape[0]
+
+        def columnCount(self, parent: QtCore.QModelIndex) -> int:
+            return self._data.shape[1]
+
+        def headerData(self, section: int, orientation, role: int):
+            # section is the index of the column/row.
+            if role == Qt.ItemDataRole.DisplayRole:
+                if orientation == Qt.Orientation.Horizontal:
+                    return str(self._data.columns[section])
+
+                if orientation == Qt.Orientation.Vertical:
+                    if len(self._data.index) <= section:
+                        return ""
+                    return str(self._data.index[section])
+
+        def removeRow(self, row: int, parent=None):
+            self._data.drop(row, inplace=True)
+            self._data.reset_index(drop=True, inplace=True)

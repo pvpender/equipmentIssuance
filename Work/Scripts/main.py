@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QWidget
-from interface import LogWindow
+from interface2 import LogWindow
 from users import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
