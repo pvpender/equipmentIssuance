@@ -101,7 +101,7 @@ def restart_if_except(function):
         try:
             return function(*args, **kwargs)
         except OperationalError:
-            self.__session.rollback()
+            self.session.rollback()
             return function(*args, **kwargs)
     return check
 
@@ -111,6 +111,9 @@ class DataBase:
     def __init__(self, session: Session):
         self.__session = session
 
+    @property
+    def session(self):
+        return self.__session
     """@staticmethod
     def __restart_if_except(function):
         def check(*args, **kwargs):
