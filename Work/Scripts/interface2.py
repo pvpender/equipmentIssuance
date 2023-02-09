@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox, QHeaderView
 from PyQt6.QtCore import Qt
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -496,7 +496,7 @@ class MainWindow(QMainWindow):
         self.pushButton_3.clicked.connect(self.nextReq)
         self.AcceptReqPushButton.clicked.connect(self.appReq)
         self.pushButton_2.clicked.connect(self.disReq)
-       # self.searchPushButton.clicked.connect(self.searchUsOrEq)
+        # self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         #self.hideEverything()
@@ -508,6 +508,8 @@ class MainWindow(QMainWindow):
          #   self.addInventoryButton.hide()
         self.adminRightsGroupBox_2.hide()
         self.refreshReqTable()
+        self.refreshEqTable()
+        self.refreshUsTable()
         self.show()
 
     def addEq(self):
@@ -646,6 +648,50 @@ class MainWindow(QMainWindow):
                 self.showMessage("Ошибка добавления", "пользователь с такой картой уже добавлен")
             elif codeError == 8:
                 self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
+    def refreshEqTable(self):
+        self.__eqTableContents.clear()
+        all_eq = self.__db.get_all_equipment()
+        for i in all_eq:
+            x = ""
+            y = ""
+            if i.x == -1:
+                x = "--"
+            else:
+                x = str(i.x)
+            if i.y == -1:
+                y = "--"
+            else:
+                y = str(i.y)
+            self.__eqTableContents.append([
+                str(i.id),
+                str(i.title),
+                str(i.count),
+                str(i.reserve_count),
+                str(i.access),
+                x,
+                y])
+        data_frame = pd.DataFrame(self.__eqTableContents,
+                                      columns=["ID", "Название", "Количество", "Зарезервировано",
+                                               "Доступ", "От стены", "От пола"],
+                                      index=[i for i in range(len(self.__eqTableContents))])
+        model = TableModel(data_frame)
+        self.eqTableView.setModel(model)
+    def refreshUsTable(self):
+        ref=AdminAccess
+        self.__usTableContents.clear()
+        for i in self.__user_list.get_user_list():
+            self.__usTableContents.append([
+                str(hex(i.id)),
+                i.mail,
+                i.access.power
+            ])
+        data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта", "Доступ"],
+                                  index=[i for i in range(len(self.__usTableContents))])
+        model = TableModel(data_frame)
+        self.usTableView.setModel(model)
+        self.usTableView.selectRow(1)
+
+
     def refreshReqTable(self):
         #self.__reqs = self.__db.get_unsolved_requests()
         self.__reqs=self.__db.get_all_requests()
