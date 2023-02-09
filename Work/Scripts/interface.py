@@ -78,6 +78,7 @@ class MainWindow(QMainWindow):
         self.__current_user = current_user
         self.__user_list = user_list
         self.__db = db
+        self.__tableContents=[]
         self.__addingEq = False  # либо добавляет оборудование, либо пользователя
         self.__viewingEq = False  # аналогично с просмотром
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
@@ -402,6 +403,7 @@ class MainWindow(QMainWindow):
         self.pushButton_3.clicked.connect(self.nextReq)
         self.AcceptReqPushButton.clicked.connect(self.appReq)
         self.pushButton_2.clicked.connect(self.disReq)
+        self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.hideEverything()
@@ -437,14 +439,14 @@ class MainWindow(QMainWindow):
     def showReqBox(self):
         self.hideEverything()
         all_req = self.__db.get_all_requests()
-        data = []
         mas = self.__reqs = self.__db.get_unsolved_requests()
         if (len(self.__reqs)) == 0:
             print("0 requests")
         self.__reqs = all_req
         self.__reqnum = 0
+        self.__tableContents.clear()
         for i in self.__reqs:
-            data.append([
+            self.__tableContents.append([
                 str(i.id),
                 str(i.title),
                 str(i.count),
@@ -452,11 +454,12 @@ class MainWindow(QMainWindow):
                 str(hex(i.sender_tg_id)),
                 str(i.sender_mail)
             ])
-        data_frame = pd.DataFrame(data,
+        data_frame = pd.DataFrame(self.__tableContents,
                                   columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
-                                  index=[i for i in range(len(data))]
+                                  index=[i for i in range(len(self.__tableContents))]
                                   )
         model = TableModel(data_frame)
+
         self.tableView2.setModel(model)
         self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         self.getReq()
@@ -702,7 +705,19 @@ class MainWindow(QMainWindow):
                     self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
 
 
-    #def searchUsOrEq(self):
+    def searchUsOrEq(self):
+        if self.searchByNameOrEmailLineEdit.text!="":
+            model = self.tableView.model()
+            data = []
+            ind = []
+            for row in range(model.rowCount()):
+                data.append([])
+                ind.append([])
+                for column in range(model.columnCount()):
+                    index = model.index(row, column)
+                    # We suppose data are strings
+                    data[row].append(str(model.data(index).toString()))
+
 
     def getReq(self):
         if self.__reqnum < len(self.__reqs):
@@ -714,7 +729,6 @@ class MainWindow(QMainWindow):
         else:
             self.__reqnum -= 1
             self.showMessage("Сообщение", "Запросов нет")
-
     def viewEqOrUser(self):
         if self.__viewingEq:
             all_eq = self.__db.get_all_equipment()
@@ -760,7 +774,6 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.tableView.setModel(model)
             # self.tableView.model().removeRow()
-
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
