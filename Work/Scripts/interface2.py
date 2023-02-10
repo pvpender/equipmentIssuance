@@ -720,7 +720,6 @@ class MainWindow(QMainWindow):
         self.usTableView.setModel(model)
     def searchUs(self):
         tg=0
-        name=""
         found=[]
         found2=[]
         found3=[]
@@ -744,7 +743,7 @@ class MainWindow(QMainWindow):
         if self.ussearchByFourthRightsCheckBox.isChecked():
             tg += 1000
         if tg!=0:
-            for i in self.__eqTableContents:
+            for i in self.__usTableContents:
                 if i[2] == tg:
                     found3.append(i)
         if len(found)!=0:
