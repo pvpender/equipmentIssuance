@@ -704,6 +704,7 @@ class MainWindow(QMainWindow):
         model = TableModel(data_frame)
         self.eqTableView.setModel(model)
     def refreshUsTable(self):
+        self.usTableView.clearSpans()
         ref=AdminAccess
         self.__usTableContents.clear()
         for i in self.__user_list.get_user_list():
@@ -716,7 +717,87 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__usTableContents))])
         model = TableModel(data_frame)
         self.usTableView.setModel(model)
-        self.usTableView.selectRow(1)
+    def searchUs(self):
+        tg=0
+        name=""
+        found=[]
+        found2=[]
+        found3=[]
+        found4=[]
+        found5=[]
+        foundres=[]
+        if self.eqsearchByIdSpinBox.value()!=-1:
+            id=self.eqsearchByIdSpinBox.value()
+            for i in self.__eqTableContents:
+                if i[0] == str(self.eqsearchByIdSpinBox.value()):
+                    found.append(i)
+        if self.eqsearchByEmailOrNameLineEdit.text()!="":
+            name=self.eqsearchByEmailOrNameLineEdit.text()
+            for i in self.__eqTableContents:
+                if i[1] == self.eqsearchByEmailOrNameLineEdit.text():
+                    found2.append(i)
+        if self.eqsearchByFirstRightsCheckBox.isChecked():
+            tg += 1
+        if self.eqsearchBySecondRightsCheckBox.isChecked():
+            tg += 10
+        if self.eqsearchByThirdRightsCheckBox.isChecked():
+            tg += 100
+        if self.eqsearchByFourthRightsCheckBox.isChecked():
+            tg += 1000
+        if self.searchByHeightSpinBox.value()!=-1:
+            for i in self.__eqTableContents:
+                if i[6] == str(self.searchByHeightSpinBox.value()):
+                   found4.append(i)
+        if self.searchByPosFromLeftSpinBox.value()!=-1:
+            for i in self.__eqTableContents:
+                if i[5] == str(self.searchByPosFromLeftSpinBox.value()):
+                   found5.append(i)
+        if tg!=0:
+            for i in self.__eqTableContents:
+                if i[4] == tg:
+                    found3.append(i)
+        if len(found)!=0:
+            foundres=found
+            if len(found2)!=0:
+                foundres=[x for x in foundres if x in found2]
+            if len(found3) != 0:
+                foundres=[x for x in foundres if x in found3]
+            if len(found4) !=0:
+                foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+        if len(found2) != 0 and len(found)==0:
+            foundres = found2
+            if len(found3) != 0:
+                foundres=[x for x in foundres if x in found3]
+            if len(found4) != 0:
+                foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+        if len(found3) != 0 and len(found2)==0 and len(found)==0:
+            foundres = found3
+            if len(found4) != 0:
+                foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+        if len(found4)!=0:
+            foundres=found4
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+        if len(found5)!=0:
+            foundres=found5
+            if len(found4) !=0:
+                foundres=[x for x in foundres if x in found4]
+        if len(foundres)!=0:
+            self.eqTableView.clearSpans()
+            data_frame = pd.DataFrame(foundres,
+                                          columns=["ID", "Название", "Количество", "Зарезервировано",
+                                                   "Доступ", "От стены", "От пола"],
+                                          index=[i for i in range(len(foundres))])
+            model = TableModel(data_frame)
+            self.eqTableView.setModel(model)
+        else:
+            self.showMessage("Проблема", "Ничего не найдено")
 
     def searchEq(self):
         tg=0
