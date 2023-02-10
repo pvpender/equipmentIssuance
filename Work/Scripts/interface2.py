@@ -518,12 +518,15 @@ class MainWindow(QMainWindow):
         self.reqViewRefreshPushButton.clicked.connect(self.refreshReqTable)
         self.usViewRefreshPushButton.clicked.connect(self.refreshUsTable)
         self.ussearchPushButton.clicked.connect(self.searchUs)
+        self.heightSpinBox.setMinimum(-1)
+        self.posFromLeftSpinBox.setMinimum(-1)
+        self.heightSpinBox.setValue(-1)
+        self.posFromLeftSpinBox.setValue(-1)
         self.eqsearchByIdSpinBox.setMinimum(-1)
-        self.eqsearchByIdSpinBox.setValue(-1)
         self.searchByPosFromLeftSpinBox.setMinimum(-1)
-        self.searchByPosFromLeftSpinBox.setValue(-1)
+        self.searchByHeightSpinBox.setValue(-1)
         self.searchByHeightSpinBox.setMinimum(-1)
-        self.searchByHeightSpinBox.setMinimum(-1)
+        self.searchByPosFromLeftSpinBox.setMinimum(-1)
         # self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
@@ -580,6 +583,8 @@ class MainWindow(QMainWindow):
             self.eqfourthRightsCheckBox.setChecked(False)
             self.eqNameOrEmailLineEdit.setText("")
             self.descriptionTextEdit.setText("")
+            self.heightSpinBox.setValue(-1)
+            self.posFromLeftSpinBox.setValue(-1)
         else:
             if codeError == 1:
                 self.showMessage("Ошибка добавления", "Введите название")
@@ -676,6 +681,8 @@ class MainWindow(QMainWindow):
             elif codeError == 8:
                 self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
     def refreshEqTable(self):
+        self.eqsearchByIdSpinBox.setValue(-1)
+        self.searchByHeightSpinBox.setValue(-1)
         self.eqTableView.clearSpans()
         self.__eqTableContents.clear()
         all_eq = self.__db.get_all_equipment()
@@ -769,7 +776,6 @@ class MainWindow(QMainWindow):
 
     def searchEq(self):
         tg=0
-        name=""
         found=[]
         found2=[]
         found3=[]
@@ -804,7 +810,7 @@ class MainWindow(QMainWindow):
                    found5.append(i)
         if tg!=0:
             for i in self.__eqTableContents:
-                if i[4] == tg:
+                if i[4] == str(tg):
                     found3.append(i)
         if len(found)!=0:
             foundres=found
