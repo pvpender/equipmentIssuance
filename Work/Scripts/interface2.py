@@ -514,6 +514,15 @@ class MainWindow(QMainWindow):
         self.AcceptReqPushButton.clicked.connect(self.appReq)
         self.pushButton_2.clicked.connect(self.disReq)
         self.eqsearchPushButton.clicked.connect(self.searchEq)
+        self.eqViewRefreshPushButton.clicked.connect(self.refreshEqTable)
+        self.reqViewRefreshPushButton.clicked.connect(self.refreshReqTable)
+        self.usViewRefreshPushButton.clicked.connect(self.refreshReqTable)
+        self.eqsearchByIdSpinBox.setMinimum(-1)
+        self.eqsearchByIdSpinBox.setValue(-1)
+        self.searchByPosFromLeftSpinBox.setMinimum(-1)
+        self.searchByPosFromLeftSpinBox.setValue(-1)
+        self.searchByHeightSpinBox.setMinimum(-1)
+        self.searchByHeightSpinBox.setMinimum(-1)
         # self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
@@ -536,7 +545,7 @@ class MainWindow(QMainWindow):
             codeError = 1
         elif self.__db.get_equipment_by_title(self.eqNameOrEmailLineEdit.text()):
             codeError=8
-        if codeError == -1 and self.__addingEq and self.descriptionTextEdit.toPlainText() == "":
+        if codeError == -1 and self.descriptionTextEdit.toPlainText() == "":
             codeError = 3
         if codeError == -1 and self.eqfirstRightsCheckBox.isChecked():
             tg += 1
@@ -716,6 +725,7 @@ class MainWindow(QMainWindow):
         found2=[]
         found3=[]
         found4=[]
+        found5=[]
         foundres=[]
         if self.eqsearchByIdSpinBox.value()!=-1:
             id=self.eqsearchByIdSpinBox.value()
@@ -735,6 +745,14 @@ class MainWindow(QMainWindow):
             tg += 100
         if self.eqsearchByFourthRightsCheckBox.isChecked():
             tg += 1000
+        if self.searchByHeightSpinBox.value()!=-1:
+            for i in self.__eqTableContents:
+                if i[6] == str(self.searchByHeightSpinBox.value()):
+                   found4.append(i)
+        if self.searchByPosFromLeftSpinBox.value()!=-1:
+            for i in self.__eqTableContents:
+                if i[5] == str(self.searchByPosFromLeftSpinBox.value()):
+                   found5.append(i)
         if tg!=0:
             for i in self.__eqTableContents:
                 if i[4] == tg:
@@ -747,18 +765,30 @@ class MainWindow(QMainWindow):
                 foundres=[x for x in foundres if x in found3]
             if len(found4) !=0:
                 foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
         if len(found2) != 0 and len(found)==0:
             foundres = found2
             if len(found3) != 0:
                 foundres=[x for x in foundres if x in found3]
             if len(found4) != 0:
                 foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
         if len(found3) != 0 and len(found2)==0 and len(found)==0:
             foundres = found3
             if len(found4) != 0:
                 foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
         if len(found4)!=0:
             foundres=found4
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+        if len(found5)!=0:
+            foundres=found5
+            if len(found4) !=0:
+                foundres=[x for x in foundres if x in found4]
         if len(foundres)!=0:
             self.eqTableView.clearSpans()
             data_frame = pd.DataFrame(foundres,
