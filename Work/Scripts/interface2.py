@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(parent=self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(0, 10, 1411, 821))
+        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 1411, 821))
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -239,7 +239,7 @@ class MainWindow(QMainWindow):
         self.adminRightsGroupBox_2.setTitle("")
         self.adminRightsGroupBox_2.setObjectName("adminRightsGroupBox_2")
         self.verticalLayoutWidget_6 = QtWidgets.QWidget(parent=self.adminRightsGroupBox_2)
-        self.verticalLayoutWidget_6.setGeometry(QtCore.QRect(90, 0, 354, 151))
+        self.verticalLayoutWidget_6.setGeometry(QtCore.QRect(100, 10, 354, 151))
         self.verticalLayoutWidget_6.setObjectName("verticalLayoutWidget_6")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_6)
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -388,7 +388,7 @@ class MainWindow(QMainWindow):
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
         self.RequestsGroupBox = QtWidgets.QGroupBox(parent=self.tab_5)
-        self.RequestsGroupBox.setGeometry(QtCore.QRect(10, 0, 1401, 621))
+        self.RequestsGroupBox.setGeometry(QtCore.QRect(0, 0, 1401, 621))
         self.RequestsGroupBox.setObjectName("RequestsGroupBox")
         self.textBrowser = QtWidgets.QTextBrowser(parent=self.RequestsGroupBox)
         self.textBrowser.setGeometry(QtCore.QRect(20, 50, 511, 141))
@@ -421,6 +421,45 @@ class MainWindow(QMainWindow):
         self.reqViewRefreshPushButton = QtWidgets.QPushButton(parent=self.RequestsGroupBox)
         self.reqViewRefreshPushButton.setGeometry(QtCore.QRect(150, 580, 351, 28))
         self.reqViewRefreshPushButton.setObjectName("reqViewRefreshPushButton")
+        self.reqsearchPushButton = QtWidgets.QPushButton(parent=self.RequestsGroupBox)
+        self.reqsearchPushButton.setGeometry(QtCore.QRect(150, 540, 351, 28))
+        self.reqsearchPushButton.setObjectName("reqsearchPushButton")
+        self.reqsearchByWhat = QtWidgets.QLineEdit(parent=self.RequestsGroupBox)
+        self.reqsearchByWhat.setGeometry(QtCore.QRect(90, 380, 381, 22))
+        self.reqsearchByWhat.setObjectName("reqsearchByWhat")
+        self.reqsearchByEmail = QtWidgets.QLineEdit(parent=self.RequestsGroupBox)
+        self.reqsearchByEmail.setGeometry(QtCore.QRect(160, 320, 311, 22))
+        self.reqsearchByEmail.setObjectName("reqsearchByEmail")
+        self.searchByIdLabel_4 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
+        self.searchByIdLabel_4.setGeometry(QtCore.QRect(40, 380, 101, 16))
+        self.searchByIdLabel_4.setObjectName("searchByIdLabel_4")
+        self.searchByEmailOrNameLabel_5 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
+        self.searchByEmailOrNameLabel_5.setGeometry(QtCore.QRect(40, 320, 101, 16))
+        self.searchByEmailOrNameLabel_5.setObjectName("searchByEmailOrNameLabel_5")
+        self.reqsearchByUsId = QtWidgets.QLineEdit(parent=self.RequestsGroupBox)
+        self.reqsearchByUsId.setGeometry(QtCore.QRect(160, 350, 311, 22))
+        self.reqsearchByUsId.setObjectName("reqsearchByUsId")
+        self.reqsearchByPurpose = QtWidgets.QLineEdit(parent=self.RequestsGroupBox)
+        self.reqsearchByPurpose.setGeometry(QtCore.QRect(90, 410, 381, 22))
+        self.reqsearchByPurpose.setObjectName("reqsearchByPurpose")
+        self.searchByIdLabel_5 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
+        self.searchByIdLabel_5.setGeometry(QtCore.QRect(40, 350, 91, 16))
+        self.searchByIdLabel_5.setObjectName("searchByIdLabel_5")
+        self.searchByEmailOrNameLabel_6 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
+        self.searchByEmailOrNameLabel_6.setGeometry(QtCore.QRect(40, 410, 31, 16))
+        self.searchByEmailOrNameLabel_6.setObjectName("searchByEmailOrNameLabel_6")
+        self.searchByIdLabel_6 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
+        self.searchByIdLabel_6.setGeometry(QtCore.QRect(40, 440, 71, 16))
+        self.searchByIdLabel_6.setObjectName("searchByIdLabel_6")
+        self.searchByEmailOrNameLabel_7 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
+        self.searchByEmailOrNameLabel_7.setGeometry(QtCore.QRect(40, 470, 91, 16))
+        self.searchByEmailOrNameLabel_7.setObjectName("searchByEmailOrNameLabel_7")
+        self.reqsearchByEqId = QtWidgets.QSpinBox(parent=self.RequestsGroupBox)
+        self.reqsearchByEqId.setGeometry(QtCore.QRect(150, 470, 81, 22))
+        self.reqsearchByEqId.setObjectName("reqsearchByEqId")
+        self.reqsearchByCount = QtWidgets.QSpinBox(parent=self.RequestsGroupBox)
+        self.reqsearchByCount.setGeometry(QtCore.QRect(150, 440, 81, 22))
+        self.reqsearchByCount.setObjectName("reqsearchByCount")
         self.tabWidget.addTab(self.tab_5, "")
         self.setCentralWidget(self.centralwidget)
 
@@ -501,6 +540,13 @@ class MainWindow(QMainWindow):
         self.pushButton_3.setText(_translate("MainWindow", "Следующий"))
         self.label_8.setText(_translate("MainWindow", "Необработанных:"))
         self.reqViewRefreshPushButton.setText(_translate("MainWindow", "Обновить таблицу"))
+        self.reqsearchPushButton.setText(_translate("MainWindow", " Поиск"))
+        self.searchByIdLabel_4.setText(_translate("MainWindow", "Что"))
+        self.searchByEmailOrNameLabel_5.setText(_translate("MainWindow", "Email запросившего"))
+        self.searchByIdLabel_5.setText(_translate("MainWindow", "ID запросившего"))
+        self.searchByEmailOrNameLabel_6.setText(_translate("MainWindow", "Цель"))
+        self.searchByIdLabel_6.setText(_translate("MainWindow", "Количество"))
+        self.searchByEmailOrNameLabel_7.setText(_translate("MainWindow", "ID оборудования"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("MainWindow", "Запросы"))
         self.ableNowSpinBox.setMinimum(0)
         self.searchByPosFromLeftSpinBox.setMinimum(1)
@@ -518,6 +564,7 @@ class MainWindow(QMainWindow):
         self.reqViewRefreshPushButton.clicked.connect(self.refreshReqTable)
         self.usViewRefreshPushButton.clicked.connect(self.refreshUsTable)
         self.ussearchPushButton.clicked.connect(self.searchUs)
+        self.reqsearchPushButton.clicked.connect(self.searchreq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -530,6 +577,10 @@ class MainWindow(QMainWindow):
         # self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
+        self.reqsearchByCount.setMinimum(-1)
+        self.reqsearchByEqId.setMinimum(-1)
+        self.reqsearchByCount.setValue(-1)
+        self.reqsearchByEqId.setValue(-1)
         if not admin_access.can_get_request:
             self.tab_5.hide()
         if not admin_access.can_add_users:
@@ -540,6 +591,7 @@ class MainWindow(QMainWindow):
         self.refreshReqTable()
         self.refreshEqTable()
         self.refreshUsTable()
+
         self.show()
 
     def addEq(self):
@@ -773,7 +825,6 @@ class MainWindow(QMainWindow):
             self.usTableView.setModel(model)
         else:
             self.showMessage("Проблема", "Ничего не найдено")
-
     def searchEq(self):
         tg=0
         found=[]
@@ -854,7 +905,90 @@ class MainWindow(QMainWindow):
             self.eqTableView.setModel(model)
         else:
             self.showMessage("Проблема", "Ничего не найдено")
-
+    def searchreq(self):
+        tg = 0
+        found = []
+        found2 = []
+        found3 = []
+        found4 = []
+        found5 = []
+        found6=[]
+        foundres = []
+        if self.reqsearchByEmail.text()!="":
+            for i in self.__reqTableContents:
+                if i[5]==self.reqsearchByEmail.text():
+                    found.append(i)
+        if self.reqsearchByUsId.text() != "":
+            for i in self.__reqTableContents:
+                if i[4] == str(int(self.reqsearchByUsId.text(),16)):
+                    found2.append(i)
+        if self.reqsearchByWhat.text()!="":
+            for i in self.__reqTableContents:
+                if i[1]==self.reqsearchByWhat.text():
+                    found3.append(i)
+        if self.reqsearchByPurpose.text()!="":
+            for i in self.__reqTableContents:
+                if i[3]==self.reqsearchByPurpose.text():
+                    found4.append(i)
+        if self.reqsearchByCount.value()!=-1:
+            for i in self.__reqTableContents:
+                if i[2]==str(self.reqsearchByCount.value()):
+                    found5.append(i)
+        if self.reqsearchByEqId.value()!=-1:
+            for i in self.__reqTableContents:
+                if i[0]==str(self.reqsearchByEqId.value()):
+                    found6.append(i)
+        if len(found)!=0:
+            foundres=found
+            if len(found2)!=0:
+                foundres=[x for x in foundres if x in found2]
+            if len(found3) != 0:
+                foundres=[x for x in foundres if x in found3]
+            if len(found4) !=0:
+                foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+            if len(found6) !=0:
+                foundres=[x for x in foundres if x in found6]
+        if len(found2) != 0 and len(found)==0:
+            foundres = found2
+            if len(found3) != 0:
+                foundres=[x for x in foundres if x in found3]
+            if len(found4) != 0:
+                foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+            if len(found6) !=0:
+                foundres=[x for x in foundres if x in found6]
+        if len(found3) != 0 and len(found2)==0 and len(found)==0:
+            foundres = found3
+            if len(found4) != 0:
+                foundres=[x for x in foundres if x in found4]
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+            if len(found6) !=0:
+                foundres=[x for x in foundres if x in found6]
+        if len(found4)!=0:
+            foundres=found4
+            if len(found5) !=0:
+                foundres=[x for x in foundres if x in found5]
+            if len(found6) !=0:
+                foundres=[x for x in foundres if x in found6]
+        if len(found5)!=0:
+            foundres=found5
+            if len(found4) !=0:
+                foundres=[x for x in foundres if x in found4]
+            if len(found6) !=0:
+                foundres=[x for x in foundres if x in found6]
+        if len(foundres)!=0:
+            data_frame = pd.DataFrame(foundres,
+                                      columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
+                                      index=[i for i in range(len(foundres))]
+                                      )
+            model = TableModel(data_frame)
+            self.tableView2.setModel(model)
+        else:
+            self.showMessage("Проблема", "Ничего не найдено")
     def refreshReqTable(self):
         #self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
