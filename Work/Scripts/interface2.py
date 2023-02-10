@@ -516,7 +516,8 @@ class MainWindow(QMainWindow):
         self.eqsearchPushButton.clicked.connect(self.searchEq)
         self.eqViewRefreshPushButton.clicked.connect(self.refreshEqTable)
         self.reqViewRefreshPushButton.clicked.connect(self.refreshReqTable)
-        self.usViewRefreshPushButton.clicked.connect(self.refreshReqTable)
+        self.usViewRefreshPushButton.clicked.connect(self.refreshUsTable)
+        self.ussearchPushButton.clicked.connect(self.searchUs)
         self.eqsearchByIdSpinBox.setMinimum(-1)
         self.eqsearchByIdSpinBox.setValue(-1)
         self.searchByPosFromLeftSpinBox.setMinimum(-1)
@@ -723,38 +724,28 @@ class MainWindow(QMainWindow):
         found=[]
         found2=[]
         found3=[]
-        found4=[]
-        found5=[]
         foundres=[]
-        if self.eqsearchByIdSpinBox.value()!=-1:
-            id=self.eqsearchByIdSpinBox.value()
-            for i in self.__eqTableContents:
-                if i[0] == str(self.eqsearchByIdSpinBox.value()):
+        if self.ussearchByNameOrEmailLineEdit.text()!="":
+            id=self.ussearchByNameOrEmailLineEdit.text()
+            for i in self.__usTableContents:
+                if i[0] == id:
                     found.append(i)
-        if self.eqsearchByEmailOrNameLineEdit.text()!="":
-            name=self.eqsearchByEmailOrNameLineEdit.text()
-            for i in self.__eqTableContents:
-                if i[1] == self.eqsearchByEmailOrNameLineEdit.text():
+        if self.ussearchByEmailOrNameLineEdit.text()!="":
+            name=self.ussearchByEmailOrNameLineEdit.text()
+            for i in self.__usTableContents:
+                if i[1] == self.ussearchByEmailOrNameLineEdit.text():
                     found2.append(i)
-        if self.eqsearchByFirstRightsCheckBox.isChecked():
+        if self.ussearchByFirstRightsCheckBox.isChecked():
             tg += 1
-        if self.eqsearchBySecondRightsCheckBox.isChecked():
+        if self.ussearchBySecondRightsCheckBox.isChecked():
             tg += 10
-        if self.eqsearchByThirdRightsCheckBox.isChecked():
+        if self.ussearchByThirdRightsCheckBox.isChecked():
             tg += 100
-        if self.eqsearchByFourthRightsCheckBox.isChecked():
+        if self.ussearchByFourthRightsCheckBox.isChecked():
             tg += 1000
-        if self.searchByHeightSpinBox.value()!=-1:
-            for i in self.__eqTableContents:
-                if i[6] == str(self.searchByHeightSpinBox.value()):
-                   found4.append(i)
-        if self.searchByPosFromLeftSpinBox.value()!=-1:
-            for i in self.__eqTableContents:
-                if i[5] == str(self.searchByPosFromLeftSpinBox.value()):
-                   found5.append(i)
         if tg!=0:
             for i in self.__eqTableContents:
-                if i[4] == tg:
+                if i[2] == tg:
                     found3.append(i)
         if len(found)!=0:
             foundres=found
@@ -762,40 +753,18 @@ class MainWindow(QMainWindow):
                 foundres=[x for x in foundres if x in found2]
             if len(found3) != 0:
                 foundres=[x for x in foundres if x in found3]
-            if len(found4) !=0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
         if len(found2) != 0 and len(found)==0:
             foundres = found2
             if len(found3) != 0:
                 foundres=[x for x in foundres if x in found3]
-            if len(found4) != 0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
         if len(found3) != 0 and len(found2)==0 and len(found)==0:
             foundres = found3
-            if len(found4) != 0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-        if len(found4)!=0:
-            foundres=found4
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-        if len(found5)!=0:
-            foundres=found5
-            if len(found4) !=0:
-                foundres=[x for x in foundres if x in found4]
         if len(foundres)!=0:
-            self.eqTableView.clearSpans()
-            data_frame = pd.DataFrame(foundres,
-                                          columns=["ID", "Название", "Количество", "Зарезервировано",
-                                                   "Доступ", "От стены", "От пола"],
-                                          index=[i for i in range(len(foundres))])
+            self.usTableView.clearSpans()
+            data_frame = pd.DataFrame(foundres, columns=["ID карты", "Почта", "Доступ"],
+                                      index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
-            self.eqTableView.setModel(model)
+            self.usTableView.setModel(model)
         else:
             self.showMessage("Проблема", "Ничего не найдено")
 
