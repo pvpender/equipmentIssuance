@@ -513,6 +513,7 @@ class MainWindow(QMainWindow):
         self.pushButton_3.clicked.connect(self.nextReq)
         self.AcceptReqPushButton.clicked.connect(self.appReq)
         self.pushButton_2.clicked.connect(self.disReq)
+        self.eqsearchPushButton.clicked.connect(self.searchEq)
         # self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
@@ -665,6 +666,7 @@ class MainWindow(QMainWindow):
             elif codeError == 8:
                 self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
     def refreshEqTable(self):
+        self.eqTableView.clearSpans()
         self.__eqTableContents.clear()
         all_eq = self.__db.get_all_equipment()
         for i in all_eq:
@@ -707,9 +709,70 @@ class MainWindow(QMainWindow):
         self.usTableView.setModel(model)
         self.usTableView.selectRow(1)
 
+    def searchEq(self):
+        tg=0
+        name=""
+        found=[]
+        found2=[]
+        found3=[]
+        found4=[]
+        foundres=[]
+        if self.eqsearchByIdSpinBox.value()!=-1:
+            id=self.eqsearchByIdSpinBox.value()
+            for i in self.__eqTableContents:
+                if i[0] == str(self.eqsearchByIdSpinBox.value()):
+                    found.append(i)
+        if self.eqsearchByEmailOrNameLineEdit.text()!="":
+            name=self.eqsearchByEmailOrNameLineEdit.text()
+            for i in self.__eqTableContents:
+                if i[1] == self.eqsearchByEmailOrNameLineEdit.text():
+                    found2.append(i)
+        if self.eqsearchByFirstRightsCheckBox.isChecked():
+            tg += 1
+        if self.eqsearchBySecondRightsCheckBox.isChecked():
+            tg += 10
+        if self.eqsearchByThirdRightsCheckBox.isChecked():
+            tg += 100
+        if self.eqsearchByFourthRightsCheckBox.isChecked():
+            tg += 1000
+        if tg!=0:
+            for i in self.__eqTableContents:
+                if i[4] == tg:
+                    found3.append(i)
+        if len(found)!=0:
+            foundres=found
+            if len(found2)!=0:
+                foundres=[x for x in foundres if x in found2]
+            if len(found3) != 0:
+                foundres=[x for x in foundres if x in found3]
+            if len(found4) !=0:
+                foundres=[x for x in foundres if x in found4]
+        if len(found2) != 0 and len(found)==0:
+            foundres = found2
+            if len(found3) != 0:
+                foundres=[x for x in foundres if x in found3]
+            if len(found4) != 0:
+                foundres=[x for x in foundres if x in found4]
+        if len(found3) != 0 and len(found2)==0 and len(found)==0:
+            foundres = found3
+            if len(found4) != 0:
+                foundres=[x for x in foundres if x in found4]
+        if len(found4)!=0:
+            foundres=found4
+        if len(foundres)!=0:
+            self.eqTableView.clearSpans()
+            data_frame = pd.DataFrame(foundres,
+                                          columns=["ID", "Название", "Количество", "Зарезервировано",
+                                                   "Доступ", "От стены", "От пола"],
+                                          index=[i for i in range(len(foundres))])
+            model = TableModel(data_frame)
+            self.eqTableView.setModel(model)
+        else:
+            self.showMessage("Проблема", "Ничего не найдено")
 
     def refreshReqTable(self):
         #self.__reqs = self.__db.get_unsolved_requests()
+        self.tableView2.clearSpans()
         self.__reqs=self.__db.get_all_requests()
         if (len(self.__reqs)) == 0:
             print("0 requests")
