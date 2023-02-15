@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
         self.__current_user = current_user
         self.__user_list = user_list
         self.__db = db
-        self.__eqTableContents=[]
+        self.__eqTableContents = []
         self.__usTableContents = []
         self.__reqTableContents = []
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
@@ -600,7 +600,7 @@ class MainWindow(QMainWindow):
         if codeError == -1 and self.eqNameOrEmailLineEdit.text() == "":
             codeError = 1
         elif self.__db.get_equipment_by_title(self.eqNameOrEmailLineEdit.text()):
-            codeError=8
+            codeError = 8
         if codeError == -1 and self.descriptionTextEdit.toPlainText() == "":
             codeError = 3
         if codeError == -1 and self.eqfirstRightsCheckBox.isChecked():
@@ -619,8 +619,8 @@ class MainWindow(QMainWindow):
         height = self.heightSpinBox.value()
         if self.heightSpinBox.value() == 0 or self.heightSpinBox.value() == -1:
             height = -1
-        if codeError == -1 and self.__db.get_equipment_by_coordinates(fromLeft, height)!=None:
-            codeError=9
+        if codeError == -1 and self.__db.get_equipment_by_coordinates(fromLeft, height) != None:
+            codeError = 9
         if codeError == -1:
             eq = Equipment(self.eqNameOrEmailLineEdit.text(),
                            self.descriptionTextEdit.toPlainText(),
@@ -646,7 +646,7 @@ class MainWindow(QMainWindow):
                 self.showMessage("Ошибка добавления", "отсутствует описание")
             elif codeError == 8:
                 self.showMessage("Ошибка добавления", "Оборудование с таким названием уже есть в базе")
-            elif codeError ==9:
+            elif codeError == 9:
                 self.showMessage("Ошибка добавления", "Ячейка занята")
 
     def addUser(self):
@@ -693,10 +693,10 @@ class MainWindow(QMainWindow):
             tg += 1000
         if codeError == -1 and tg == 0:
             codeError = 2
-        if codeError == -1 and self.__db.get_user_by_id(int(self.usIdCardLineEdit.text(), 16))!=None:
+        if codeError == -1 and self.__db.get_user_by_id(int(self.usIdCardLineEdit.text(), 16)) != None:
             codeError = 7
-        if codeError ==-1 and self.__db.get_user_by_mail(self.usnameOrEmailLineEdit.text())!=None:
-            codeError=8
+        if codeError == -1 and self.__db.get_user_by_mail(self.usnameOrEmailLineEdit.text()) != None:
+            codeError = 8
         if codeError == -1:
             if self.usradioButton_User.isChecked():
                 ac = Access(tg)
@@ -719,7 +719,7 @@ class MainWindow(QMainWindow):
             if codeError == 1:
                 self.showMessage("Ошибка добавления", "Введите Email")
             elif codeError == 2:
-                    self.showMessage("Ошибка добавления", "Не отмечены права на получение")
+                self.showMessage("Ошибка добавления", "Не отмечены права на получение")
             elif codeError == 3:
                 self.showMessage("Ошибка добавления", "отсутствует описание")
             elif codeError == 4:
@@ -732,6 +732,7 @@ class MainWindow(QMainWindow):
                 self.showMessage("Ошибка добавления", "пользователь с такой картой уже добавлен")
             elif codeError == 8:
                 self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
+
     def refreshEqTable(self):
         self.eqsearchByIdSpinBox.setValue(-1)
         self.searchByHeightSpinBox.setValue(-1)
@@ -758,14 +759,15 @@ class MainWindow(QMainWindow):
                 x,
                 y])
         data_frame = pd.DataFrame(self.__eqTableContents,
-                                      columns=["ID", "Название", "Количество", "Зарезервировано",
-                                               "Доступ", "От стены", "От пола"],
-                                      index=[i for i in range(len(self.__eqTableContents))])
+                                  columns=["ID", "Название", "Количество", "Зарезервировано",
+                                           "Доступ", "От стены", "От пола"],
+                                  index=[i for i in range(len(self.__eqTableContents))])
         model = TableModel(data_frame)
         self.eqTableView.setModel(model)
+
     def refreshUsTable(self):
         self.usTableView.clearSpans()
-        ref=AdminAccess
+        ref = AdminAccess
         self.__usTableContents.clear()
         for i in self.__user_list.get_user_list():
             self.__usTableContents.append([
@@ -777,19 +779,20 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__usTableContents))])
         model = TableModel(data_frame)
         self.usTableView.setModel(model)
+
     def searchUs(self):
-        tg=0
-        found=[]
-        found2=[]
-        found3=[]
-        foundres=[]
-        if self.ussearchByNameOrEmailLineEdit.text()!="":
-            id=self.ussearchByNameOrEmailLineEdit.text()
+        tg = 0
+        found = []
+        found2 = []
+        found3 = []
+        foundres = []
+        if self.ussearchByNameOrEmailLineEdit.text() != "":
+            id = self.ussearchByNameOrEmailLineEdit.text()
             for i in self.__usTableContents:
                 if i[0] == id:
                     found.append(i)
-        if self.ussearchByEmailOrNameLineEdit.text()!="":
-            name=self.ussearchByEmailOrNameLineEdit.text()
+        if self.ussearchByEmailOrNameLineEdit.text() != "":
+            name = self.ussearchByEmailOrNameLineEdit.text()
             for i in self.__usTableContents:
                 if i[1] == self.ussearchByEmailOrNameLineEdit.text():
                     found2.append(i)
@@ -801,23 +804,23 @@ class MainWindow(QMainWindow):
             tg += 100
         if self.ussearchByFourthRightsCheckBox.isChecked():
             tg += 1000
-        if tg!=0:
+        if tg != 0:
             for i in self.__usTableContents:
                 if i[2] == tg:
                     found3.append(i)
-        if len(found)!=0:
-            foundres=found
-            if len(found2)!=0:
-                foundres=[x for x in foundres if x in found2]
+        if len(found) != 0:
+            foundres = found
+            if len(found2) != 0:
+                foundres = [x for x in foundres if x in found2]
             if len(found3) != 0:
-                foundres=[x for x in foundres if x in found3]
-        if len(found2) != 0 and len(found)==0:
+                foundres = [x for x in foundres if x in found3]
+        if len(found2) != 0 and len(found) == 0:
             foundres = found2
             if len(found3) != 0:
-                foundres=[x for x in foundres if x in found3]
-        if len(found3) != 0 and len(found2)==0 and len(found)==0:
+                foundres = [x for x in foundres if x in found3]
+        if len(found3) != 0 and len(found2) == 0 and len(found) == 0:
             foundres = found3
-        if len(foundres)!=0:
+        if len(foundres) != 0:
             self.usTableView.clearSpans()
             data_frame = pd.DataFrame(foundres, columns=["ID карты", "Почта", "Доступ"],
                                       index=[i for i in range(len(foundres))])
@@ -825,21 +828,22 @@ class MainWindow(QMainWindow):
             self.usTableView.setModel(model)
         else:
             self.showMessage("Проблема", "Ничего не найдено")
+
     def searchEq(self):
-        tg=0
-        found=[]
-        found2=[]
-        found3=[]
-        found4=[]
-        found5=[]
-        foundres=[]
-        if self.eqsearchByIdSpinBox.value()!=-1:
-            id=self.eqsearchByIdSpinBox.value()
+        tg = 0
+        found = []
+        found2 = []
+        found3 = []
+        found4 = []
+        found5 = []
+        foundres = []
+        if self.eqsearchByIdSpinBox.value() != -1:
+            id = self.eqsearchByIdSpinBox.value()
             for i in self.__eqTableContents:
                 if i[0] == str(self.eqsearchByIdSpinBox.value()):
                     found.append(i)
-        if self.eqsearchByEmailOrNameLineEdit.text()!="":
-            name=self.eqsearchByEmailOrNameLineEdit.text()
+        if self.eqsearchByEmailOrNameLineEdit.text() != "":
+            name = self.eqsearchByEmailOrNameLineEdit.text()
             for i in self.__eqTableContents:
                 if i[1] == self.eqsearchByEmailOrNameLineEdit.text():
                     found2.append(i)
@@ -851,60 +855,61 @@ class MainWindow(QMainWindow):
             tg += 100
         if self.eqsearchByFourthRightsCheckBox.isChecked():
             tg += 1000
-        if self.searchByHeightSpinBox.value()!=-1:
+        if self.searchByHeightSpinBox.value() != -1:
             for i in self.__eqTableContents:
                 if i[6] == str(self.searchByHeightSpinBox.value()):
-                   found4.append(i)
-        if self.searchByPosFromLeftSpinBox.value()!=-1:
+                    found4.append(i)
+        if self.searchByPosFromLeftSpinBox.value() != -1:
             for i in self.__eqTableContents:
                 if i[5] == str(self.searchByPosFromLeftSpinBox.value()):
-                   found5.append(i)
-        if tg!=0:
+                    found5.append(i)
+        if tg != 0:
             for i in self.__eqTableContents:
                 if i[4] == str(tg):
                     found3.append(i)
-        if len(found)!=0:
-            foundres=found
-            if len(found2)!=0:
-                foundres=[x for x in foundres if x in found2]
+        if len(found) != 0:
+            foundres = found
+            if len(found2) != 0:
+                foundres = [x for x in foundres if x in found2]
             if len(found3) != 0:
-                foundres=[x for x in foundres if x in found3]
-            if len(found4) !=0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-        if len(found2) != 0 and len(found)==0:
+                foundres = [x for x in foundres if x in found3]
+            if len(found4) != 0:
+                foundres = [x for x in foundres if x in found4]
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+        if len(found2) != 0 and len(found) == 0:
             foundres = found2
             if len(found3) != 0:
-                foundres=[x for x in foundres if x in found3]
+                foundres = [x for x in foundres if x in found3]
             if len(found4) != 0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-        if len(found3) != 0 and len(found2)==0 and len(found)==0:
+                foundres = [x for x in foundres if x in found4]
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+        if len(found3) != 0 and len(found2) == 0 and len(found) == 0:
             foundres = found3
             if len(found4) != 0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-        if len(found4)!=0:
-            foundres=found4
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-        if len(found5)!=0:
-            foundres=found5
-            if len(found4) !=0:
-                foundres=[x for x in foundres if x in found4]
-        if len(foundres)!=0:
+                foundres = [x for x in foundres if x in found4]
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+        if len(found4) != 0:
+            foundres = found4
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+        if len(found5) != 0:
+            foundres = found5
+            if len(found4) != 0:
+                foundres = [x for x in foundres if x in found4]
+        if len(foundres) != 0:
             self.eqTableView.clearSpans()
             data_frame = pd.DataFrame(foundres,
-                                          columns=["ID", "Название", "Количество", "Зарезервировано",
-                                                   "Доступ", "От стены", "От пола"],
-                                          index=[i for i in range(len(foundres))])
+                                      columns=["ID", "Название", "Количество", "Зарезервировано",
+                                               "Доступ", "От стены", "От пола"],
+                                      index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
             self.eqTableView.setModel(model)
         else:
             self.showMessage("Проблема", "Ничего не найдено")
+
     def searchreq(self):
         tg = 0
         found = []
@@ -912,75 +917,75 @@ class MainWindow(QMainWindow):
         found3 = []
         found4 = []
         found5 = []
-        found6=[]
+        found6 = []
         foundres = []
-        if self.reqsearchByEmail.text()!="":
+        if self.reqsearchByEmail.text() != "":
             for i in self.__reqTableContents:
-                if i[5]==self.reqsearchByEmail.text():
+                if i[5] == self.reqsearchByEmail.text():
                     found.append(i)
         if self.reqsearchByUsId.text() != "":
             for i in self.__reqTableContents:
-                if i[4] == str(int(self.reqsearchByUsId.text(),16)):
+                if i[4] == str(int(self.reqsearchByUsId.text(), 16)):
                     found2.append(i)
-        if self.reqsearchByWhat.text()!="":
+        if self.reqsearchByWhat.text() != "":
             for i in self.__reqTableContents:
-                if i[1]==self.reqsearchByWhat.text():
+                if i[1] == self.reqsearchByWhat.text():
                     found3.append(i)
-        if self.reqsearchByPurpose.text()!="":
+        if self.reqsearchByPurpose.text() != "":
             for i in self.__reqTableContents:
-                if i[3]==self.reqsearchByPurpose.text():
+                if i[3] == self.reqsearchByPurpose.text():
                     found4.append(i)
-        if self.reqsearchByCount.value()!=-1:
+        if self.reqsearchByCount.value() != -1:
             for i in self.__reqTableContents:
-                if i[2]==str(self.reqsearchByCount.value()):
+                if i[2] == str(self.reqsearchByCount.value()):
                     found5.append(i)
-        if self.reqsearchByEqId.value()!=-1:
+        if self.reqsearchByEqId.value() != -1:
             for i in self.__reqTableContents:
-                if i[0]==str(self.reqsearchByEqId.value()):
+                if i[0] == str(self.reqsearchByEqId.value()):
                     found6.append(i)
-        if len(found)!=0:
-            foundres=found
-            if len(found2)!=0:
-                foundres=[x for x in foundres if x in found2]
+        if len(found) != 0:
+            foundres = found
+            if len(found2) != 0:
+                foundres = [x for x in foundres if x in found2]
             if len(found3) != 0:
-                foundres=[x for x in foundres if x in found3]
-            if len(found4) !=0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-            if len(found6) !=0:
-                foundres=[x for x in foundres if x in found6]
-        if len(found2) != 0 and len(found)==0:
+                foundres = [x for x in foundres if x in found3]
+            if len(found4) != 0:
+                foundres = [x for x in foundres if x in found4]
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+        if len(found2) != 0 and len(found) == 0:
             foundres = found2
             if len(found3) != 0:
-                foundres=[x for x in foundres if x in found3]
+                foundres = [x for x in foundres if x in found3]
             if len(found4) != 0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-            if len(found6) !=0:
-                foundres=[x for x in foundres if x in found6]
-        if len(found3) != 0 and len(found2)==0 and len(found)==0:
+                foundres = [x for x in foundres if x in found4]
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+        if len(found3) != 0 and len(found2) == 0 and len(found) == 0:
             foundres = found3
             if len(found4) != 0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-            if len(found6) !=0:
-                foundres=[x for x in foundres if x in found6]
-        if len(found4)!=0:
-            foundres=found4
-            if len(found5) !=0:
-                foundres=[x for x in foundres if x in found5]
-            if len(found6) !=0:
-                foundres=[x for x in foundres if x in found6]
-        if len(found5)!=0:
-            foundres=found5
-            if len(found4) !=0:
-                foundres=[x for x in foundres if x in found4]
-            if len(found6) !=0:
-                foundres=[x for x in foundres if x in found6]
-        if len(foundres)!=0:
+                foundres = [x for x in foundres if x in found4]
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+        if len(found4) != 0:
+            foundres = found4
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+        if len(found5) != 0:
+            foundres = found5
+            if len(found4) != 0:
+                foundres = [x for x in foundres if x in found4]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+        if len(foundres) != 0:
             data_frame = pd.DataFrame(foundres,
                                       columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
                                       index=[i for i in range(len(foundres))]
@@ -989,10 +994,11 @@ class MainWindow(QMainWindow):
             self.tableView2.setModel(model)
         else:
             self.showMessage("Проблема", "Ничего не найдено")
+
     def refreshReqTable(self):
-        #self.__reqs = self.__db.get_unsolved_requests()
+        # self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
-        self.__reqs=self.__db.get_all_requests()
+        self.__reqs = self.__db.get_all_requests()
         if (len(self.__reqs)) == 0:
             print("0 requests")
         self.__reqnum = 0
@@ -1011,10 +1017,10 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__reqTableContents))]
                                   )
         model = TableModel(data_frame)
-
         self.tableView2.setModel(model)
         self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         self.getReq()
+
     def getReq(self):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
@@ -1025,6 +1031,7 @@ class MainWindow(QMainWindow):
         else:
             self.__reqnum -= 1
             self.showMessage("Сообщение", "Запросов нет")
+
     def prevReq(self):
         if self.__reqnum > 0:
             self.__reqnum = self.__reqnum - 1
@@ -1046,7 +1053,7 @@ class MainWindow(QMainWindow):
         self.reqDecision(True)
 
     def reqDecision(self, decision):
-        if len(self.__reqs)!=0:
+        if len(self.__reqs) != 0:
             self.__reqs[self.__reqnum].approved = decision
             print(self.__reqnum)
             self.__reqs[self.__reqnum].approved_id = self.__current_user.id
@@ -1094,3 +1101,12 @@ class MainWindow(QMainWindow):
         def removeRow(self, row: int, parent=None):
             self._data.drop(row, inplace=True)
             self._data.reset_index(drop=True, inplace=True)
+
+        def setData(self, index: QtCore.QModelIndex, value, role: int = ...) -> bool:
+            if role == Qt.ItemDataRole.EditRole:
+                self._data.iloc[index.row(), index.column()] = value
+                return True
+            return False
+
+        def flags(self, index: QtCore.QModelIndex) -> Qt.ItemFlag:
+            return Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsEditable
