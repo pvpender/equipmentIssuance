@@ -1,8 +1,10 @@
+import datetime
+from enum import Enum
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer, BigInteger
 from sqlalchemy import Boolean
-from sqlalchemy import Text
+from sqlalchemy import Text, Time
 from sqlalchemy.orm import declarative_base, Session, relationship
 from users import *
 from equipment import *
@@ -95,6 +97,28 @@ class UserRequests(Base):
     approved_id = Column(Integer)
 
 
+class ActionTypes(Enum):
+    INSERT = "insert"
+    UPDATE = "update"
+    DELETE = "delete"
+
+
+class WhatTypes(Enum):
+    USER = "user"
+    EQUIPMENT = "equipment"
+    REQUEST = "request"
+
+
+class Actions(Base):
+    __tablename__ = "actions"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer)
+    action = Column(Text)
+    what = Column(Text)
+    what_id = Column(Integer)
+    action_time = Column(Time)
+
+
 def restart_if_except(function):
     def check(*args, **kwargs):
         self = args[0]
@@ -109,7 +133,8 @@ def restart_if_except(function):
 
 def for_all_methods(decorator):
     def decorate(cls):
-        for attr in cls.__dict__:  # there's propably a better way to do this
+        print(cls.__dict__)
+        for attr in cls.__dict__:
             if callable(getattr(cls, attr)):
                 setattr(cls, attr, decorator(getattr(cls, attr)))
         return cls
@@ -378,7 +403,6 @@ class DataBase:
             purpose=request.purpose,
             solved=False
         )
-        print(request.what)
         eq = self.get_equipment_by_title(request.what)
         eq.reserve_count += 1
         self.update_equipment(eq.id, eq)
@@ -425,3 +449,18 @@ class DataBase:
                 "approved": request.approved,
                 "approved_id": request.approved_id
             }, synchronize_session=False)
+
+    def add_action(self, user_mail_or_id: str | int, action: ActionTypes, what: WhatTypes, what_id: int,
+                   action_time: datetime.datetime):
+        if isinstance(user_mail_or_id, str):
+            user = self.get_user_by_mail(user_mail_or_id)
+            user_mail_or_id = user.id
+        new_action = Actions(
+            user_id=user_mail_or_id,
+            action=action,
+            what=what,
+            what_id=what_id,
+            action_time=action_time
+        )
+        self.__session.add(new_action)
+        self.__session.commit()
