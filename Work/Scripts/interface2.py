@@ -71,6 +71,13 @@ class LogWindow(QMainWindow):
             self.__password_field.setText("")
 
 
+def show_message(title: str, info: str):
+    msg_box = QMessageBox()
+    msg_box.setText(info)
+    msg_box.setWindowTitle(title)
+    msg_box.exec()
+
+
 class MainWindow(QMainWindow):
     def __init__(self, user_list: UserCollection, current_user, db: DataBase, admin_access: AdminAccess):
         super(MainWindow, self).__init__()
@@ -553,18 +560,18 @@ class MainWindow(QMainWindow):
         self.searchByHeightSpinBox.setMinimum(1)
         self.usradioButton_Admin.clicked.connect(self.adminRightsGroupBox_2.show)
         self.usradioButton_User.clicked.connect(self.adminRightsGroupBox_2.hide)
-        self.eqaddUserOrInvButton.clicked.connect(self.addEq)
-        self.usaddUserOrInvButton.clicked.connect(self.addUser)
-        self.pushButton.clicked.connect(self.prevReq)
-        self.pushButton_3.clicked.connect(self.nextReq)
-        self.AcceptReqPushButton.clicked.connect(self.appReq)
-        self.pushButton_2.clicked.connect(self.disReq)
+        self.eqaddUserOrInvButton.clicked.connect(self.add_equipment)
+        self.usaddUserOrInvButton.clicked.connect(self.add_user)
+        self.pushButton.clicked.connect(self.previous_request)
+        self.pushButton_3.clicked.connect(self.next_request)
+        self.AcceptReqPushButton.clicked.connect(self.approve_request)
+        self.pushButton_2.clicked.connect(self.reject_request)
         self.eqsearchPushButton.clicked.connect(self.searchEq)
-        self.eqViewRefreshPushButton.clicked.connect(self.refreshEqTable)
-        self.reqViewRefreshPushButton.clicked.connect(self.refreshReqTable)
-        self.usViewRefreshPushButton.clicked.connect(self.refreshUsTable)
-        self.ussearchPushButton.clicked.connect(self.searchUs)
-        self.reqsearchPushButton.clicked.connect(self.searchreq)
+        self.eqViewRefreshPushButton.clicked.connect(self.refresh_equipment_table)
+        self.reqViewRefreshPushButton.clicked.connect(self.refresh_requests_table)
+        self.usViewRefreshPushButton.clicked.connect(self.refresh_users_table)
+        self.ussearchPushButton.clicked.connect(self.search_users)
+        self.reqsearchPushButton.clicked.connect(self.search_request)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -588,44 +595,45 @@ class MainWindow(QMainWindow):
         if not admin_access.can_add_inventory:
             self.tab.hide()
         self.adminRightsGroupBox_2.hide()
-        self.refreshReqTable()
-        self.refreshEqTable()
-        self.refreshUsTable()
+
+        self.refresh_requests_table()
+        self.refresh_equipment_table()
+        self.refresh_users_table()
 
         self.show()
 
-    def addEq(self):
-        codeError = -1
+    def add_equipment(self):
+        code_error = -1
         tg = 0
-        if codeError == -1 and self.eqNameOrEmailLineEdit.text() == "":
-            codeError = 1
+        if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
+            code_error = 1
         elif self.__db.get_equipment_by_title(self.eqNameOrEmailLineEdit.text()):
-            codeError = 8
-        if codeError == -1 and self.descriptionTextEdit.toPlainText() == "":
-            codeError = 3
-        if codeError == -1 and self.eqfirstRightsCheckBox.isChecked():
+            code_error = 8
+        if code_error == -1 and self.descriptionTextEdit.toPlainText() == "":
+            code_error = 3
+        if code_error == -1 and self.eqfirstRightsCheckBox.isChecked():
             tg += 1
-        if codeError == -1 and self.eqsecondRightsCheckBox.isChecked():
+        if code_error == -1 and self.eqsecondRightsCheckBox.isChecked():
             tg += 10
-        if codeError == -1 and self.eqthirdRightsCheckBox.isChecked():
+        if code_error == -1 and self.eqthirdRightsCheckBox.isChecked():
             tg += 100
-        if codeError == -1 and self.eqfourthRightsCheckBox.isChecked():
+        if code_error == -1 and self.eqfourthRightsCheckBox.isChecked():
             tg += 1000
-        if codeError == -1 and tg == 0:
-            codeError = 2
-        fromLeft = self.posFromLeftSpinBox.value()
+        if code_error == -1 and tg == 0:
+            code_error = 2
+        from_left = self.posFromLeftSpinBox.value()
         if self.posFromLeftSpinBox.value() == 0 or self.posFromLeftSpinBox.value() == -1:
-            fromLeft = -1
+            from_left = -1
         height = self.heightSpinBox.value()
         if self.heightSpinBox.value() == 0 or self.heightSpinBox.value() == -1:
             height = -1
-        if codeError == -1 and self.__db.get_equipment_by_coordinates(fromLeft, height) != None:
-            codeError = 9
-        if codeError == -1:
+        if code_error == -1 and self.__db.get_equipment_by_coordinates(from_left, height) is not None:
+            code_error = 9
+        if code_error == -1:
             eq = Equipment(self.eqNameOrEmailLineEdit.text(),
                            self.descriptionTextEdit.toPlainText(),
-                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, height, fromLeft)
-            self.showMessage("Успех", "Оборудование добавлено в базу")
+                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, height, from_left)
+            show_message("Успех", "Оборудование добавлено в базу")
             self.__db.add_equipment(eq)
             self.heightSpinBox.setValue(-1)
             self.posFromLeftSpinBox.setValue(-1)
@@ -638,72 +646,72 @@ class MainWindow(QMainWindow):
             self.heightSpinBox.setValue(-1)
             self.posFromLeftSpinBox.setValue(-1)
         else:
-            if codeError == 1:
-                self.showMessage("Ошибка добавления", "Введите название")
-            elif codeError == 2:
-                self.showMessage("Ошибка добавления", "Не отмечены требования выдачи")
-            elif codeError == 3:
-                self.showMessage("Ошибка добавления", "отсутствует описание")
-            elif codeError == 8:
-                self.showMessage("Ошибка добавления", "Оборудование с таким названием уже есть в базе")
-            elif codeError == 9:
-                self.showMessage("Ошибка добавления", "Ячейка занята")
+            if code_error == 1:
+                show_message("Ошибка добавления", "Введите название")
+            elif code_error == 2:
+                show_message("Ошибка добавления", "Не отмечены требования выдачи")
+            elif code_error == 3:
+                show_message("Ошибка добавления", "отсутствует описание")
+            elif code_error == 8:
+                show_message("Ошибка добавления", "Оборудование с таким названием уже есть в базе")
+            elif code_error == 9:
+                show_message("Ошибка добавления", "Ячейка занята")
 
-    def addUser(self):
-        codeError = -1
+    def add_user(self):
+        code_error = -1
         tg = 0
-        addUs = False
-        chUs = False
-        addEq = False
-        chEq = False
-        getReq = False
-        if codeError == -1 and self.usnameOrEmailLineEdit.text() == "":
-            codeError = 1
-        if codeError == -1 and self.usIdCardLineEdit.text() == "":
-            codeError = 4
-        if codeError == -1 and (not self.usradioButton_User.isChecked()) and (
+        add_users = False
+        change_users = False
+        add_equipment = False
+        change_equipment = False
+        get_request = False
+        if code_error == -1 and self.usnameOrEmailLineEdit.text() == "":
+            code_error = 1
+        if code_error == -1 and self.usIdCardLineEdit.text() == "":
+            code_error = 4
+        if code_error == -1 and (not self.usradioButton_User.isChecked()) and (
                 not self.usradioButton_Admin.isChecked()):
-            codeError = 6
-        if codeError == -1 and self.usradioButton_Admin.isChecked():
+            code_error = 6
+        if code_error == -1 and self.usradioButton_Admin.isChecked():
             if self.usadminRightsCheckBox.isChecked():
-                addUs = True
+                add_users = True
             if self.usadmin2RightsCheckBox.isChecked():
-                chUs = True
+                change_users = True
             if self.usadmin3RightsCheckBox.isChecked():
-                addEq = True
+                add_equipment = True
             if self.usadmin4RightsCheckBox.isChecked():
-                chEq = True
+                change_equipment = True
             if self.usadmin5RightsCheckBox.isChecked():
-                getReq = True
-            if (not addUs) and (not chEq) and (not chUs) and (addEq) and (getReq):
-                codeError = 5
-        if codeError == -1 and self.usradioButton_User.isChecked():
-            addUs = False
-            chUs = False
-            addEq = False
-            chEq = False
-            getReq = False
-        if codeError == -1 and self.usfirstRightsCheckBox.isChecked():
+                get_request = True
+            if (not add_users) and (not change_equipment) and (not change_users) and add_equipment and get_request:
+                code_error = 5
+        if code_error == -1 and self.usradioButton_User.isChecked():
+            add_users = False
+            change_users = False
+            add_equipment = False
+            change_equipment = False
+            get_request = False
+        if code_error == -1 and self.usfirstRightsCheckBox.isChecked():
             tg += 1
-        if codeError == -1 and self.ussecondRightsCheckBox.isChecked():
+        if code_error == -1 and self.ussecondRightsCheckBox.isChecked():
             tg += 10
-        if codeError == -1 and self.usthirdRightsCheckBox.isChecked():
+        if code_error == -1 and self.usthirdRightsCheckBox.isChecked():
             tg += 100
-        if codeError == -1 and self.usfourthRightsCheckBox.isChecked():
+        if code_error == -1 and self.usfourthRightsCheckBox.isChecked():
             tg += 1000
-        if codeError == -1 and tg == 0:
-            codeError = 2
-        if codeError == -1 and self.__db.get_user_by_id(int(self.usIdCardLineEdit.text(), 16)) != None:
-            codeError = 7
-        if codeError == -1 and self.__db.get_user_by_mail(self.usnameOrEmailLineEdit.text()) != None:
-            codeError = 8
-        if codeError == -1:
+        if code_error == -1 and tg == 0:
+            code_error = 2
+        if code_error == -1 and self.__db.get_user_by_id(int(self.usIdCardLineEdit.text(), 16)) is not None:
+            code_error = 7
+        if code_error == -1 and self.__db.get_user_by_mail(self.usnameOrEmailLineEdit.text()) is not None:
+            code_error = 8
+        if code_error == -1:
             if self.usradioButton_User.isChecked():
                 ac = Access(tg)
                 us = CommonUser(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), ac)
                 self.__user_list.append_user(us)
             if self.usradioButton_Admin.isChecked():
-                ac = AdminAccess(tg, addUs, chUs, addEq, chEq, getReq)
+                ac = AdminAccess(tg, add_users, change_users, add_equipment, change_equipment, get_request)
                 adm = Admin(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), "", ac)
                 self.__user_list.append_user(adm)
             self.heightSpinBox.setValue(-1)
@@ -716,24 +724,24 @@ class MainWindow(QMainWindow):
             self.descriptionTextEdit.setText("")
             self.usIdCardLineEdit.setText("")
         else:
-            if codeError == 1:
-                self.showMessage("Ошибка добавления", "Введите Email")
-            elif codeError == 2:
-                self.showMessage("Ошибка добавления", "Не отмечены права на получение")
-            elif codeError == 3:
-                self.showMessage("Ошибка добавления", "отсутствует описание")
-            elif codeError == 4:
-                self.showMessage("Ошибка добавления", "не введен ID карты сотрудника")
-            elif codeError == 5:
-                self.showMessage("Ошибка добавления", "не выбраны права администратора")
-            elif codeError == 6:
-                self.showMessage("Ошибка добавления", "Не выбран тип пользователя")
-            elif codeError == 7:
-                self.showMessage("Ошибка добавления", "пользователь с такой картой уже добавлен")
-            elif codeError == 8:
-                self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
+            if code_error == 1:
+                show_message("Ошибка добавления", "Введите Email")
+            elif code_error == 2:
+                show_message("Ошибка добавления", "Не отмечены права на получение")
+            elif code_error == 3:
+                show_message("Ошибка добавления", "отсутствует описание")
+            elif code_error == 4:
+                show_message("Ошибка добавления", "не введен ID карты сотрудника")
+            elif code_error == 5:
+                show_message("Ошибка добавления", "не выбраны права администратора")
+            elif code_error == 6:
+                show_message("Ошибка добавления", "Не выбран тип пользователя")
+            elif code_error == 7:
+                show_message("Ошибка добавления", "пользователь с такой картой уже добавлен")
+            elif code_error == 8:
+                show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
 
-    def refreshEqTable(self):
+    def refresh_equipment_table(self):
         self.eqsearchByIdSpinBox.setValue(-1)
         self.searchByHeightSpinBox.setValue(-1)
         self.eqTableView.clearSpans()
@@ -765,7 +773,7 @@ class MainWindow(QMainWindow):
         model = TableModel(data_frame)
         self.eqTableView.setModel(model)
 
-    def refreshUsTable(self):
+    def refresh_users_table(self):
         self.usTableView.clearSpans()
         ref = AdminAccess
         self.__usTableContents.clear()
@@ -780,7 +788,7 @@ class MainWindow(QMainWindow):
         model = TableModel(data_frame)
         self.usTableView.setModel(model)
 
-    def searchUs(self):
+    def search_users(self):
         tg = 0
         found = []
         found2 = []
@@ -827,7 +835,7 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.usTableView.setModel(model)
         else:
-            self.showMessage("Проблема", "Ничего не найдено")
+            show_message("Проблема", "Ничего не найдено")
 
     def searchEq(self):
         tg = 0
@@ -908,9 +916,9 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.eqTableView.setModel(model)
         else:
-            self.showMessage("Проблема", "Ничего не найдено")
+            show_message("Проблема", "Ничего не найдено")
 
-    def searchreq(self):
+    def search_request(self):
         tg = 0
         found = []
         found2 = []
@@ -993,9 +1001,9 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.tableView2.setModel(model)
         else:
-            self.showMessage("Проблема", "Ничего не найдено")
+            show_message("Проблема", "Ничего не найдено")
 
-    def refreshReqTable(self):
+    def refresh_requests_table(self):
         # self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
         self.__reqs = self.__db.get_all_requests()
@@ -1019,9 +1027,9 @@ class MainWindow(QMainWindow):
         model = TableModel(data_frame)
         self.tableView2.setModel(model)
         self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
-        self.getReq()
+        self.get_request()
 
-    def getReq(self):
+    def get_request(self):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
                 self.__reqs[self.__reqnum].sender_tg_id) + "\n Что запрашивается: " + str(
@@ -1030,29 +1038,29 @@ class MainWindow(QMainWindow):
             self.textBrowser.setText(a)
         else:
             self.__reqnum -= 1
-            self.showMessage("Сообщение", "Запросов нет")
+            show_message("Сообщение", "Запросов нет")
 
-    def prevReq(self):
+    def previous_request(self):
         if self.__reqnum > 0:
             self.__reqnum = self.__reqnum - 1
-            self.getReq()
+            self.get_request()
         else:
-            self.showMessage("Ошибка", "Запрос уже первый в списке")
+            show_message("Ошибка", "Запрос уже первый в списке")
 
-    def nextReq(self):
+    def next_request(self):
         if self.__reqnum < len(self.__reqs):
             self.__reqnum = self.__reqnum + 1
-            self.getReq()
+            self.get_request()
         else:
-            self.showMessage("Ошибка", "Запрос последний в списке")
+            show_message("Ошибка", "Запрос последний в списке")
 
-    def disReq(self):
-        self.reqDecision(False)
+    def reject_request(self):
+        self.decide_request(False)
 
-    def appReq(self):
-        self.reqDecision(True)
+    def approve_request(self):
+        self.decide_request(True)
 
-    def reqDecision(self, decision):
+    def decide_request(self, decision):
         if len(self.__reqs) != 0:
             self.__reqs[self.__reqnum].approved = decision
             print(self.__reqnum)
@@ -1063,13 +1071,7 @@ class MainWindow(QMainWindow):
             self.tableView2.update()
             self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         else:
-            self.showMessage("Ошибка", "Запросов нет")
-
-    def showMessage(self, title: str, info: str):
-        msg_box = QMessageBox()
-        msg_box.setText(info)
-        msg_box.setWindowTitle(title)
-        msg_box.exec()
+            show_message("Ошибка", "Запросов нет")
 
     class TableModel(QtCore.QAbstractTableModel):
         def __init__(self, data):
