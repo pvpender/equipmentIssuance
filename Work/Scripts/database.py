@@ -4,7 +4,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer, BigInteger
 from sqlalchemy import Boolean
-from sqlalchemy import Text, Time
+from sqlalchemy import Text, DateTime
 from sqlalchemy.orm import declarative_base, Session, relationship
 from users import *
 from equipment import *
@@ -101,6 +101,8 @@ class ActionTypes(Enum):
     INSERT = "insert"
     UPDATE = "update"
     DELETE = "delete"
+    APPROVE = "approve"
+    REJECT = "reject"
 
 
 class WhatTypes(Enum):
@@ -115,8 +117,8 @@ class Actions(Base):
     user_id = Column(Integer)
     action = Column(Text)
     what = Column(Text)
-    what_id = Column(Integer)
-    action_time = Column(Time)
+    what_id = Column(Text)
+    action_time = Column(DateTime)
 
 
 def restart_if_except(function):
@@ -450,8 +452,7 @@ class DataBase:
                 "approved_id": request.approved_id
             }, synchronize_session=False)
 
-    def add_action(self, user_mail_or_id: str | int, action: ActionTypes, what: WhatTypes, what_id: int,
-                   action_time: datetime.datetime):
+    def add_action(self, user_mail_or_id: str | int, action: ActionTypes, what: WhatTypes, what_id: str | int):
         if isinstance(user_mail_or_id, str):
             user = self.get_user_by_mail(user_mail_or_id)
             user_mail_or_id = user.id
@@ -460,7 +461,11 @@ class DataBase:
             action=action,
             what=what,
             what_id=what_id,
-            action_time=action_time
+            action_time=datetime.datetime.now()
         )
         self.__session.add(new_action)
         self.__session.commit()
+
+    def get_all_actions(self):
+        return self.__session.query(Actions).all()
+

@@ -633,6 +633,12 @@ class MainWindow(QMainWindow):
             eq = Equipment(self.eqNameOrEmailLineEdit.text(),
                            self.descriptionTextEdit.toPlainText(),
                            self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, height, from_left)
+            self.__db.add_action(
+                self.__current_user.id,
+                ActionTypes.INSERT,
+                WhatTypes.EQUIPMENT,
+                self.eqNameOrEmailLineEdit.text()
+            )
             show_message("Успех", "Оборудование добавлено в базу")
             self.__db.add_equipment(eq)
             self.heightSpinBox.setValue(-1)
@@ -706,6 +712,12 @@ class MainWindow(QMainWindow):
         if code_error == -1 and self.__db.get_user_by_mail(self.usnameOrEmailLineEdit.text()) is not None:
             code_error = 8
         if code_error == -1:
+            self.__db.add_action(
+                self.__current_user.id,
+                ActionTypes.INSERT,
+                WhatTypes.USER,
+                self.usnameOrEmailLineEdit.text()
+            )
             if self.usradioButton_User.isChecked():
                 ac = Access(tg)
                 us = CommonUser(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), ac)
@@ -1065,6 +1077,12 @@ class MainWindow(QMainWindow):
             self.__reqs[self.__reqnum].approved = decision
             print(self.__reqnum)
             self.__reqs[self.__reqnum].approved_id = self.__current_user.id
+            self.__db.add_action(
+                self.__current_user.id,
+                ActionTypes.APPROVE if decision else ActionTypes.REJECT,
+                WhatTypes.REQUEST,
+                self.__reqs[self.__reqnum].id
+            )
             self.__db.update_request(self.__reqs[self.__reqnum])
             self.__reqs.remove(self.__reqs[self.__reqnum])
             self.tableView2.model().removeRow(self.__reqnum)
