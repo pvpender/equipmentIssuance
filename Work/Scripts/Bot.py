@@ -95,7 +95,6 @@ async def get_data(**kwargs):
     except OperationalError:
         session.rollback()
         mas = db.get_all_equipment()
-    print(len(mas))
     out_list = []
     for i in mas:
         if i.count - i.reserve_count > 0:
@@ -143,6 +142,7 @@ async def send_request(c: CallbackQuery, button: Button, manager: DialogManager)
     mail = db.get_tg_user(c.from_user.id).mail
     request = req.Request(c.from_user.id, mail, r.title,
                           1, c.message.text[c.message.text.find(":")+2: c.message.text.find("Продолжить?")])
+    db.add_action(mail, ActionTypes.INSERT, WhatTypes.REQUEST, r.title)
     db.add_request(request)
     await c.message.edit_text(f"Оборудование {r.title} заказано!\nКак только администратор ответит на ваш запрос "
                               f"- вы получите уведомление")

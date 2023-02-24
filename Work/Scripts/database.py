@@ -455,7 +455,8 @@ class DataBase:
     def add_action(self, user_mail_or_id: str | int, action: ActionTypes, what: WhatTypes, what_id: str | int):
         if isinstance(user_mail_or_id, str):
             user = self.get_user_by_mail(user_mail_or_id)
-            user_mail_or_id = user.id
+            user = self.get_admin_by_mail(user_mail_or_id) if not user else user
+            user_mail_or_id = user[0].id
         new_action = Actions(
             user_id=user_mail_or_id,
             action=action,
