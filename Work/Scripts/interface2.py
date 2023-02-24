@@ -101,15 +101,26 @@ class MainWindow(QMainWindow):
         # self.__button.setText("Test")
         # self.__button.setStyleSheet("QPushButton { border-radius: 10; border : 1px solid white; color: #808080;}"
         #                            "QPushButton:hover { background-color: #000000; color: white;} ")
-        self.centralwidget = QtWidgets.QWidget()
+
+        self.centralwidget = QtWidgets.QWidget(parent=self)
+        self.centralwidget.setStyleSheet("QWidget#centralwidget{\n"
+                                         "    border: 0;\n"
+                                         "}")
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(parent=self.centralwidget)
         self.tabWidget.setGeometry(QtCore.QRect(0, 0, 1411, 821))
+        self.tabWidget.setStyleSheet("QTabWidget#tabWidget{\n"
+                                     "    border: 0;\n"
+                                     "}")
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.addSmthBox = QtWidgets.QGroupBox(parent=self.tab)
+        self.addSmthBox.setEnabled(True)
         self.addSmthBox.setGeometry(QtCore.QRect(10, 10, 461, 521))
+        self.addSmthBox.setStyleSheet("QGroupBox#addSmthBox{\n"
+                                      "    border: 0;\n"
+                                      "}")
         self.addSmthBox.setObjectName("addSmthBox")
         self.label_4 = QtWidgets.QLabel(parent=self.addSmthBox)
         self.label_4.setGeometry(QtCore.QRect(10, 30, 61, 21))
@@ -150,6 +161,9 @@ class MainWindow(QMainWindow):
         self.eqIdCardLineEdit.setObjectName("eqIdCardLineEdit")
         self.inventoryWidgetsGroupBox = QtWidgets.QGroupBox(parent=self.addSmthBox)
         self.inventoryWidgetsGroupBox.setGeometry(QtCore.QRect(20, 220, 421, 191))
+        self.inventoryWidgetsGroupBox.setStyleSheet("QGroupBox#inventoryWidgetsGroupBox{\n"
+                                                    "    border: 0;\n"
+                                                    "}")
         self.inventoryWidgetsGroupBox.setTitle("")
         self.inventoryWidgetsGroupBox.setObjectName("inventoryWidgetsGroupBox")
         self.label_10 = QtWidgets.QLabel(parent=self.inventoryWidgetsGroupBox)
@@ -157,6 +171,9 @@ class MainWindow(QMainWindow):
         self.label_10.setObjectName("label_10")
         self.descriptionTextEdit = QtWidgets.QTextEdit(parent=self.inventoryWidgetsGroupBox)
         self.descriptionTextEdit.setGeometry(QtCore.QRect(70, 70, 321, 51))
+        self.descriptionTextEdit.setStyleSheet("QTextEdit {\n"
+                                               "border: 1px solid black;\n"
+                                               "}")
         self.descriptionTextEdit.setObjectName("descriptionTextEdit")
         self.ableNowSpinBox = QtWidgets.QSpinBox(parent=self.inventoryWidgetsGroupBox)
         self.ableNowSpinBox.setGeometry(QtCore.QRect(240, 10, 151, 22))
@@ -168,13 +185,13 @@ class MainWindow(QMainWindow):
         self.reservedSpinBox.setGeometry(QtCore.QRect(240, 40, 151, 22))
         self.reservedSpinBox.setObjectName("reservedSpinBox")
         self.label_12 = QtWidgets.QLabel(parent=self.inventoryWidgetsGroupBox)
-        self.label_12.setGeometry(QtCore.QRect(10, 70, 61, 16))
+        self.label_12.setGeometry(QtCore.QRect(0, 70, 61, 20))
         self.label_12.setObjectName("label_12")
         self.label_26 = QtWidgets.QLabel(parent=self.inventoryWidgetsGroupBox)
         self.label_26.setGeometry(QtCore.QRect(10, 160, 101, 16))
         self.label_26.setObjectName("label_26")
         self.label_27 = QtWidgets.QLabel(parent=self.inventoryWidgetsGroupBox)
-        self.label_27.setGeometry(QtCore.QRect(180, 160, 141, 16))
+        self.label_27.setGeometry(QtCore.QRect(180, 160, 121, 16))
         self.label_27.setObjectName("label_27")
         self.heightSpinBox = QtWidgets.QSpinBox(parent=self.inventoryWidgetsGroupBox)
         self.heightSpinBox.setGeometry(QtCore.QRect(110, 160, 61, 22))
@@ -187,12 +204,31 @@ class MainWindow(QMainWindow):
         self.radioButton_setPos.setObjectName("radioButton_setPos")
         self.eqaddUserOrInvButton = QtWidgets.QPushButton(parent=self.addSmthBox)
         self.eqaddUserOrInvButton.setGeometry(QtCore.QRect(20, 410, 401, 41))
+        self.eqaddUserOrInvButton.setStyleSheet("QPushButton{\n"
+                                                " background-color: #081f2d; \n"
+                                                " border-radius: 8px; \n"
+                                                " border: 2px solid #081F2D; \n"
+                                                " color: white; \n"
+                                                " font-size: 15px;  \n"
+                                                " cursor: pointer; \n"
+                                                " transition: 0.3s; \n"
+                                                " }\n"
+                                                " \n"
+                                                "QPushButton:hover{ \n"
+                                                " background-color: white; \n"
+                                                " color: #081F2D; \n"
+                                                " border-color: #081F2D;\n"
+                                                " transition: 0.9s; \n"
+                                                "}")
         self.eqaddUserOrInvButton.setObjectName("eqaddUserOrInvButton")
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.addSmthBox_2 = QtWidgets.QGroupBox(parent=self.tab_2)
         self.addSmthBox_2.setGeometry(QtCore.QRect(20, 10, 581, 541))
+        self.addSmthBox_2.setStyleSheet("QGroupBox#addSmthBox_2{\n"
+                                        "    border: 0;\n"
+                                        "}")
         self.addSmthBox_2.setObjectName("addSmthBox_2")
         self.label_6 = QtWidgets.QLabel(parent=self.addSmthBox_2)
         self.label_6.setGeometry(QtCore.QRect(10, 30, 61, 21))
@@ -233,6 +269,9 @@ class MainWindow(QMainWindow):
         self.usIdCardLineEdit.setObjectName("usIdCardLineEdit")
         self.addHuman_groupBox_2 = QtWidgets.QGroupBox(parent=self.addSmthBox_2)
         self.addHuman_groupBox_2.setGeometry(QtCore.QRect(10, 220, 411, 201))
+        self.addHuman_groupBox_2.setStyleSheet("QGroupBox#addHuman_groupBox_2{\n"
+                                               "    border: 0;\n"
+                                               "}")
         self.addHuman_groupBox_2.setTitle("")
         self.addHuman_groupBox_2.setObjectName("addHuman_groupBox_2")
         self.usradioButton_User = QtWidgets.QRadioButton(parent=self.addHuman_groupBox_2)
@@ -243,6 +282,9 @@ class MainWindow(QMainWindow):
         self.usradioButton_Admin.setObjectName("usradioButton_Admin")
         self.adminRightsGroupBox_2 = QtWidgets.QGroupBox(parent=self.addHuman_groupBox_2)
         self.adminRightsGroupBox_2.setGeometry(QtCore.QRect(0, 40, 411, 211))
+        self.adminRightsGroupBox_2.setStyleSheet("QGroupBox#adminRightsGroupBox_2{\n"
+                                                 "    border: 0;\n"
+                                                 "}")
         self.adminRightsGroupBox_2.setTitle("")
         self.adminRightsGroupBox_2.setObjectName("adminRightsGroupBox_2")
         self.verticalLayoutWidget_6 = QtWidgets.QWidget(parent=self.adminRightsGroupBox_2)
@@ -271,12 +313,31 @@ class MainWindow(QMainWindow):
         self.rightsLabel_4.setObjectName("rightsLabel_4")
         self.usaddUserOrInvButton = QtWidgets.QPushButton(parent=self.addSmthBox_2)
         self.usaddUserOrInvButton.setGeometry(QtCore.QRect(50, 440, 401, 41))
+        self.usaddUserOrInvButton.setStyleSheet("QPushButton{\n"
+                                                " background-color: #081f2d; \n"
+                                                " border-radius: 8px; \n"
+                                                " border: 2px solid #081F2D; \n"
+                                                " color: white; \n"
+                                                " font-size: 15px;  \n"
+                                                " cursor: pointer; \n"
+                                                " transition: 0.3s; \n"
+                                                " }\n"
+                                                " \n"
+                                                "QPushButton:hover{ \n"
+                                                " background-color: white; \n"
+                                                " color: #081F2D; \n"
+                                                " border-color: #081F2D;\n"
+                                                " transition: 0.9s; \n"
+                                                "}")
         self.usaddUserOrInvButton.setObjectName("usaddUserOrInvButton")
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.viewInvOrUserBox = QtWidgets.QGroupBox(parent=self.tab_3)
         self.viewInvOrUserBox.setGeometry(QtCore.QRect(10, 10, 1151, 761))
+        self.viewInvOrUserBox.setStyleSheet("QGroupBox#viewInvOrUserBox{\n"
+                                            "    border: 0;\n"
+                                            "}")
         self.viewInvOrUserBox.setObjectName("viewInvOrUserBox")
         self.eqsearchByIdLabel = QtWidgets.QLabel(parent=self.viewInvOrUserBox)
         self.eqsearchByIdLabel.setGeometry(QtCore.QRect(10, 30, 21, 16))
@@ -288,7 +349,7 @@ class MainWindow(QMainWindow):
         self.eqsearchByIdSpinBox.setGeometry(QtCore.QRect(30, 30, 161, 22))
         self.eqsearchByIdSpinBox.setObjectName("eqsearchByIdSpinBox")
         self.eqsearchByEmailOrNameLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox)
-        self.eqsearchByEmailOrNameLineEdit.setGeometry(QtCore.QRect(60, 60, 191, 22))
+        self.eqsearchByEmailOrNameLineEdit.setGeometry(QtCore.QRect(70, 60, 191, 22))
         self.eqsearchByEmailOrNameLineEdit.setObjectName("eqsearchByEmailOrNameLineEdit")
         self.listLabel = QtWidgets.QLabel(parent=self.viewInvOrUserBox)
         self.listLabel.setGeometry(QtCore.QRect(450, 10, 111, 16))
@@ -312,10 +373,13 @@ class MainWindow(QMainWindow):
         self.eqsearchByFourthRightsCheckBox.setObjectName("eqsearchByFourthRightsCheckBox")
         self.searchByRightsVerticalLayout.addWidget(self.eqsearchByFourthRightsCheckBox)
         self.SearchByRightsLabel = QtWidgets.QLabel(parent=self.viewInvOrUserBox)
-        self.SearchByRightsLabel.setGeometry(QtCore.QRect(10, 90, 121, 20))
+        self.SearchByRightsLabel.setGeometry(QtCore.QRect(10, 90, 111, 20))
         self.SearchByRightsLabel.setObjectName("SearchByRightsLabel")
         self.searchByPosGroupBox = QtWidgets.QGroupBox(parent=self.viewInvOrUserBox)
         self.searchByPosGroupBox.setGeometry(QtCore.QRect(10, 210, 441, 61))
+        self.searchByPosGroupBox.setStyleSheet("QGroupBox#searchByPosGroupBox{\n"
+                                               "    border: 0;\n"
+                                               "}")
         self.searchByPosGroupBox.setObjectName("searchByPosGroupBox")
         self.label_36 = QtWidgets.QLabel(parent=self.searchByPosGroupBox)
         self.label_36.setGeometry(QtCore.QRect(20, 30, 101, 16))
@@ -331,6 +395,22 @@ class MainWindow(QMainWindow):
         self.searchByPosFromLeftSpinBox.setObjectName("searchByPosFromLeftSpinBox")
         self.eqsearchPushButton = QtWidgets.QPushButton(parent=self.viewInvOrUserBox)
         self.eqsearchPushButton.setGeometry(QtCore.QRect(20, 280, 351, 28))
+        self.eqsearchPushButton.setStyleSheet("QPushButton{\n"
+                                              " background-color: #081f2d; \n"
+                                              " border-radius: 8px; \n"
+                                              " border: 2px solid #081F2D; \n"
+                                              " color: white; \n"
+                                              " font-size: 15px;  \n"
+                                              " cursor: pointer; \n"
+                                              " transition: 0.3s; \n"
+                                              " }\n"
+                                              " \n"
+                                              "QPushButton:hover{ \n"
+                                              " background-color: white; \n"
+                                              " color: #081F2D; \n"
+                                              " border-color: #081F2D;\n"
+                                              " transition: 0.9s; \n"
+                                              "}")
         self.eqsearchPushButton.setObjectName("eqsearchPushButton")
         self.eqTableView = QtWidgets.QTableView(parent=self.viewInvOrUserBox)
         self.eqTableView.setGeometry(QtCore.QRect(450, 30, 701, 721))
@@ -338,21 +418,40 @@ class MainWindow(QMainWindow):
         self.eqTableView.setObjectName("eqTableView")
         self.eqViewRefreshPushButton = QtWidgets.QPushButton(parent=self.viewInvOrUserBox)
         self.eqViewRefreshPushButton.setGeometry(QtCore.QRect(20, 320, 351, 28))
+        self.eqViewRefreshPushButton.setStyleSheet("QPushButton{\n"
+                                                   " background-color: #081f2d; \n"
+                                                   " border-radius: 8px; \n"
+                                                   " border: 2px solid #081F2D; \n"
+                                                   " color: white; \n"
+                                                   " font-size: 15px;  \n"
+                                                   " cursor: pointer; \n"
+                                                   " transition: 0.3s; \n"
+                                                   " }\n"
+                                                   " \n"
+                                                   "QPushButton:hover{ \n"
+                                                   " background-color: white; \n"
+                                                   " color: #081F2D; \n"
+                                                   " border-color: #081F2D;\n"
+                                                   " transition: 0.9s; \n"
+                                                   "}")
         self.eqViewRefreshPushButton.setObjectName("eqViewRefreshPushButton")
         self.tabWidget.addTab(self.tab_3, "")
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
         self.viewInvOrUserBox_2 = QtWidgets.QGroupBox(parent=self.tab_4)
         self.viewInvOrUserBox_2.setGeometry(QtCore.QRect(10, 10, 1151, 761))
+        self.viewInvOrUserBox_2.setStyleSheet("QGroupBox#viewInvOrUserBox_2{\n"
+                                              "    border: 0;\n"
+                                              "}")
         self.viewInvOrUserBox_2.setObjectName("viewInvOrUserBox_2")
         self.searchByIdLabel_2 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
         self.searchByIdLabel_2.setGeometry(QtCore.QRect(10, 30, 101, 16))
         self.searchByIdLabel_2.setObjectName("searchByIdLabel_2")
         self.searchByEmailOrNameLabel_2 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
-        self.searchByEmailOrNameLabel_2.setGeometry(QtCore.QRect(10, 60, 71, 16))
+        self.searchByEmailOrNameLabel_2.setGeometry(QtCore.QRect(10, 60, 31, 16))
         self.searchByEmailOrNameLabel_2.setObjectName("searchByEmailOrNameLabel_2")
         self.ussearchByEmailOrNameLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox_2)
-        self.ussearchByEmailOrNameLineEdit.setGeometry(QtCore.QRect(40, 60, 161, 22))
+        self.ussearchByEmailOrNameLineEdit.setGeometry(QtCore.QRect(50, 60, 161, 22))
         self.ussearchByEmailOrNameLineEdit.setObjectName("ussearchByEmailOrNameLineEdit")
         self.listLabel_2 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
         self.listLabel_2.setGeometry(QtCore.QRect(450, 10, 111, 16))
@@ -376,35 +475,102 @@ class MainWindow(QMainWindow):
         self.ussearchByFourthRightsCheckBox.setObjectName("ussearchByFourthRightsCheckBox")
         self.ussearchByRightsVerticalLayout.addWidget(self.ussearchByFourthRightsCheckBox)
         self.SearchByRightsLabel_2 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
-        self.SearchByRightsLabel_2.setGeometry(QtCore.QRect(10, 90, 121, 20))
+        self.SearchByRightsLabel_2.setGeometry(QtCore.QRect(10, 90, 111, 20))
         self.SearchByRightsLabel_2.setObjectName("SearchByRightsLabel_2")
         self.usTableView = QtWidgets.QTableView(parent=self.viewInvOrUserBox_2)
         self.usTableView.setGeometry(QtCore.QRect(450, 30, 701, 721))
         self.usTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.usTableView.setObjectName("usTableView")
         self.ussearchByNameOrEmailLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox_2)
-        self.ussearchByNameOrEmailLineEdit.setGeometry(QtCore.QRect(110, 30, 311, 22))
+        self.ussearchByNameOrEmailLineEdit.setGeometry(QtCore.QRect(120, 30, 311, 22))
         self.ussearchByNameOrEmailLineEdit.setObjectName("ussearchByNameOrEmailLineEdit")
         self.ussearchPushButton = QtWidgets.QPushButton(parent=self.viewInvOrUserBox_2)
         self.ussearchPushButton.setGeometry(QtCore.QRect(20, 220, 351, 28))
+        self.ussearchPushButton.setStyleSheet("QPushButton{\n"
+                                              " background-color: #081f2d; \n"
+                                              " border-radius: 8px; \n"
+                                              " border: 2px solid #081F2D; \n"
+                                              " color: white; \n"
+                                              " font-size: 15px;  \n"
+                                              " cursor: pointer; \n"
+                                              " transition: 0.3s; \n"
+                                              " }\n"
+                                              " \n"
+                                              "QPushButton:hover{ \n"
+                                              " background-color: white; \n"
+                                              " color: #081F2D; \n"
+                                              " border-color: #081F2D;\n"
+                                              " transition: 0.9s; \n"
+                                              "}")
         self.ussearchPushButton.setObjectName("ussearchPushButton")
         self.usViewRefreshPushButton = QtWidgets.QPushButton(parent=self.viewInvOrUserBox_2)
         self.usViewRefreshPushButton.setGeometry(QtCore.QRect(20, 250, 351, 28))
+        self.usViewRefreshPushButton.setStyleSheet("QPushButton{\n"
+                                                   " background-color: #081f2d; \n"
+                                                   " border-radius: 8px; \n"
+                                                   " border: 2px solid #081F2D; \n"
+                                                   " color: white; \n"
+                                                   " font-size: 15px;  \n"
+                                                   " cursor: pointer; \n"
+                                                   " transition: 0.3s; \n"
+                                                   " }\n"
+                                                   " \n"
+                                                   "QPushButton:hover{ \n"
+                                                   " background-color: white; \n"
+                                                   " color: #081F2D; \n"
+                                                   " border-color: #081F2D;\n"
+                                                   " transition: 0.9s; \n"
+                                                   "}")
         self.usViewRefreshPushButton.setObjectName("usViewRefreshPushButton")
         self.tabWidget.addTab(self.tab_4, "")
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
         self.RequestsGroupBox = QtWidgets.QGroupBox(parent=self.tab_5)
         self.RequestsGroupBox.setGeometry(QtCore.QRect(0, 0, 1401, 621))
+        self.RequestsGroupBox.setStyleSheet("QGroupBox#RequestsGroupBox{\n"
+                                            "    border: 0;\n"
+                                            "}")
         self.RequestsGroupBox.setObjectName("RequestsGroupBox")
         self.textBrowser = QtWidgets.QTextBrowser(parent=self.RequestsGroupBox)
         self.textBrowser.setGeometry(QtCore.QRect(20, 50, 511, 141))
         self.textBrowser.setObjectName("textBrowser")
         self.AcceptReqPushButton = QtWidgets.QPushButton(parent=self.RequestsGroupBox)
         self.AcceptReqPushButton.setGeometry(QtCore.QRect(20, 190, 181, 28))
+        self.AcceptReqPushButton.setStyleSheet("QPushButton{\n"
+                                               " background-color: #081f2d; \n"
+                                               " border-radius: 8px; \n"
+                                               " border: 2px solid #081F2D; \n"
+                                               " color: white; \n"
+                                               " font-size: 15px;  \n"
+                                               " cursor: pointer; \n"
+                                               " transition: 0.3s; \n"
+                                               " }\n"
+                                               " \n"
+                                               "QPushButton:hover{ \n"
+                                               " background-color: white; \n"
+                                               " color: #081F2D; \n"
+                                               " border-color: #081F2D;\n"
+                                               " transition: 0.9s; \n"
+                                               "}")
         self.AcceptReqPushButton.setObjectName("AcceptReqPushButton")
         self.pushButton_2 = QtWidgets.QPushButton(parent=self.RequestsGroupBox)
         self.pushButton_2.setGeometry(QtCore.QRect(20, 220, 181, 28))
+        self.pushButton_2.setStyleSheet("QPushButton{\n"
+                                        " background-color: #081f2d; \n"
+                                        " border-radius: 8px; \n"
+                                        " border: 2px solid #081F2D; \n"
+                                        " color: white; \n"
+                                        " font-size: 15px;  \n"
+                                        " cursor: pointer; \n"
+                                        " transition: 0.3s; \n"
+                                        " }\n"
+                                        " \n"
+                                        "QPushButton:hover{ \n"
+                                        " background-color: white; \n"
+                                        " color: #081F2D; \n"
+                                        " border-color: #081F2D;\n"
+                                        " transition: 0.9s; \n"
+                                        "}")
         self.pushButton_2.setObjectName("pushButton_2")
         self.label_2 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
         self.label_2.setGeometry(QtCore.QRect(20, 30, 201, 16))
@@ -414,9 +580,41 @@ class MainWindow(QMainWindow):
         self.label_7.setObjectName("label_7")
         self.pushButton = QtWidgets.QPushButton(parent=self.RequestsGroupBox)
         self.pushButton.setGeometry(QtCore.QRect(550, 50, 101, 28))
+        self.pushButton.setStyleSheet("QPushButton{\n"
+                                      " background-color: #081f2d; \n"
+                                      " border-radius: 8px; \n"
+                                      " border: 2px solid #081F2D; \n"
+                                      " color: white; \n"
+                                      " font-size: 15px;  \n"
+                                      " cursor: pointer; \n"
+                                      " transition: 0.3s; \n"
+                                      " }\n"
+                                      " \n"
+                                      "QPushButton:hover{ \n"
+                                      " background-color: white; \n"
+                                      " color: #081F2D; \n"
+                                      " border-color: #081F2D;\n"
+                                      " transition: 0.9s; \n"
+                                      "}")
         self.pushButton.setObjectName("pushButton")
         self.pushButton_3 = QtWidgets.QPushButton(parent=self.RequestsGroupBox)
         self.pushButton_3.setGeometry(QtCore.QRect(550, 80, 101, 28))
+        self.pushButton_3.setStyleSheet("QPushButton{\n"
+                                        " background-color: #081f2d; \n"
+                                        " border-radius: 8px; \n"
+                                        " border: 2px solid #081F2D; \n"
+                                        " color: white; \n"
+                                        " font-size: 15px;  \n"
+                                        " cursor: pointer; \n"
+                                        " transition: 0.3s; \n"
+                                        " }\n"
+                                        " \n"
+                                        "QPushButton:hover{ \n"
+                                        " background-color: white; \n"
+                                        " color: #081F2D; \n"
+                                        " border-color: #081F2D;\n"
+                                        " transition: 0.9s; \n"
+                                        "}")
         self.pushButton_3.setObjectName("pushButton_3")
         self.label_8 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
         self.label_8.setGeometry(QtCore.QRect(540, 110, 131, 16))
@@ -427,9 +625,41 @@ class MainWindow(QMainWindow):
         self.tableView2.setObjectName("tableView2")
         self.reqViewRefreshPushButton = QtWidgets.QPushButton(parent=self.RequestsGroupBox)
         self.reqViewRefreshPushButton.setGeometry(QtCore.QRect(150, 580, 351, 28))
+        self.reqViewRefreshPushButton.setStyleSheet("QPushButton{\n"
+                                                    " background-color: #081f2d; \n"
+                                                    " border-radius: 8px; \n"
+                                                    " border: 2px solid #081F2D; \n"
+                                                    " color: white; \n"
+                                                    " font-size: 15px;  \n"
+                                                    " cursor: pointer; \n"
+                                                    " transition: 0.3s; \n"
+                                                    " }\n"
+                                                    " \n"
+                                                    "QPushButton:hover{ \n"
+                                                    " background-color: white; \n"
+                                                    " color: #081F2D; \n"
+                                                    " border-color: #081F2D;\n"
+                                                    " transition: 0.9s; \n"
+                                                    "}")
         self.reqViewRefreshPushButton.setObjectName("reqViewRefreshPushButton")
         self.reqsearchPushButton = QtWidgets.QPushButton(parent=self.RequestsGroupBox)
         self.reqsearchPushButton.setGeometry(QtCore.QRect(150, 540, 351, 28))
+        self.reqsearchPushButton.setStyleSheet("QPushButton{\n"
+                                               " background-color: #081f2d; \n"
+                                               " border-radius: 8px; \n"
+                                               " border: 2px solid #081F2D; \n"
+                                               " color: white; \n"
+                                               " font-size: 15px;  \n"
+                                               " cursor: pointer; \n"
+                                               " transition: 0.3s; \n"
+                                               " }\n"
+                                               " \n"
+                                               "QPushButton:hover{ \n"
+                                               " background-color: white; \n"
+                                               " color: #081F2D; \n"
+                                               " border-color: #081F2D;\n"
+                                               " transition: 0.9s; \n"
+                                               "}")
         self.reqsearchPushButton.setObjectName("reqsearchPushButton")
         self.reqsearchByWhat = QtWidgets.QLineEdit(parent=self.RequestsGroupBox)
         self.reqsearchByWhat.setGeometry(QtCore.QRect(90, 380, 381, 22))
@@ -438,7 +668,7 @@ class MainWindow(QMainWindow):
         self.reqsearchByEmail.setGeometry(QtCore.QRect(160, 320, 311, 22))
         self.reqsearchByEmail.setObjectName("reqsearchByEmail")
         self.searchByIdLabel_4 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
-        self.searchByIdLabel_4.setGeometry(QtCore.QRect(40, 380, 101, 16))
+        self.searchByIdLabel_4.setGeometry(QtCore.QRect(40, 380, 41, 16))
         self.searchByIdLabel_4.setObjectName("searchByIdLabel_4")
         self.searchByEmailOrNameLabel_5 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
         self.searchByEmailOrNameLabel_5.setGeometry(QtCore.QRect(40, 320, 101, 16))
@@ -450,7 +680,7 @@ class MainWindow(QMainWindow):
         self.reqsearchByPurpose.setGeometry(QtCore.QRect(90, 410, 381, 22))
         self.reqsearchByPurpose.setObjectName("reqsearchByPurpose")
         self.searchByIdLabel_5 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
-        self.searchByIdLabel_5.setGeometry(QtCore.QRect(40, 350, 91, 16))
+        self.searchByIdLabel_5.setGeometry(QtCore.QRect(40, 350, 101, 16))
         self.searchByIdLabel_5.setObjectName("searchByIdLabel_5")
         self.searchByEmailOrNameLabel_6 = QtWidgets.QLabel(parent=self.RequestsGroupBox)
         self.searchByEmailOrNameLabel_6.setGeometry(QtCore.QRect(40, 410, 31, 16))
@@ -469,12 +699,11 @@ class MainWindow(QMainWindow):
         self.reqsearchByCount.setObjectName("reqsearchByCount")
         self.tabWidget.addTab(self.tab_5, "")
         self.setCentralWidget(self.centralwidget)
-
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(self)
+
         _translate = QtCore.QCoreApplication.translate
-        #   MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        #   self.burgerButton.setText(_translate("MainWindow", "Меню"))
+        self.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.addSmthBox.setTitle(_translate("MainWindow", "Добавление инвентаря"))
         self.nameOrEmailLabel_2.setText(_translate("MainWindow", "Название"))
         self.rightsLabel_3.setText(_translate("MainWindow", "Кто может получить "))
