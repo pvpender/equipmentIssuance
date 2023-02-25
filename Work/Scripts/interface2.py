@@ -90,6 +90,8 @@ class MainWindow(QMainWindow):
         self.__eqTableContents = []
         self.__usTableContents = []
         self.__reqTableContents = []
+        self.__usFoundTableContents=[]
+        self.__eqFoundTableContents=[]
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
@@ -108,7 +110,7 @@ class MainWindow(QMainWindow):
                                          "}")
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(-10, 0, 1411, 821))
+        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 1411, 821))
         self.tabWidget.setStyleSheet("QTabWidget#tabWidget{\n"
                                      "    border: 0;\n"
                                      "}")
@@ -303,7 +305,7 @@ class MainWindow(QMainWindow):
         self.usadmin5RightsCheckBox.setObjectName("usadmin5RightsCheckBox")
         self.verticalLayout_4.addWidget(self.usadmin5RightsCheckBox)
         self.rightsLabel_4 = QtWidgets.QLabel(self.adminRightsGroupBox_2)
-        self.rightsLabel_4.setGeometry(QtCore.QRect(20, 0, 81, 16))
+        self.rightsLabel_4.setGeometry(QtCore.QRect(0, 0, 101, 16))
         self.rightsLabel_4.setObjectName("rightsLabel_4")
         self.usaddUserOrInvButton = QtWidgets.QPushButton(self.addSmthBox_2)
         self.usaddUserOrInvButton.setGeometry(QtCore.QRect(50, 440, 401, 41))
@@ -388,7 +390,7 @@ class MainWindow(QMainWindow):
         self.searchByPosFromLeftSpinBox.setGeometry(QtCore.QRect(330, 30, 71, 22))
         self.searchByPosFromLeftSpinBox.setObjectName("searchByPosFromLeftSpinBox")
         self.eqsearchPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox)
-        self.eqsearchPushButton.setGeometry(QtCore.QRect(20, 280, 351, 28))
+        self.eqsearchPushButton.setGeometry(QtCore.QRect(20, 370, 351, 28))
         self.eqsearchPushButton.setStyleSheet("QPushButton{\n"
                                               " background-color: #081f2d; \n"
                                               " border-radius: 8px; \n"
@@ -410,7 +412,7 @@ class MainWindow(QMainWindow):
         self.eqTableView.setGeometry(QtCore.QRect(450, 30, 701, 721))
         self.eqTableView.setObjectName("eqTableView")
         self.eqViewRefreshPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox)
-        self.eqViewRefreshPushButton.setGeometry(QtCore.QRect(20, 320, 351, 28))
+        self.eqViewRefreshPushButton.setGeometry(QtCore.QRect(20, 410, 351, 28))
         self.eqViewRefreshPushButton.setStyleSheet("QPushButton{\n"
                                                    " background-color: #081f2d; \n"
                                                    " border-radius: 8px; \n"
@@ -428,6 +430,67 @@ class MainWindow(QMainWindow):
                                                    " transition: 0.9s; \n"
                                                    "}")
         self.eqViewRefreshPushButton.setObjectName("eqViewRefreshPushButton")
+        self.eqchangerGroupBox = QtWidgets.QGroupBox(self.viewInvOrUserBox)
+        self.eqchangerGroupBox.setGeometry(QtCore.QRect(20, 270, 371, 91))
+        self.eqchangerGroupBox.setTitle("")
+        self.eqchangerGroupBox.setObjectName("eqchangerGroupBox")
+        self.eqchangernextPushButton = QtWidgets.QPushButton(self.eqchangerGroupBox)
+        self.eqchangernextPushButton.setGeometry(QtCore.QRect(10, 10, 121, 31))
+        self.eqchangernextPushButton.setStyleSheet("QPushButton{\n"
+                                                   " background-color: #081f2d; \n"
+                                                   " border-radius: 8px; \n"
+                                                   " border: 2px solid #081F2D; \n"
+                                                   " color: white; \n"
+                                                   " font-size: 15px;  \n"
+                                                   " cursor: pointer; \n"
+                                                   " transition: 0.3s; \n"
+                                                   " }\n"
+                                                   " \n"
+                                                   "QPushButton:hover{ \n"
+                                                   " background-color: white; \n"
+                                                   " color: #081F2D; \n"
+                                                   " border-color: #081F2D;\n"
+                                                   " transition: 0.9s; \n"
+                                                   "}")
+        self.eqchangernextPushButton.setObjectName("eqchangernextPushButton")
+        self.eqchangerprevPushButton = QtWidgets.QPushButton(self.eqchangerGroupBox)
+        self.eqchangerprevPushButton.setGeometry(QtCore.QRect(10, 50, 121, 31))
+        self.eqchangerprevPushButton.setStyleSheet("QPushButton{\n"
+                                                   " background-color: #081f2d; \n"
+                                                   " border-radius: 8px; \n"
+                                                   " border: 2px solid #081F2D; \n"
+                                                   " color: white; \n"
+                                                   " font-size: 15px;  \n"
+                                                   " cursor: pointer; \n"
+                                                   " transition: 0.3s; \n"
+                                                   " }\n"
+                                                   " \n"
+                                                   "QPushButton:hover{ \n"
+                                                   " background-color: white; \n"
+                                                   " color: #081F2D; \n"
+                                                   " border-color: #081F2D;\n"
+                                                   " transition: 0.9s; \n"
+                                                   "}")
+        self.eqchangerprevPushButton.setObjectName("eqchangerprevPushButton")
+        self.eqcommitchangesPushButton = QtWidgets.QPushButton(self.eqchangerGroupBox)
+        self.eqcommitchangesPushButton.setGeometry(QtCore.QRect(150, 10, 211, 71))
+        self.eqcommitchangesPushButton.setStyleSheet("QPushButton{\n"
+                                                     " background-color: #081f2d; \n"
+                                                     " border-radius: 8px; \n"
+                                                     " border: 2px solid #081F2D; \n"
+                                                     " color: white; \n"
+                                                     " font-size: 15px;  \n"
+                                                     " cursor: pointer; \n"
+                                                     " transition: 0.3s; \n"
+                                                     " }\n"
+                                                     " \n"
+                                                     "QPushButton:hover{ \n"
+                                                     " background-color: white; \n"
+                                                     " color: #081F2D; \n"
+                                                     " border-color: #081F2D;\n"
+                                                     " transition: 0.9s; \n"
+                                                     "}")
+        self.eqcommitchangesPushButton.setObjectName("eqcommitchangesPushButton")
         self.tabWidget.addTab(self.tab_3, "")
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
@@ -450,7 +513,7 @@ class MainWindow(QMainWindow):
         self.listLabel_2.setGeometry(QtCore.QRect(450, 10, 111, 16))
         self.listLabel_2.setObjectName("listLabel_2")
         self.verticalLayoutWidget_14 = QtWidgets.QWidget(self.viewInvOrUserBox_2)
-        self.verticalLayoutWidget_14.setGeometry(QtCore.QRect(130, 90, 197, 119))
+        self.verticalLayoutWidget_14.setGeometry(QtCore.QRect(150, 90, 197, 119))
         self.verticalLayoutWidget_14.setObjectName("verticalLayoutWidget_14")
         self.ussearchByRightsVerticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_14)
         self.ussearchByRightsVerticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -468,7 +531,7 @@ class MainWindow(QMainWindow):
         self.ussearchByFourthRightsCheckBox.setObjectName("ussearchByFourthRightsCheckBox")
         self.ussearchByRightsVerticalLayout.addWidget(self.ussearchByFourthRightsCheckBox)
         self.SearchByRightsLabel_2 = QtWidgets.QLabel(self.viewInvOrUserBox_2)
-        self.SearchByRightsLabel_2.setGeometry(QtCore.QRect(10, 90, 111, 20))
+        self.SearchByRightsLabel_2.setGeometry(QtCore.QRect(10, 100, 131, 20))
         self.SearchByRightsLabel_2.setObjectName("SearchByRightsLabel_2")
         self.usTableView = QtWidgets.QTableView(self.viewInvOrUserBox_2)
         self.usTableView.setGeometry(QtCore.QRect(450, 30, 701, 721))
@@ -477,7 +540,7 @@ class MainWindow(QMainWindow):
         self.ussearchByNameOrEmailLineEdit.setGeometry(QtCore.QRect(170, 30, 261, 22))
         self.ussearchByNameOrEmailLineEdit.setObjectName("ussearchByNameOrEmailLineEdit")
         self.ussearchPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox_2)
-        self.ussearchPushButton.setGeometry(QtCore.QRect(20, 220, 351, 28))
+        self.ussearchPushButton.setGeometry(QtCore.QRect(30, 320, 351, 28))
         self.ussearchPushButton.setStyleSheet("QPushButton{\n"
                                               " background-color: #081f2d; \n"
                                               " border-radius: 8px; \n"
@@ -496,7 +559,7 @@ class MainWindow(QMainWindow):
                                               "}")
         self.ussearchPushButton.setObjectName("ussearchPushButton")
         self.usViewRefreshPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox_2)
-        self.usViewRefreshPushButton.setGeometry(QtCore.QRect(20, 250, 351, 28))
+        self.usViewRefreshPushButton.setGeometry(QtCore.QRect(30, 360, 351, 28))
         self.usViewRefreshPushButton.setStyleSheet("QPushButton{\n"
                                                    " background-color: #081f2d; \n"
                                                    " border-radius: 8px; \n"
@@ -514,6 +577,67 @@ class MainWindow(QMainWindow):
                                                    " transition: 0.9s; \n"
                                                    "}")
         self.usViewRefreshPushButton.setObjectName("usViewRefreshPushButton")
+        self.uschangerGroupBox = QtWidgets.QGroupBox(self.viewInvOrUserBox_2)
+        self.uschangerGroupBox.setGeometry(QtCore.QRect(20, 220, 371, 91))
+        self.uschangerGroupBox.setTitle("")
+        self.uschangerGroupBox.setObjectName("uschangerGroupBox")
+        self.uschangernextPushButton = QtWidgets.QPushButton(self.uschangerGroupBox)
+        self.uschangernextPushButton.setGeometry(QtCore.QRect(10, 10, 121, 31))
+        self.uschangernextPushButton.setStyleSheet("QPushButton{\n"
+                                                   " background-color: #081f2d; \n"
+                                                   " border-radius: 8px; \n"
+                                                   " border: 2px solid #081F2D; \n"
+                                                   " color: white; \n"
+                                                   " font-size: 15px;  \n"
+                                                   " cursor: pointer; \n"
+                                                   " transition: 0.3s; \n"
+                                                   " }\n"
+                                                   " \n"
+                                                   "QPushButton:hover{ \n"
+                                                   " background-color: white; \n"
+                                                   " color: #081F2D; \n"
+                                                   " border-color: #081F2D;\n"
+                                                   " transition: 0.9s; \n"
+                                                   "}")
+        self.uschangernextPushButton.setObjectName("uschangernextPushButton")
+        self.uschangerprevPushButton = QtWidgets.QPushButton(self.uschangerGroupBox)
+        self.uschangerprevPushButton.setGeometry(QtCore.QRect(10, 50, 121, 31))
+        self.uschangerprevPushButton.setStyleSheet("QPushButton{\n"
+                                                   " background-color: #081f2d; \n"
+                                                   " border-radius: 8px; \n"
+                                                   " border: 2px solid #081F2D; \n"
+                                                   " color: white; \n"
+                                                   " font-size: 15px;  \n"
+                                                   " cursor: pointer; \n"
+                                                   " transition: 0.3s; \n"
+                                                   " }\n"
+                                                   " \n"
+                                                   "QPushButton:hover{ \n"
+                                                   " background-color: white; \n"
+                                                   " color: #081F2D; \n"
+                                                   " border-color: #081F2D;\n"
+                                                   " transition: 0.9s; \n"
+                                                   "}")
+        self.uschangerprevPushButton.setObjectName("uschangerprevPushButton")
+        self.uscommitchangesPushButton = QtWidgets.QPushButton(self.uschangerGroupBox)
+        self.uscommitchangesPushButton.setGeometry(QtCore.QRect(150, 10, 211, 71))
+        self.uscommitchangesPushButton.setStyleSheet("QPushButton{\n"
+                                                     " background-color: #081f2d; \n"
+                                                     " border-radius: 8px; \n"
+                                                     " border: 2px solid #081F2D; \n"
+                                                     " color: white; \n"
+                                                     " font-size: 15px;  \n"
+                                                     " cursor: pointer; \n"
+                                                     " transition: 0.3s; \n"
+                                                     " }\n"
+                                                     " \n"
+                                                     "QPushButton:hover{ \n"
+                                                     " background-color: white; \n"
+                                                     " color: #081F2D; \n"
+                                                     " border-color: #081F2D;\n"
+                                                     " transition: 0.9s; \n"
+                                                     "}")
+        self.uscommitchangesPushButton.setObjectName("uscommitchangesPushButton")
         self.tabWidget.addTab(self.tab_4, "")
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
@@ -743,6 +867,9 @@ class MainWindow(QMainWindow):
         self.label_37.setText(_translate("MainWindow", "Номер от левого края"))
         self.eqsearchPushButton.setText(_translate("MainWindow", " Поиск"))
         self.eqViewRefreshPushButton.setText(_translate("MainWindow", "Обновить таблицу"))
+        self.eqchangernextPushButton.setText(_translate("MainWindow", "Следующий"))
+        self.eqchangerprevPushButton.setText(_translate("MainWindow", "Предыдущий"))
+        self.eqcommitchangesPushButton.setText(_translate("MainWindow", "Принять изменения"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Просмотр инвентаря"))
         self.viewInvOrUserBox_2.setTitle(_translate("MainWindow", "Просмотр пользователей"))
         self.searchByIdLabel_2.setText(_translate("MainWindow", "ID карты пропуска"))
@@ -755,6 +882,9 @@ class MainWindow(QMainWindow):
         self.SearchByRightsLabel_2.setText(_translate("MainWindow", "Права на выдачу"))
         self.ussearchPushButton.setText(_translate("MainWindow", " Поиск"))
         self.usViewRefreshPushButton.setText(_translate("MainWindow", "Обновить таблицу"))
+        self.uschangernextPushButton.setText(_translate("MainWindow", "Следующий"))
+        self.uschangerprevPushButton.setText(_translate("MainWindow", "Предыдущий"))
+        self.uscommitchangesPushButton.setText(_translate("MainWindow", "Принять изменения"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4),
                                   _translate("MainWindow", "Просмотр пользователей"))
         self.RequestsGroupBox.setTitle(_translate("MainWindow", "Принятие решений по запросам"))
@@ -973,6 +1103,7 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
 
     def refresh_equipment_table(self):
+        self.__eqFoundTableContents = []
         self.eqsearchByIdSpinBox.setValue(-1)
         self.searchByHeightSpinBox.setValue(-1)
         self.eqTableView.clearSpans()
@@ -1005,6 +1136,7 @@ class MainWindow(QMainWindow):
         self.eqTableView.setModel(model)
 
     def refresh_users_table(self):
+        self.__usFoundTableContents = []
         self.usTableView.clearSpans()
         ref = AdminAccess
         self.__usTableContents.clear()
@@ -1061,6 +1193,7 @@ class MainWindow(QMainWindow):
             foundres = found3
         if len(foundres) != 0:
             self.usTableView.clearSpans()
+            self.__usFoundTableContents=foundres
             data_frame = pd.DataFrame(foundres, columns=["ID карты", "Почта", "Доступ"],
                                       index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
@@ -1139,6 +1272,7 @@ class MainWindow(QMainWindow):
             if len(found4) != 0:
                 foundres = [x for x in foundres if x in found4]
         if len(foundres) != 0:
+            self.__eqFoundTableContents=foundres
             self.eqTableView.clearSpans()
             data_frame = pd.DataFrame(foundres,
                                       columns=["ID", "Название", "Количество", "Зарезервировано",
