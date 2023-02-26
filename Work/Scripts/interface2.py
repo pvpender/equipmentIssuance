@@ -937,6 +937,8 @@ class MainWindow(QMainWindow):
         self.usViewRefreshPushButton.clicked.connect(self.refresh_users_table)
         self.ussearchPushButton.clicked.connect(self.search_users)
         self.reqsearchPushButton.clicked.connect(self.search_request)
+        self.eqchangernextPushButton.clicked.connect(self.nextEq)
+        self.eqchangerprevPushButton.clicked.connect(self.previousEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -1346,27 +1348,53 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.eqTableView.setModel(model)
             self.__eqnum=0
-            self.eqsearchByIdSpinBox.setValue(int(foundres[0][0]))
-            self.eqsearchByEmailOrNameLineEdit.setText(foundres[0][1])
-            if int(foundres[self.__eqnum][4])%10==1:
-                self.eqsearchByFirstRightsCheckBox.setChecked(True)
-            if int(foundres[self.__eqnum][4]) % 100 == 10 or int(foundres[self.__eqnum][4]) % 100 == 11:
-                self.eqsearchBySecondRightsCheckBox.setChecked(True)
-            if int(foundres[self.__eqnum][4]) % 1000 == 100 or int(foundres[0][4]) % 1000 == 101 or int(foundres[self.__eqnum][4]) % 1000 == 110 or int(foundres[self.__eqnum][4]) % 1000 == 111:
-                self.eqsearchByThirdRightsCheckBox.setChecked(True)
-            if int(foundres[self.__eqnum][4]) // 1000 ==1:
-                self.eqsearchByFourthRightsCheckBox.setChecked(True)
-            if foundres[self.__eqnum][6]!='--':
-                self.searchByHeightSpinBox.setValue(int(foundres[self.__eqnum][6]))
-            if foundres[self.__eqnum][5] != '--':
-                self.searchByPosFromLeftSpinBox.setValue(int(foundres[self.__eqnum][5]))
-            if foundres[self.__eqnum][2] != '-1' and foundres[self.__eqnum][2] != '0':
-                self.eqsearchByNumberSpinBox.setValue(int(foundres[0][2]))
-            if foundres[self.__eqnum][3] != '-1' and foundres[self.__eqnum][3] != '0':
-                self.eqsearchByReservedSpinBox.setValue(int(foundres[0][2]))
+            self.setEqInfo()
+            self.eqchangerGroupBox.show()
         else:
             show_message("Проблема", "Ничего не найдено")
-
+    def setEqInfo(self):
+        self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[0][0]))
+        self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[0][1])
+        if int(self.__eqFoundTableContents[self.__eqnum][4]) % 10 == 1:
+            self.eqsearchByFirstRightsCheckBox.setChecked(True)
+        else:
+            self.eqsearchByFirstRightsCheckBox.setChecked(False)
+        if int(self.__eqFoundTableContents[self.__eqnum][4]) % 100 == 10 or int(
+                self.__eqFoundTableContents[self.__eqnum][4]) % 100 == 11:
+            self.eqsearchBySecondRightsCheckBox.setChecked(True)
+        else:
+            self.eqsearchBySecondRightsCheckBox.setChecked(False)
+        if int(self.__eqFoundTableContents[self.__eqnum][4]) % 1000 == 100 or int(
+                self.__eqFoundTableContents[0][4]) % 1000 == 101 or int(
+                self.__eqFoundTableContents[self.__eqnum][4]) % 1000 == 110 or int(
+                self.__eqFoundTableContents[self.__eqnum][4]) % 1000 == 111:
+            self.eqsearchByThirdRightsCheckBox.setChecked(True)
+        else:
+            self.eqsearchByThirdRightsCheckBox.setChecked(False)
+        if int(self.__eqFoundTableContents[self.__eqnum][4]) // 1000 == 1:
+            self.eqsearchByFourthRightsCheckBox.setChecked(True)
+        else:
+            self.eqsearchByFourthRightsCheckBox.setChecked(False)
+        if self.__eqFoundTableContents[self.__eqnum][6] != '--':
+            self.searchByHeightSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][6]))
+        if self.__eqFoundTableContents[self.__eqnum][5] != '--':
+            self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
+        #if self.__eqFoundTableContents[self.__eqnum][2] != '-1' and self.__eqFoundTableContents[self.__eqnum][2] != '0':
+        self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[0][2]))
+        #if self.__eqFoundTableContents[self.__eqnum][3] != '-1' and self.__eqFoundTableContents[self.__eqnum][3] != '0':
+        self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
+    def previousEq(self):
+        if self.__eqnum > 0:
+            self.__eqnum = self.__eqnum - 1
+            self.setEqInfo()
+        else:
+            show_message("Ошибка", "Это первый элемент в списке")
+    def nextEq(self):
+        if self.__eqnum < len(self.__eqFoundTableContents):
+            self.__eqnum = self.__eqnum + 1
+            self.setEqInfo()
+        else:
+            show_message("Ошибка", "Элемент последний в списке")
     def search_request(self):
         tg = 0
         found = []
