@@ -95,10 +95,8 @@ class MainWindow(QMainWindow):
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
-        self.__eqnum = 0
-        self.__usnum = 0
-        self.__isChangingUs
-        self.__isChangingEq
+        self.__eqnum = -1
+        self.__usnum = -1
         # self.__sidePanel = QFrame(self)
         # self.__sidePanel.setFixedSize(200, 720)
         # self.__sidePanel.setStyleSheet("background-color:#FFFFFF;")
