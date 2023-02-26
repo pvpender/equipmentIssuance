@@ -123,6 +123,7 @@ class MainWindow(QMainWindow):
         self.addSmthBox.setStyleSheet("QGroupBox#addSmthBox{\n"
                                       "    border: 0;\n"
                                       "}")
+        self.addSmthBox.setTitle("")
         self.addSmthBox.setObjectName("addSmthBox")
         self.label_4 = QtWidgets.QLabel(self.addSmthBox)
         self.label_4.setGeometry(QtCore.QRect(10, 30, 61, 21))
@@ -225,6 +226,7 @@ class MainWindow(QMainWindow):
         self.addSmthBox_2.setStyleSheet("QGroupBox#addSmthBox_2{\n"
                                         "    border: 0;\n"
                                         "}")
+        self.addSmthBox_2.setTitle("")
         self.addSmthBox_2.setObjectName("addSmthBox_2")
         self.label_6 = QtWidgets.QLabel(self.addSmthBox_2)
         self.label_6.setGeometry(QtCore.QRect(10, 30, 61, 21))
@@ -330,10 +332,11 @@ class MainWindow(QMainWindow):
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.viewInvOrUserBox = QtWidgets.QGroupBox(self.tab_3)
-        self.viewInvOrUserBox.setGeometry(QtCore.QRect(10, 10, 1151, 761))
+        self.viewInvOrUserBox.setGeometry(QtCore.QRect(0, 0, 1151, 761))
         self.viewInvOrUserBox.setStyleSheet("QGroupBox#viewInvOrUserBox{\n"
                                             "    border: 0;\n"
                                             "}")
+        self.viewInvOrUserBox.setTitle("")
         self.viewInvOrUserBox.setObjectName("viewInvOrUserBox")
         self.eqsearchByIdLabel = QtWidgets.QLabel(self.viewInvOrUserBox)
         self.eqsearchByIdLabel.setGeometry(QtCore.QRect(10, 30, 21, 16))
@@ -351,7 +354,7 @@ class MainWindow(QMainWindow):
         self.listLabel.setGeometry(QtCore.QRect(450, 10, 111, 16))
         self.listLabel.setObjectName("listLabel")
         self.verticalLayoutWidget_13 = QtWidgets.QWidget(self.viewInvOrUserBox)
-        self.verticalLayoutWidget_13.setGeometry(QtCore.QRect(130, 90, 197, 119))
+        self.verticalLayoutWidget_13.setGeometry(QtCore.QRect(130, 150, 197, 119))
         self.verticalLayoutWidget_13.setObjectName("verticalLayoutWidget_13")
         self.searchByRightsVerticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_13)
         self.searchByRightsVerticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -369,10 +372,10 @@ class MainWindow(QMainWindow):
         self.eqsearchByFourthRightsCheckBox.setObjectName("eqsearchByFourthRightsCheckBox")
         self.searchByRightsVerticalLayout.addWidget(self.eqsearchByFourthRightsCheckBox)
         self.SearchByRightsLabel = QtWidgets.QLabel(self.viewInvOrUserBox)
-        self.SearchByRightsLabel.setGeometry(QtCore.QRect(10, 90, 111, 20))
+        self.SearchByRightsLabel.setGeometry(QtCore.QRect(10, 150, 111, 20))
         self.SearchByRightsLabel.setObjectName("SearchByRightsLabel")
         self.searchByPosGroupBox = QtWidgets.QGroupBox(self.viewInvOrUserBox)
-        self.searchByPosGroupBox.setGeometry(QtCore.QRect(10, 210, 441, 61))
+        self.searchByPosGroupBox.setGeometry(QtCore.QRect(10, 280, 441, 61))
         self.searchByPosGroupBox.setStyleSheet("QGroupBox#searchByPosGroupBox{\n"
                                                "    border: 0;\n"
                                                "}")
@@ -390,7 +393,7 @@ class MainWindow(QMainWindow):
         self.searchByPosFromLeftSpinBox.setGeometry(QtCore.QRect(330, 30, 71, 22))
         self.searchByPosFromLeftSpinBox.setObjectName("searchByPosFromLeftSpinBox")
         self.eqsearchPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox)
-        self.eqsearchPushButton.setGeometry(QtCore.QRect(20, 370, 351, 28))
+        self.eqsearchPushButton.setGeometry(QtCore.QRect(40, 340, 351, 28))
         self.eqsearchPushButton.setStyleSheet("QPushButton{\n"
                                               " background-color: #081f2d; \n"
                                               " border-radius: 8px; \n"
@@ -412,7 +415,7 @@ class MainWindow(QMainWindow):
         self.eqTableView.setGeometry(QtCore.QRect(450, 30, 701, 721))
         self.eqTableView.setObjectName("eqTableView")
         self.eqViewRefreshPushButton = QtWidgets.QPushButton(self.viewInvOrUserBox)
-        self.eqViewRefreshPushButton.setGeometry(QtCore.QRect(20, 410, 351, 28))
+        self.eqViewRefreshPushButton.setGeometry(QtCore.QRect(40, 380, 351, 28))
         self.eqViewRefreshPushButton.setStyleSheet("QPushButton{\n"
                                                    " background-color: #081f2d; \n"
                                                    " border-radius: 8px; \n"
@@ -431,7 +434,7 @@ class MainWindow(QMainWindow):
                                                    "}")
         self.eqViewRefreshPushButton.setObjectName("eqViewRefreshPushButton")
         self.eqchangerGroupBox = QtWidgets.QGroupBox(self.viewInvOrUserBox)
-        self.eqchangerGroupBox.setGeometry(QtCore.QRect(20, 270, 371, 91))
+        self.eqchangerGroupBox.setGeometry(QtCore.QRect(30, 410, 371, 91))
         self.eqchangerGroupBox.setTitle("")
         self.eqchangerGroupBox.setObjectName("eqchangerGroupBox")
         self.eqchangernextPushButton = QtWidgets.QPushButton(self.eqchangerGroupBox)
@@ -491,6 +494,18 @@ class MainWindow(QMainWindow):
                                                      " transition: 0.9s; \n"
                                                      "}")
         self.eqcommitchangesPushButton.setObjectName("eqcommitchangesPushButton")
+        self.eqsearchByNumberSpinBox = QtWidgets.QSpinBox(self.viewInvOrUserBox)
+        self.eqsearchByNumberSpinBox.setGeometry(QtCore.QRect(90, 90, 171, 22))
+        self.eqsearchByNumberSpinBox.setObjectName("eqsearchByNumberSpinBox")
+        self.eqsearchByIdLabel_2 = QtWidgets.QLabel(self.viewInvOrUserBox)
+        self.eqsearchByIdLabel_2.setGeometry(QtCore.QRect(10, 90, 71, 16))
+        self.eqsearchByIdLabel_2.setObjectName("eqsearchByIdLabel_2")
+        self.eqsearchByReservedSpinBox = QtWidgets.QSpinBox(self.viewInvOrUserBox)
+        self.eqsearchByReservedSpinBox.setGeometry(QtCore.QRect(120, 120, 141, 22))
+        self.eqsearchByReservedSpinBox.setObjectName("eqsearchByReservedSpinBox")
+        self.eqsearchByIdLabel_3 = QtWidgets.QLabel(self.viewInvOrUserBox)
+        self.eqsearchByIdLabel_3.setGeometry(QtCore.QRect(10, 120, 111, 16))
+        self.eqsearchByIdLabel_3.setObjectName("eqsearchByIdLabel_3")
         self.tabWidget.addTab(self.tab_3, "")
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
@@ -499,6 +514,7 @@ class MainWindow(QMainWindow):
         self.viewInvOrUserBox_2.setStyleSheet("QGroupBox#viewInvOrUserBox_2{\n"
                                               "    border: 0;\n"
                                               "}")
+        self.viewInvOrUserBox_2.setTitle("")
         self.viewInvOrUserBox_2.setObjectName("viewInvOrUserBox_2")
         self.searchByIdLabel_2 = QtWidgets.QLabel(self.viewInvOrUserBox_2)
         self.searchByIdLabel_2.setGeometry(QtCore.QRect(10, 30, 141, 16))
@@ -646,6 +662,7 @@ class MainWindow(QMainWindow):
         self.RequestsGroupBox.setStyleSheet("QGroupBox#RequestsGroupBox{\n"
                                             "    border: 0;\n"
                                             "}")
+        self.RequestsGroupBox.setTitle("")
         self.RequestsGroupBox.setObjectName("RequestsGroupBox")
         self.textBrowser = QtWidgets.QTextBrowser(self.RequestsGroupBox)
         self.textBrowser.setGeometry(QtCore.QRect(20, 50, 511, 141))
@@ -819,7 +836,6 @@ class MainWindow(QMainWindow):
 
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.addSmthBox.setTitle(_translate("MainWindow", "Добавление инвентаря"))
         self.nameOrEmailLabel_2.setText(_translate("MainWindow", "Название"))
         self.rightsLabel_3.setText(_translate("MainWindow", "Кто может получить "))
         self.eqfirstRightsCheckBox.setText(_translate("MainWindow", "Обычный пользователь"))
@@ -834,7 +850,6 @@ class MainWindow(QMainWindow):
         self.radioButton_setPos.setText(_translate("MainWindow", "Указать расположение в шкафу"))
         self.eqaddUserOrInvButton.setText(_translate("MainWindow", "Добавить"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Добавление инвентаря"))
-        self.addSmthBox_2.setTitle(_translate("MainWindow", "Добавление пользователя"))
         self.nameOrEmailLabel_3.setText(_translate("MainWindow", "Email"))
         self.rightsLabel_5.setText(_translate("MainWindow", "Кто может получить "))
         self.usfirstRightsCheckBox.setText(_translate("MainWindow", "Обычный пользователь"))
@@ -853,7 +868,6 @@ class MainWindow(QMainWindow):
         self.usaddUserOrInvButton.setText(_translate("MainWindow", "Добавить"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2),
                                   _translate("MainWindow", "Добавление пользователей"))
-        self.viewInvOrUserBox.setTitle(_translate("MainWindow", "Просмотр инвентаря"))
         self.eqsearchByIdLabel.setText(_translate("MainWindow", "ID"))
         self.searchByEmailOrNameLabel.setText(_translate("MainWindow", "Название"))
         self.listLabel.setText(_translate("MainWindow", "Все элементы"))
@@ -870,8 +884,9 @@ class MainWindow(QMainWindow):
         self.eqchangernextPushButton.setText(_translate("MainWindow", "Следующий"))
         self.eqchangerprevPushButton.setText(_translate("MainWindow", "Предыдущий"))
         self.eqcommitchangesPushButton.setText(_translate("MainWindow", "Принять изменения"))
+        self.eqsearchByIdLabel_2.setText(_translate("MainWindow", "Количество"))
+        self.eqsearchByIdLabel_3.setText(_translate("MainWindow", "Зарезервировано"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Просмотр инвентаря"))
-        self.viewInvOrUserBox_2.setTitle(_translate("MainWindow", "Просмотр пользователей"))
         self.searchByIdLabel_2.setText(_translate("MainWindow", "ID карты пропуска"))
         self.searchByEmailOrNameLabel_2.setText(_translate("MainWindow", "Email"))
         self.listLabel_2.setText(_translate("MainWindow", "Все элементы"))
@@ -887,7 +902,6 @@ class MainWindow(QMainWindow):
         self.uscommitchangesPushButton.setText(_translate("MainWindow", "Принять изменения"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4),
                                   _translate("MainWindow", "Просмотр пользователей"))
-        self.RequestsGroupBox.setTitle(_translate("MainWindow", "Принятие решений по запросам"))
         self.AcceptReqPushButton.setText(_translate("MainWindow", "Одобрить запрос"))
         self.pushButton_2.setText(_translate("MainWindow", "Отклонить запрос"))
         self.label_2.setText(_translate("MainWindow", "Информация по запросу"))
@@ -944,7 +958,6 @@ class MainWindow(QMainWindow):
         if not admin_access.can_add_inventory:
             self.tab.hide()
         self.adminRightsGroupBox_2.hide()
-
         self.refresh_requests_table()
         self.refresh_equipment_table()
         self.refresh_users_table()
@@ -1103,6 +1116,7 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
 
     def refresh_equipment_table(self):
+        self.eqchangerGroupBox.hide()
         self.__eqFoundTableContents = []
         self.eqsearchByIdSpinBox.setValue(-1)
         self.searchByHeightSpinBox.setValue(-1)
@@ -1134,8 +1148,17 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__eqTableContents))])
         model = TableModel(data_frame)
         self.eqTableView.setModel(model)
+        self.eqsearchByIdSpinBox.setValue(-1)
+        self.eqsearchByEmailOrNameLineEdit.setText('')
+        self.eqsearchByFirstRightsCheckBox.setChecked(False)
+        self.eqsearchBySecondRightsCheckBox.setChecked(False)
+        self.eqsearchByThirdRightsCheckBox.setChecked(False)
+        self.eqsearchByFourthRightsCheckBox.setChecked(False)
+        self.searchByHeightSpinBox.setValue(-1)
+        self.searchByPosFromLeftSpinBox.setValue(-1)
 
     def refresh_users_table(self):
+        self.uschangerGroupBox.hide()
         self.__usFoundTableContents = []
         self.usTableView.clearSpans()
         ref = AdminAccess
@@ -1150,7 +1173,6 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__usTableContents))])
         model = TableModel(data_frame)
         self.usTableView.setModel(model)
-
     def search_users(self):
         tg = 0
         found = []
@@ -1280,6 +1302,21 @@ class MainWindow(QMainWindow):
                                       index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
             self.eqTableView.setModel(model)
+            self.eqsearchByIdSpinBox.setValue(int(foundres[0][0]))
+            self.eqsearchByEmailOrNameLineEdit.setText(foundres[0][1])
+            if int(foundres[0][4])%10==1:
+                self.eqsearchByFirstRightsCheckBox.setChecked(True)
+            if int(foundres[0][4]) % 100 == 10 or int(foundres[0][4]) % 100 == 11:
+                self.eqsearchBySecondRightsCheckBox.setChecked(True)
+            if int(foundres[0][4]) % 1000 == 100 or int(foundres[0][4]) % 1000 == 101 or int(foundres[0][4]) % 1000 == 110 or int(foundres[0][4]) % 1000 == 111:
+                self.eqsearchByThirdRightsCheckBox.setChecked(True)
+            if int(foundres[0][4]) // 1000 ==1:
+                self.eqsearchByFourthRightsCheckBox.setChecked(True)
+            if foundres[0][6]!='--':
+                self.searchByHeightSpinBox.setValue(int(foundres[0][6]))
+            if foundres[0][5] != '--':
+                self.searchByPosFromLeftSpinBox.setValue(int(foundres[0][5]))
+
         else:
             show_message("Проблема", "Ничего не найдено")
 
