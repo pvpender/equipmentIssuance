@@ -95,6 +95,10 @@ class MainWindow(QMainWindow):
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
+        self.__eqnum = 0
+        self.__usnum = 0
+        self.__isChangingUs
+        self.__isChangingEq
         # self.__sidePanel = QFrame(self)
         # self.__sidePanel.setFixedSize(200, 720)
         # self.__sidePanel.setStyleSheet("background-color:#FFFFFF;")
@@ -944,6 +948,10 @@ class MainWindow(QMainWindow):
         self.searchByHeightSpinBox.setValue(-1)
         self.searchByHeightSpinBox.setMinimum(-1)
         self.searchByPosFromLeftSpinBox.setMinimum(-1)
+        self.eqsearchByNumberSpinBox.setMinimum(-1)
+        self.eqsearchByReservedSpinBox.setMinimum(-1)
+        self.eqsearchByNumberSpinBox.setValue(-1)
+        self.eqsearchByReservedSpinBox.setValue(-1)
         # self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
@@ -1156,7 +1164,8 @@ class MainWindow(QMainWindow):
         self.eqsearchByFourthRightsCheckBox.setChecked(False)
         self.searchByHeightSpinBox.setValue(-1)
         self.searchByPosFromLeftSpinBox.setValue(-1)
-
+        self.eqsearchByReservedSpinBox.setValue(-1)
+        self.eqsearchByNumberSpinBox.setValue(-1)
     def refresh_users_table(self):
         self.uschangerGroupBox.hide()
         self.__usFoundTableContents = []
@@ -1230,6 +1239,8 @@ class MainWindow(QMainWindow):
         found3 = []
         found4 = []
         found5 = []
+        found6=[]
+        found7=[]
         foundres = []
         if self.eqsearchByIdSpinBox.value() != -1:
             id = self.eqsearchByIdSpinBox.value()
@@ -1257,6 +1268,14 @@ class MainWindow(QMainWindow):
             for i in self.__eqTableContents:
                 if i[5] == str(self.searchByPosFromLeftSpinBox.value()):
                     found5.append(i)
+        if self.eqsearchByReservedSpinBox.value()!=-1:
+            for i in self.__eqTableContents:
+                if i[3] == str(self.eqsearchByReservedSpinBox.value()):
+                    found6.append(i)
+        if self.eqsearchByNumberSpinBox.value() != -1:
+            for i in self.__eqTableContents:
+                if i[2] == str(self.eqsearchByNumberSpinBox.value()):
+                    found7.append(i)
         if tg != 0:
             for i in self.__eqTableContents:
                 if i[4] == str(tg):
@@ -1271,6 +1290,10 @@ class MainWindow(QMainWindow):
                 foundres = [x for x in foundres if x in found4]
             if len(found5) != 0:
                 foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+            if len(found7) != 0:
+                foundres = [x for x in foundres if x in found7]
         if len(found2) != 0 and len(found) == 0:
             foundres = found2
             if len(found3) != 0:
@@ -1279,20 +1302,42 @@ class MainWindow(QMainWindow):
                 foundres = [x for x in foundres if x in found4]
             if len(found5) != 0:
                 foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+            if len(found7) != 0:
+                foundres = [x for x in foundres if x in found7]
         if len(found3) != 0 and len(found2) == 0 and len(found) == 0:
             foundres = found3
             if len(found4) != 0:
                 foundres = [x for x in foundres if x in found4]
             if len(found5) != 0:
                 foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+            if len(found7) != 0:
+                foundres = [x for x in foundres if x in found7]
         if len(found4) != 0:
             foundres = found4
             if len(found5) != 0:
                 foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+            if len(found7) != 0:
+                foundres = [x for x in foundres if x in found7]
         if len(found5) != 0:
             foundres = found5
             if len(found4) != 0:
                 foundres = [x for x in foundres if x in found4]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+            if len(found7) != 0:
+                foundres = [x for x in foundres if x in found7]
+        if len(found6) != 0 and len(found) == 0 and len(found2) == 0 and len(found3) == 0 and len(found4) == 0 and len(found5) == 0:
+            foundres = found6
+            if len(found7) != 0:
+                foundres = [x for x in foundres if x in found7]
+        if len(found7) != 0 and len(found) == 0 and len(found2) == 0 and len(found3) == 0 and len(found4) == 0 and len(found5) == 0 and len(found6) == 0:
+            foundres = found7
         if len(foundres) != 0:
             self.__eqFoundTableContents=foundres
             self.eqTableView.clearSpans()
@@ -1302,21 +1347,25 @@ class MainWindow(QMainWindow):
                                       index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
             self.eqTableView.setModel(model)
+            self.__eqnum=0
             self.eqsearchByIdSpinBox.setValue(int(foundres[0][0]))
             self.eqsearchByEmailOrNameLineEdit.setText(foundres[0][1])
-            if int(foundres[0][4])%10==1:
+            if int(foundres[self.__eqnum][4])%10==1:
                 self.eqsearchByFirstRightsCheckBox.setChecked(True)
-            if int(foundres[0][4]) % 100 == 10 or int(foundres[0][4]) % 100 == 11:
+            if int(foundres[self.__eqnum][4]) % 100 == 10 or int(foundres[self.__eqnum][4]) % 100 == 11:
                 self.eqsearchBySecondRightsCheckBox.setChecked(True)
-            if int(foundres[0][4]) % 1000 == 100 or int(foundres[0][4]) % 1000 == 101 or int(foundres[0][4]) % 1000 == 110 or int(foundres[0][4]) % 1000 == 111:
+            if int(foundres[self.__eqnum][4]) % 1000 == 100 or int(foundres[0][4]) % 1000 == 101 or int(foundres[self.__eqnum][4]) % 1000 == 110 or int(foundres[self.__eqnum][4]) % 1000 == 111:
                 self.eqsearchByThirdRightsCheckBox.setChecked(True)
-            if int(foundres[0][4]) // 1000 ==1:
+            if int(foundres[self.__eqnum][4]) // 1000 ==1:
                 self.eqsearchByFourthRightsCheckBox.setChecked(True)
-            if foundres[0][6]!='--':
-                self.searchByHeightSpinBox.setValue(int(foundres[0][6]))
-            if foundres[0][5] != '--':
-                self.searchByPosFromLeftSpinBox.setValue(int(foundres[0][5]))
-
+            if foundres[self.__eqnum][6]!='--':
+                self.searchByHeightSpinBox.setValue(int(foundres[self.__eqnum][6]))
+            if foundres[self.__eqnum][5] != '--':
+                self.searchByPosFromLeftSpinBox.setValue(int(foundres[self.__eqnum][5]))
+            if foundres[self.__eqnum][2] != '-1' and foundres[self.__eqnum][2] != '0':
+                self.eqsearchByNumberSpinBox.setValue(int(foundres[0][2]))
+            if foundres[self.__eqnum][3] != '-1' and foundres[self.__eqnum][3] != '0':
+                self.eqsearchByReservedSpinBox.setValue(int(foundres[0][2]))
         else:
             show_message("Проблема", "Ничего не найдено")
 
