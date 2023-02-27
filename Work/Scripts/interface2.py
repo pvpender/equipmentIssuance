@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox, QHeaderView
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer, pyqtSlot
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 from Work.Scripts.interface import TableModel
@@ -11,7 +11,22 @@ from users import *
 from accesses import *
 import pandas as pd
 
-
+class QDoublePushButton(QPushButton):
+    doubleClicked = pyqtSignal()
+    clicked = pyqtSignal()
+    def __init__(self, *args, **kwargs):
+        QPushButton.__init__(self, *args, **kwargs)
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.clicked.emit)
+        super().clicked.connect(self.checkDoubleClick)
+    @pyqtSlot()
+    def checkDoubleClick(self):
+        if self.timer.isActive():
+            self.doubleClicked.emit()
+            self.timer.stop()
+        else:
+            self.timer.start(250)
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
@@ -939,6 +954,8 @@ class MainWindow(QMainWindow):
         self.reqsearchPushButton.clicked.connect(self.search_request)
         self.eqchangernextPushButton.clicked.connect(self.nextEq)
         self.eqchangerprevPushButton.clicked.connect(self.previousEq)
+        self.uschangernextPushButton.clicked.connect(self.nextUs)
+        self.uschangerprevPushButton.clicked.connect(self.previousUs)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -1225,13 +1242,53 @@ class MainWindow(QMainWindow):
         if len(foundres) != 0:
             self.usTableView.clearSpans()
             self.__usFoundTableContents=foundres
+            self.__usnum=0
             data_frame = pd.DataFrame(foundres, columns=["ID карты", "Почта", "Доступ"],
                                       index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
             self.usTableView.setModel(model)
+            self.setUsInfo()
+            self.uschangerGroupBox.show()
         else:
             show_message("Проблема", "Ничего не найдено")
-
+    def setUsInfo(self):
+        self.usTableView.selectRow(self.__usnum)
+        self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
+        self.ussearchByEmailOrNameLineEdit.setText(self.__usFoundTableContents[self.__usnum][1])
+        if len(str(self.__usFoundTableContents[self.__usnum][2])) == 1:
+            self.__usFoundTableContents[self.__usnum][2] = '000' + self.__usFoundTableContents[self.__usnum][2]
+        elif len(str(self.__usFoundTableContents[self.__usnum][2])) == 2:
+            self.__usFoundTableContents[self.__usnum][2] = '00' + self.__usFoundTableContents[self.__usnum][2]
+        elif len(str(self.__usFoundTableContents[self.__usnum][2])) == 3:
+            self.__usFoundTableContents[self.__usnum][2] = '0' + self.__usFoundTableContents[self.__usnum][2]
+        if str(self.__usFoundTableContents[self.__usnum][2])[3] == '1':
+            self.ussearchByFirstRightsCheckBox.setChecked(True)
+        else:
+            self.ussearchByFirstRightsCheckBox.setChecked(False)
+        if str(self.__usFoundTableContents[self.__usnum][2])[2] == '1':
+            self.ussearchBySecondRightsCheckBox.setChecked(True)
+        else:
+            self.ussearchBySecondRightsCheckBox.setChecked(False)
+        if str(self.__usFoundTableContents[self.__usnum][2])[1] == '1':
+            self.ussearchByThirdRightsCheckBox.setChecked(True)
+        else:
+            self.ussearchByThirdRightsCheckBox.setChecked(False)
+        if str(self.__usFoundTableContents[self.__usnum][2])[0] == '1':
+            self.ussearchByFourthRightsCheckBox.setChecked(True)
+        else:
+            self.ussearchByFourthRightsCheckBox.setChecked(False)
+    def previousUs(self):
+        if self.__usnum > 0:
+            self.__usnum = self.__usnum - 1
+            self.setUsInfo()
+        else:
+            show_message("Ошибка", "Это первый элемент в списке")
+    def nextUs(self):
+        if self.__usnum < len(self.__usFoundTableContents)-1:
+            self.__usnum = self.__usnum + 1
+            self.setUsInfo()
+        else:
+            show_message("Ошибка", "Элемент последний в списке")
     def searchEq(self):
         tg = 0
         found = []
@@ -1382,8 +1439,12 @@ class MainWindow(QMainWindow):
             self.eqsearchByFourthRightsCheckBox.setChecked(False)
         if self.__eqFoundTableContents[self.__eqnum][6] != '--':
             self.searchByHeightSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][6]))
+        else:
+            self.searchByHeightSpinBox.setValue(-1)
         if self.__eqFoundTableContents[self.__eqnum][5] != '--':
             self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
+        else:
+            self.searchByPosFromLeftSpinBox.setValue(-1)
         #if self.__eqFoundTableContents[self.__eqnum][2] != '-1' and self.__eqFoundTableContents[self.__eqnum][2] != '0':
         self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
         #if self.__eqFoundTableContents[self.__eqnum][3] != '-1' and self.__eqFoundTableContents[self.__eqnum][3] != '0':
