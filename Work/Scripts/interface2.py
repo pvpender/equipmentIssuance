@@ -956,6 +956,8 @@ class MainWindow(QMainWindow):
         self.eqchangerprevPushButton.clicked.connect(self.previousEq)
         self.uschangernextPushButton.clicked.connect(self.nextUs)
         self.uschangerprevPushButton.clicked.connect(self.previousUs)
+        self.uscommitchangesPushButton.clicked.connect(self.testForButton)
+        #self.uscommitchangesPushButton.doubleClicked.connect(self.testForDCButton)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -1049,6 +1051,10 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "Оборудование с таким названием уже есть в базе")
             elif code_error == 9:
                 show_message("Ошибка добавления", "Ячейка занята")
+    def testForDCButton(self):
+        show_message("нажатие", "двойное")
+    def testForButton(self):
+        show_message("нажатие", "одиночное")
 
     def add_user(self):
         code_error = -1
@@ -1248,7 +1254,8 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.usTableView.setModel(model)
             self.setUsInfo()
-            self.uschangerGroupBox.show()
+            if self.__admin_access.can_change_users:
+                self.uschangerGroupBox.show()
         else:
             show_message("Проблема", "Ничего не найдено")
     def setUsInfo(self):
@@ -1406,7 +1413,8 @@ class MainWindow(QMainWindow):
             self.eqTableView.setModel(model)
             self.__eqnum=0
             self.setEqInfo()
-            self.eqchangerGroupBox.show()
+            if self.__admin_access.can_change_inventory:
+                self.eqchangerGroupBox.show()
             print(self.__eqFoundTableContents)
         else:
             show_message("Проблема", "Ничего не найдено")
