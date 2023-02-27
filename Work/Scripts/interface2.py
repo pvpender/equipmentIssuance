@@ -492,7 +492,7 @@ class MainWindow(QMainWindow):
                                                    " transition: 0.9s; \n"
                                                    "}")
         self.eqchangerprevPushButton.setObjectName("eqchangerprevPushButton")
-        self.eqcommitchangesPushButton = QtWidgets.QPushButton(self.eqchangerGroupBox)
+        self.eqcommitchangesPushButton = QDoublePushButton(self.eqchangerGroupBox)
         self.eqcommitchangesPushButton.setGeometry(QtCore.QRect(150, 10, 211, 71))
         self.eqcommitchangesPushButton.setStyleSheet("QPushButton{\n"
                                                      " background-color: #081f2d; \n"
@@ -652,7 +652,7 @@ class MainWindow(QMainWindow):
                                                    " transition: 0.9s; \n"
                                                    "}")
         self.uschangerprevPushButton.setObjectName("uschangerprevPushButton")
-        self.uscommitchangesPushButton = QtWidgets.QPushButton(self.uschangerGroupBox)
+        self.uscommitchangesPushButton = QDoublePushButton(self.uschangerGroupBox)
         self.uscommitchangesPushButton.setGeometry(QtCore.QRect(150, 10, 211, 71))
         self.uscommitchangesPushButton.setStyleSheet("QPushButton{\n"
                                                      " background-color: #081f2d; \n"
@@ -956,8 +956,9 @@ class MainWindow(QMainWindow):
         self.eqchangerprevPushButton.clicked.connect(self.previousEq)
         self.uschangernextPushButton.clicked.connect(self.nextUs)
         self.uschangerprevPushButton.clicked.connect(self.previousUs)
-        self.uscommitchangesPushButton.clicked.connect(self.testForButton)
+        #self.uscommitchangesPushButton.clicked.connect(self.testForButton)
         #self.uscommitchangesPushButton.doubleClicked.connect(self.testForDCButton)
+        self.uscommitchangesPushButton.clicked.connect(self.changeUs)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -988,7 +989,6 @@ class MainWindow(QMainWindow):
         self.refresh_requests_table()
         self.refresh_equipment_table()
         self.refresh_users_table()
-
         self.show()
 
     def add_equipment(self):
@@ -1051,11 +1051,6 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "Оборудование с таким названием уже есть в базе")
             elif code_error == 9:
                 show_message("Ошибка добавления", "Ячейка занята")
-    def testForDCButton(self):
-        show_message("нажатие", "двойное")
-    def testForButton(self):
-        show_message("нажатие", "одиночное")
-
     def add_user(self):
         code_error = -1
         tg = 0
@@ -1145,7 +1140,45 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "пользователь с такой картой уже добавлен")
             elif code_error == 8:
                 show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
-
+    def changeUs(self):
+        code_error = -1
+        tg = 0
+        if code_error == -1 and self.ussearchByNameOrEmailLineEdit.text() == "":
+            code_error = 1
+        if code_error == -1 and self.ussearchByEmailOrNameLineEdit.text() == "":
+            code_error = 2
+        if code_error == -1 and self.ussearchByFirstRightsCheckBox.isChecked():
+            tg += 1
+        if code_error == -1 and self.ussearchBySecondRightsCheckBox.isChecked():
+            tg += 10
+        if code_error == -1 and self.ussearchByThirdRightsCheckBox.isChecked():
+            tg += 100
+        if code_error == -1 and self.ussearchByFourthRightsCheckBox.isChecked():
+            tg += 1000
+        if code_error == -1 and tg == 0:
+            code_error = 3
+        if code_error == -1 and (self.__db.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and self.__db.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).__mail!=self.__usFoundTableContents[self.__usnum][1]:
+            code_error = 7
+        if code_error == -1 and (self.__db.get_user_by_mail(self.ussearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_user_by_mail(self.ussearchByEmailOrNameLineEdit.text()).__id!=int(self.__usFoundTableContents[self.__usnum][0],16):
+            code_error = 8
+        if code_error == -1:
+            us = CommonUser(int(self.ussearchByNameOrEmailLineEdit.text(),16), self.ussearchByEmailOrNameLineEdit.text(), Access(tg))
+            self.__db.update_user(int(self.__usFoundTableContents[self.__usnum][0],16),self.__usFoundTableContents[self.__usnum][1], us)
+            self.ussearchByFirstRightsCheckBox.setChecked(False)
+            self.ussearchBySecondRightsCheckBox.setChecked(False)
+            self.ussearchByThirdRightsCheckBox.setChecked(False)
+            self.ussearchByFourthRightsCheckBox.setChecked(False)
+        else:
+            if code_error == 1:
+                show_message("Ошибка изменения", "Введите ID карты сотрудника")
+            elif code_error == 2:
+                show_message("Ошибка изменения", "Введите Email сотрудника")
+            elif code_error == 3:
+                show_message("Ошибка изменения", "Не отмечены права пользователя")
+            elif code_error == 7:
+                show_message("Ошибка изменения", "этот ID уже занят")
+            elif code_error == 8:
+                show_message("Ошибка изменения", "Другой пользователь с таким email уже добавлен")
     def refresh_equipment_table(self):
         self.eqchangerGroupBox.hide()
         self.__eqFoundTableContents = []
@@ -1263,11 +1296,11 @@ class MainWindow(QMainWindow):
         self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
         self.ussearchByEmailOrNameLineEdit.setText(self.__usFoundTableContents[self.__usnum][1])
         if len(str(self.__usFoundTableContents[self.__usnum][2])) == 1:
-            self.__usFoundTableContents[self.__usnum][2] = '000' + self.__usFoundTableContents[self.__usnum][2]
+            self.__usFoundTableContents[self.__usnum][2] = '000' + str(self.__usFoundTableContents[self.__usnum][2])
         elif len(str(self.__usFoundTableContents[self.__usnum][2])) == 2:
-            self.__usFoundTableContents[self.__usnum][2] = '00' + self.__usFoundTableContents[self.__usnum][2]
+            self.__usFoundTableContents[self.__usnum][2] = '00' + str(self.__usFoundTableContents[self.__usnum][2])
         elif len(str(self.__usFoundTableContents[self.__usnum][2])) == 3:
-            self.__usFoundTableContents[self.__usnum][2] = '0' + self.__usFoundTableContents[self.__usnum][2]
+            self.__usFoundTableContents[self.__usnum][2] = '0' +str(self.__usFoundTableContents[self.__usnum][2])
         if str(self.__usFoundTableContents[self.__usnum][2])[3] == '1':
             self.ussearchByFirstRightsCheckBox.setChecked(True)
         else:
