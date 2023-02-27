@@ -13,8 +13,8 @@ import pymysql
 
 import datetime
 
-#engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
-engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
+
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
