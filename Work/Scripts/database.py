@@ -206,6 +206,7 @@ class DataBase:
             access_id = self.__session.query(Accesses.id).filter(
                 Accesses.power == access.power
             ).one()
+        a = self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).first()
         self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
             {"pass_number": user.id, "mail": user.mail, "access_id": access_id[0]}, synchronize_session=False
         )

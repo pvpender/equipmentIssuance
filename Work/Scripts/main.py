@@ -11,9 +11,10 @@ from database import *
 import sqlalchemy
 import pymysql
 
+import datetime
 
 #engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
-engine = create_engine("mysql+pymysql://admin:testpassword!@194.67.206.233:3306/test_base")
+engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
@@ -21,6 +22,9 @@ session = Session(engine)
 db = DataBase(session)
 m = db.get_all_users()
 #print(m[0][1].power)
+f = db.get_all_actions()
+for i in f:
+    print(i.user_id, i.action, i.what, i.what_id, i.action_time)
 zero_admin = Admin(1, "superuser", "superpassword", AdminAccess(12, True, True, True, True, True))
 user_list = UserCollection(db)
 user_list.append_user(zero_admin)

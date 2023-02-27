@@ -11,15 +11,18 @@ from users import *
 from accesses import *
 import pandas as pd
 
+
 class QDoublePushButton(QPushButton):
     doubleClicked = pyqtSignal()
     clicked = pyqtSignal()
+
     def __init__(self, *args, **kwargs):
         QPushButton.__init__(self, *args, **kwargs)
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.clicked.emit)
         super().clicked.connect(self.checkDoubleClick)
+
     @pyqtSlot()
     def checkDoubleClick(self):
         if self.timer.isActive():
@@ -27,6 +30,8 @@ class QDoublePushButton(QPushButton):
             self.timer.stop()
         else:
             self.timer.start(250)
+
+
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
@@ -105,8 +110,8 @@ class MainWindow(QMainWindow):
         self.__eqTableContents = []
         self.__usTableContents = []
         self.__reqTableContents = []
-        self.__usFoundTableContents=[]
-        self.__eqFoundTableContents=[]
+        self.__usFoundTableContents = []
+        self.__eqFoundTableContents = []
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
@@ -956,8 +961,8 @@ class MainWindow(QMainWindow):
         self.eqchangerprevPushButton.clicked.connect(self.previousEq)
         self.uschangernextPushButton.clicked.connect(self.nextUs)
         self.uschangerprevPushButton.clicked.connect(self.previousUs)
-        #self.uscommitchangesPushButton.clicked.connect(self.testForButton)
-        #self.uscommitchangesPushButton.doubleClicked.connect(self.testForDCButton)
+        # self.uscommitchangesPushButton.clicked.connect(self.testForButton)
+        # self.uscommitchangesPushButton.doubleClicked.connect(self.testForDCButton)
         self.uscommitchangesPushButton.clicked.connect(self.changeUs)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
@@ -1051,6 +1056,7 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "Оборудование с таким названием уже есть в базе")
             elif code_error == 9:
                 show_message("Ошибка добавления", "Ячейка занята")
+
     def add_user(self):
         code_error = -1
         tg = 0
@@ -1140,6 +1146,7 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "пользователь с такой картой уже добавлен")
             elif code_error == 8:
                 show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
+
     def changeUs(self):
         code_error = -1
         tg = 0
@@ -1157,13 +1164,24 @@ class MainWindow(QMainWindow):
             tg += 1000
         if code_error == -1 and tg == 0:
             code_error = 3
-        if code_error == -1 and (self.__db.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and self.__db.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).__mail!=self.__usFoundTableContents[self.__usnum][1]:
+        if code_error == -1 and (self.__db.get_user_by_id(
+                int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and self.__db.get_user_by_id(
+                int(self.ussearchByNameOrEmailLineEdit.text(), 16)).__mail != self.__usFoundTableContents[self.__usnum][
+            1]:
             code_error = 7
-        if code_error == -1 and (self.__db.get_user_by_mail(self.ussearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_user_by_mail(self.ussearchByEmailOrNameLineEdit.text()).__id!=int(self.__usFoundTableContents[self.__usnum][0],16):
+        if code_error == -1 and (self.__db.get_user_by_mail(
+                self.ussearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_user_by_mail(
+                self.ussearchByEmailOrNameLineEdit.text()).__id != int(self.__usFoundTableContents[self.__usnum][0],
+                                                                       16):
             code_error = 8
         if code_error == -1:
-            us = CommonUser(int(self.ussearchByNameOrEmailLineEdit.text(),16), self.ussearchByEmailOrNameLineEdit.text(), Access(tg))
-            self.__db.update_user(int(self.__usFoundTableContents[self.__usnum][0],16),self.__usFoundTableContents[self.__usnum][1], us)
+            user_to_change = self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16))
+            user_to_change.id = int(self.ussearchByNameOrEmailLineEdit.text(), 16)
+            user_to_change.mail = self.ussearchByEmailOrNameLineEdit.text()
+            user_to_change.access.power = tg
+            self.__user_list.change_user(int(self.__usFoundTableContents[self.__usnum][0], 16),
+                                         self.__usFoundTableContents[self.__usnum][1],
+                                         user_to_change)
             self.ussearchByFirstRightsCheckBox.setChecked(False)
             self.ussearchBySecondRightsCheckBox.setChecked(False)
             self.ussearchByThirdRightsCheckBox.setChecked(False)
@@ -1179,6 +1197,7 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка изменения", "этот ID уже занят")
             elif code_error == 8:
                 show_message("Ошибка изменения", "Другой пользователь с таким email уже добавлен")
+
     def refresh_equipment_table(self):
         self.eqchangerGroupBox.hide()
         self.__eqFoundTableContents = []
@@ -1222,6 +1241,7 @@ class MainWindow(QMainWindow):
         self.searchByPosFromLeftSpinBox.setValue(-1)
         self.eqsearchByReservedSpinBox.setValue(-1)
         self.eqsearchByNumberSpinBox.setValue(-1)
+
     def refresh_users_table(self):
         self.uschangerGroupBox.hide()
         self.__usFoundTableContents = []
@@ -1238,6 +1258,7 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__usTableContents))])
         model = TableModel(data_frame)
         self.usTableView.setModel(model)
+
     def search_users(self):
         tg = 0
         found = []
@@ -1280,8 +1301,8 @@ class MainWindow(QMainWindow):
             foundres = found3
         if len(foundres) != 0:
             self.usTableView.clearSpans()
-            self.__usFoundTableContents=foundres
-            self.__usnum=0
+            self.__usFoundTableContents = foundres
+            self.__usnum = 0
             data_frame = pd.DataFrame(foundres, columns=["ID карты", "Почта", "Доступ"],
                                       index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
@@ -1291,6 +1312,7 @@ class MainWindow(QMainWindow):
                 self.uschangerGroupBox.show()
         else:
             show_message("Проблема", "Ничего не найдено")
+
     def setUsInfo(self):
         self.usTableView.selectRow(self.__usnum)
         self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
@@ -1300,7 +1322,7 @@ class MainWindow(QMainWindow):
         elif len(str(self.__usFoundTableContents[self.__usnum][2])) == 2:
             self.__usFoundTableContents[self.__usnum][2] = '00' + str(self.__usFoundTableContents[self.__usnum][2])
         elif len(str(self.__usFoundTableContents[self.__usnum][2])) == 3:
-            self.__usFoundTableContents[self.__usnum][2] = '0' +str(self.__usFoundTableContents[self.__usnum][2])
+            self.__usFoundTableContents[self.__usnum][2] = '0' + str(self.__usFoundTableContents[self.__usnum][2])
         if str(self.__usFoundTableContents[self.__usnum][2])[3] == '1':
             self.ussearchByFirstRightsCheckBox.setChecked(True)
         else:
@@ -1317,18 +1339,21 @@ class MainWindow(QMainWindow):
             self.ussearchByFourthRightsCheckBox.setChecked(True)
         else:
             self.ussearchByFourthRightsCheckBox.setChecked(False)
+
     def previousUs(self):
         if self.__usnum > 0:
             self.__usnum = self.__usnum - 1
             self.setUsInfo()
         else:
             show_message("Ошибка", "Это первый элемент в списке")
+
     def nextUs(self):
-        if self.__usnum < len(self.__usFoundTableContents)-1:
+        if self.__usnum < len(self.__usFoundTableContents) - 1:
             self.__usnum = self.__usnum + 1
             self.setUsInfo()
         else:
             show_message("Ошибка", "Элемент последний в списке")
+
     def searchEq(self):
         tg = 0
         found = []
@@ -1336,8 +1361,8 @@ class MainWindow(QMainWindow):
         found3 = []
         found4 = []
         found5 = []
-        found6=[]
-        found7=[]
+        found6 = []
+        found7 = []
         foundres = []
         if self.eqsearchByIdSpinBox.value() != -1:
             id = self.eqsearchByIdSpinBox.value()
@@ -1365,7 +1390,7 @@ class MainWindow(QMainWindow):
             for i in self.__eqTableContents:
                 if i[5] == str(self.searchByPosFromLeftSpinBox.value()):
                     found5.append(i)
-        if self.eqsearchByReservedSpinBox.value()!=-1:
+        if self.eqsearchByReservedSpinBox.value() != -1:
             for i in self.__eqTableContents:
                 if i[3] == str(self.eqsearchByReservedSpinBox.value()):
                     found6.append(i)
@@ -1429,14 +1454,16 @@ class MainWindow(QMainWindow):
                 foundres = [x for x in foundres if x in found6]
             if len(found7) != 0:
                 foundres = [x for x in foundres if x in found7]
-        if len(found6) != 0 and len(found) == 0 and len(found2) == 0 and len(found3) == 0 and len(found4) == 0 and len(found5) == 0:
+        if len(found6) != 0 and len(found) == 0 and len(found2) == 0 and len(found3) == 0 and len(found4) == 0 and len(
+                found5) == 0:
             foundres = found6
             if len(found7) != 0:
                 foundres = [x for x in foundres if x in found7]
-        if len(found7) != 0 and len(found) == 0 and len(found2) == 0 and len(found3) == 0 and len(found4) == 0 and len(found5) == 0 and len(found6) == 0:
+        if len(found7) != 0 and len(found) == 0 and len(found2) == 0 and len(found3) == 0 and len(found4) == 0 and len(
+                found5) == 0 and len(found6) == 0:
             foundres = found7
         if len(foundres) != 0:
-            self.__eqFoundTableContents=foundres
+            self.__eqFoundTableContents = foundres
             self.eqTableView.clearSpans()
             data_frame = pd.DataFrame(foundres,
                                       columns=["ID", "Название", "Количество", "Зарезервировано",
@@ -1444,37 +1471,38 @@ class MainWindow(QMainWindow):
                                       index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
             self.eqTableView.setModel(model)
-            self.__eqnum=0
+            self.__eqnum = 0
             self.setEqInfo()
             if self.__admin_access.can_change_inventory:
                 self.eqchangerGroupBox.show()
             print(self.__eqFoundTableContents)
         else:
             show_message("Проблема", "Ничего не найдено")
+
     def setEqInfo(self):
         print(self.__eqnum)
         self.eqTableView.selectRow(self.__eqnum)
         self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
         self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[self.__eqnum][1])
-        if len(str(self.__eqFoundTableContents[self.__eqnum][4]))==1:
-            self.__eqFoundTableContents[self.__eqnum][4]='000'+self.__eqFoundTableContents[self.__eqnum][4]
-        elif len(str(self.__eqFoundTableContents[self.__eqnum][4]))==2:
-            self.__eqFoundTableContents[self.__eqnum][4]='00'+self.__eqFoundTableContents[self.__eqnum][4]
-        elif len(str(self.__eqFoundTableContents[self.__eqnum][4]))==3:
-            self.__eqFoundTableContents[self.__eqnum][4]='0'+self.__eqFoundTableContents[self.__eqnum][4]
-        if str(self.__eqFoundTableContents[self.__eqnum][4])[3]=='1':
+        if len(str(self.__eqFoundTableContents[self.__eqnum][4])) == 1:
+            self.__eqFoundTableContents[self.__eqnum][4] = '000' + self.__eqFoundTableContents[self.__eqnum][4]
+        elif len(str(self.__eqFoundTableContents[self.__eqnum][4])) == 2:
+            self.__eqFoundTableContents[self.__eqnum][4] = '00' + self.__eqFoundTableContents[self.__eqnum][4]
+        elif len(str(self.__eqFoundTableContents[self.__eqnum][4])) == 3:
+            self.__eqFoundTableContents[self.__eqnum][4] = '0' + self.__eqFoundTableContents[self.__eqnum][4]
+        if str(self.__eqFoundTableContents[self.__eqnum][4])[3] == '1':
             self.eqsearchByFirstRightsCheckBox.setChecked(True)
         else:
             self.eqsearchByFirstRightsCheckBox.setChecked(False)
-        if str(self.__eqFoundTableContents[self.__eqnum][4])[2]=='1':
+        if str(self.__eqFoundTableContents[self.__eqnum][4])[2] == '1':
             self.eqsearchBySecondRightsCheckBox.setChecked(True)
         else:
             self.eqsearchBySecondRightsCheckBox.setChecked(False)
-        if str(self.__eqFoundTableContents[self.__eqnum][4])[1]=='1':
+        if str(self.__eqFoundTableContents[self.__eqnum][4])[1] == '1':
             self.eqsearchByThirdRightsCheckBox.setChecked(True)
         else:
             self.eqsearchByThirdRightsCheckBox.setChecked(False)
-        if str(self.__eqFoundTableContents[self.__eqnum][4])[0]=='1':
+        if str(self.__eqFoundTableContents[self.__eqnum][4])[0] == '1':
             self.eqsearchByFourthRightsCheckBox.setChecked(True)
         else:
             self.eqsearchByFourthRightsCheckBox.setChecked(False)
@@ -1486,22 +1514,25 @@ class MainWindow(QMainWindow):
             self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
         else:
             self.searchByPosFromLeftSpinBox.setValue(-1)
-        #if self.__eqFoundTableContents[self.__eqnum][2] != '-1' and self.__eqFoundTableContents[self.__eqnum][2] != '0':
+        # if self.__eqFoundTableContents[self.__eqnum][2] != '-1' and self.__eqFoundTableContents[self.__eqnum][2] != '0':
         self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
-        #if self.__eqFoundTableContents[self.__eqnum][3] != '-1' and self.__eqFoundTableContents[self.__eqnum][3] != '0':
+        # if self.__eqFoundTableContents[self.__eqnum][3] != '-1' and self.__eqFoundTableContents[self.__eqnum][3] != '0':
         self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][3]))
+
     def previousEq(self):
         if self.__eqnum > 0:
             self.__eqnum = self.__eqnum - 1
             self.setEqInfo()
         else:
             show_message("Ошибка", "Это первый элемент в списке")
+
     def nextEq(self):
-        if self.__eqnum < len(self.__eqFoundTableContents)-1:
+        if self.__eqnum < len(self.__eqFoundTableContents) - 1:
             self.__eqnum = self.__eqnum + 1
             self.setEqInfo()
         else:
             show_message("Ошибка", "Элемент последний в списке")
+
     def search_request(self):
         tg = 0
         found = []
