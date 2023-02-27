@@ -1350,28 +1350,33 @@ class MainWindow(QMainWindow):
             self.__eqnum=0
             self.setEqInfo()
             self.eqchangerGroupBox.show()
+            print(self.__eqFoundTableContents)
         else:
             show_message("Проблема", "Ничего не найдено")
     def setEqInfo(self):
-        self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[0][0]))
-        self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[0][1])
-        if int(self.__eqFoundTableContents[self.__eqnum][4]) % 10 == 1:
+        print(self.__eqnum)
+        self.eqTableView.selectRow(self.__eqnum)
+        self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
+        self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[self.__eqnum][1])
+        if len(str(self.__eqFoundTableContents[self.__eqnum][4]))==1:
+            self.__eqFoundTableContents[self.__eqnum][4]='000'+self.__eqFoundTableContents[self.__eqnum][4]
+        elif len(str(self.__eqFoundTableContents[self.__eqnum][4]))==2:
+            self.__eqFoundTableContents[self.__eqnum][4]='00'+self.__eqFoundTableContents[self.__eqnum][4]
+        elif len(str(self.__eqFoundTableContents[self.__eqnum][4]))==3:
+            self.__eqFoundTableContents[self.__eqnum][4]='0'+self.__eqFoundTableContents[self.__eqnum][4]
+        if str(self.__eqFoundTableContents[self.__eqnum][4])[3]=='1':
             self.eqsearchByFirstRightsCheckBox.setChecked(True)
         else:
             self.eqsearchByFirstRightsCheckBox.setChecked(False)
-        if int(self.__eqFoundTableContents[self.__eqnum][4]) % 100 == 10 or int(
-                self.__eqFoundTableContents[self.__eqnum][4]) % 100 == 11:
+        if str(self.__eqFoundTableContents[self.__eqnum][4])[2]=='1':
             self.eqsearchBySecondRightsCheckBox.setChecked(True)
         else:
             self.eqsearchBySecondRightsCheckBox.setChecked(False)
-        if int(self.__eqFoundTableContents[self.__eqnum][4]) % 1000 == 100 or int(
-                self.__eqFoundTableContents[0][4]) % 1000 == 101 or int(
-                self.__eqFoundTableContents[self.__eqnum][4]) % 1000 == 110 or int(
-                self.__eqFoundTableContents[self.__eqnum][4]) % 1000 == 111:
+        if str(self.__eqFoundTableContents[self.__eqnum][4])[1]=='1':
             self.eqsearchByThirdRightsCheckBox.setChecked(True)
         else:
             self.eqsearchByThirdRightsCheckBox.setChecked(False)
-        if int(self.__eqFoundTableContents[self.__eqnum][4]) // 1000 == 1:
+        if str(self.__eqFoundTableContents[self.__eqnum][4])[0]=='1':
             self.eqsearchByFourthRightsCheckBox.setChecked(True)
         else:
             self.eqsearchByFourthRightsCheckBox.setChecked(False)
@@ -1380,9 +1385,9 @@ class MainWindow(QMainWindow):
         if self.__eqFoundTableContents[self.__eqnum][5] != '--':
             self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
         #if self.__eqFoundTableContents[self.__eqnum][2] != '-1' and self.__eqFoundTableContents[self.__eqnum][2] != '0':
-        self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[0][2]))
+        self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
         #if self.__eqFoundTableContents[self.__eqnum][3] != '-1' and self.__eqFoundTableContents[self.__eqnum][3] != '0':
-        self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
+        self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][3]))
     def previousEq(self):
         if self.__eqnum > 0:
             self.__eqnum = self.__eqnum - 1
@@ -1390,7 +1395,7 @@ class MainWindow(QMainWindow):
         else:
             show_message("Ошибка", "Это первый элемент в списке")
     def nextEq(self):
-        if self.__eqnum < len(self.__eqFoundTableContents):
+        if self.__eqnum < len(self.__eqFoundTableContents)-1:
             self.__eqnum = self.__eqnum + 1
             self.setEqInfo()
         else:
