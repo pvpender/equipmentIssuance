@@ -964,6 +964,7 @@ class MainWindow(QMainWindow):
         # self.uscommitchangesPushButton.clicked.connect(self.testForButton)
         # self.uscommitchangesPushButton.doubleClicked.connect(self.testForDCButton)
         self.uscommitchangesPushButton.clicked.connect(self.changeUs)
+        self.eqcommitchangesPushButton.clicked.connect(self.changeEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -1182,10 +1183,6 @@ class MainWindow(QMainWindow):
             self.__user_list.change_user(int(self.__usFoundTableContents[self.__usnum][0], 16),
                                          self.__usFoundTableContents[self.__usnum][1],
                                          user_to_change)
-            self.ussearchByFirstRightsCheckBox.setChecked(False)
-            self.ussearchBySecondRightsCheckBox.setChecked(False)
-            self.ussearchByThirdRightsCheckBox.setChecked(False)
-            self.ussearchByFourthRightsCheckBox.setChecked(False)
         else:
             if code_error == 1:
                 show_message("Ошибка изменения", "Введите ID карты сотрудника")
@@ -1197,7 +1194,44 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка изменения", "этот ID уже занят")
             elif code_error == 8:
                 show_message("Ошибка изменения", "Другой пользователь с таким email уже добавлен")
+    def changeEq(self):
+        code_error = -1
+        tg = 0
+        if code_error == -1 and self.eqsearchByEmailOrNameLineEdit.text() == "":
+            code_error = 1
+        if code_error == -1 and self.eqsearchByFirstRightsCheckBox.isChecked():
+            tg += 1
+        if code_error == -1 and self.eqsearchBySecondRightsCheckBox.isChecked():
+            tg += 10
+        if code_error == -1 and self.eqsearchByThirdRightsCheckBox.isChecked():
+            tg += 100
+        if code_error == -1 and self.eqsearchByFourthRightsCheckBox.isChecked():
+            tg += 1000
+        if code_error == -1 and tg == 0:
+            code_error = 3
+        if code_error == -1 and (self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()).id != int(self.__eqFoundTableContents[self.__eqnum][0]):
+            code_error = 7
+        if code_error == -1:
+            eq_to_change = self.__db.get_equipment_by_id(int(self.__eqFoundTableContents[self.__eqnum][0]))
+            eq_to_change.title = self.eqsearchByEmailOrNameLineEdit.text()
+            eq_to_change.access = tg
+            if self.eqsearchByNumberSpinBox.value()>-1:
+                eq_to_change.count=self.reqsearchByCount.value()
+            else:
+                eq_to_change.count=0
+            if self.eqsearchByReservedSpinBox.value() > -1:
+                eq_to_change.count = self.reqsearchByCount.value()
+            else:
+                eq_to_change.reserve_count = 0
 
+            self.__db.update_equipment(int(self.__eqFoundTableContents[self.__eqnum][0]),eq_to_change)
+        else:
+            if code_error == 1:
+                show_message("Ошибка изменения", "Введите название")
+            elif code_error == 3:
+                show_message("Ошибка изменения", "Не отмечены права для получения")
+            elif code_error == 8:
+                show_message("Ошибка изменения", "Уже существует оборудование с таким названием")
     def refresh_equipment_table(self):
         self.eqchangerGroupBox.hide()
         self.__eqFoundTableContents = []
