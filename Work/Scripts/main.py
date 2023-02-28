@@ -14,7 +14,6 @@ import pymysql
 
 import datetime
 
-engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
