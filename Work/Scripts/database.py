@@ -1,5 +1,7 @@
 import datetime
 from enum import Enum
+
+import pandas as pd
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer, BigInteger
@@ -80,7 +82,7 @@ class TelegramLogins(Base):
 class LastRequest(Base):
     __tablename__ = "last_message"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer)
+    user_id = Column(BigInteger)
     title = Column(Text)
 
 
@@ -90,7 +92,7 @@ class UserRequests(Base):
     title = Column(Text)
     count = Column(Integer)
     purpose = Column(Text)
-    sender_tg_id = Column(Integer)
+    sender_tg_id = Column(BigInteger)
     sender_mail = Column(Text)
     solved = Column(Boolean)
     approved = Column(Boolean)
@@ -128,7 +130,7 @@ def restart_if_except(function):
             return function(*args, **kwargs)
         except OperationalError:
             self.session.rollback()
-            return function(*args, **kwargs)
+            return function(*args, **kwargs)    
 
     return check
 
@@ -471,3 +473,11 @@ class DataBase:
     def get_all_actions(self):
         return self.__session.query(Actions).all()
 
+    def get_action_by_passes(self, pass_numbers: list):
+        return self.__session.query(Actions).filter(Actions.user_id.in_(pass_numbers)).all()
+
+    def get_action_by_passes_as_df(self, pass_numbers: list):
+        df = pd.read_sql(self.__session.query(Actions).filter(Actions.user_id.in_(pass_numbers)).statement,
+                         self.__session.connection())
+
+        return df
