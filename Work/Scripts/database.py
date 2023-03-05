@@ -481,3 +481,10 @@ class DataBase:
                          self.__session.connection())
 
         return df
+
+    def get_inv_from_act_as_df(self, inventories_id: list):
+        df = pd.read_sql(
+            self.__session.query(Actions).filter(Actions.what_id.in_(inventories_id)).statement,
+            self.__session.connection()
+        )
+        return df

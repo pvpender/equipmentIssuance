@@ -1766,4 +1766,4 @@ class MainWindow(QMainWindow):
             return False
 
         def flags(self, index: QtCore.QModelIndex) -> Qt.ItemFlag:
-            return Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsEditable
+            return Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsEditableFACTION
