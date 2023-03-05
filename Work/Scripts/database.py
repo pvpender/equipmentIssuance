@@ -482,9 +482,9 @@ class DataBase:
 
         return df
 
-    def get_inv_from_act_as_df(self, inventories_id: list):
+    def get_inv_from_act_as_df(self, inventories_names: list):
         df = pd.read_sql(
-            self.__session.query(Actions).filter(Actions.what_id.in_(inventories_id)).statement,
+            self.__session.query(Actions).filter(Actions.what_id.in_(inventories_names)).statement,
             self.__session.connection()
         )
         return df
