@@ -13,12 +13,12 @@ import cryptography
 import pymysql
 
 import datetime
-
+engine = create_engine("")
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
-session = Session(engine)
-db = DataBase(session)
+#session = Session(engine)
+db = DataBase(engine)
 m = db.get_all_users()
 #print(m[0][1].power)
 f = db.get_all_actions()
