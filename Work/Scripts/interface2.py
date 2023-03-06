@@ -84,6 +84,7 @@ class LogWindow(QMainWindow):
     def login(self):
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
         if isinstance(user, Admin) and user.password == self.__password_field.text():
+            self.__db.change_user(user)
             self.hide()
             self.__main_window = MainWindow(self.__user_list, user, self.__db, user.access)
         else:

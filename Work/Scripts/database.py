@@ -6,7 +6,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer, BigInteger
 from sqlalchemy import Boolean
-from sqlalchemy import Text, DateTime
+from sqlalchemy import Text, DateTime, Engine, create_engine
 from sqlalchemy.orm import declarative_base, Session, relationship
 from users import *
 from equipment import *
@@ -149,8 +149,9 @@ def for_all_methods(decorator):
 @for_all_methods(restart_if_except)
 class DataBase:
 
-    def __init__(self, session: Session):
-        self.__session = session
+    def __init__(self, engine: Engine):
+        self.__engine = engine
+        self.__session = Session(engine)
 
     @property
     def session(self):
@@ -168,6 +169,11 @@ class DataBase:
 
         return check
         """
+    def change_user(self, user: Admin):
+        self.__engine.dispose()
+        self.__engine = create_engine(f"mysql+pymysql://{user.mail}:{user.password}@194.67.206.233:3306/test_base")
+        self.__session.close()
+        self.__session = Session(self.__engine)
 
     def add_user(self, user: CommonUser):
         exist = self.__session.query(Users.id).filter(Users.mail == user.mail, Users.pass_number == user.id).first()
