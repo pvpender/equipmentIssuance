@@ -2,13 +2,13 @@
 class Equipment:
 
     def __init__(self, title: str, description: str, count: int,
-                 reserve_count: int, access: int, x: int = -1, y: int = -1):
+                 reserve_count: int, groups: list, x: int = -1, y: int = -1, eq_id=None):
         self.__title = title
         self.__description = description
-        self.__id = -1
+        self.__id = eq_id
         self.__count = count
         self.__reserve_count = reserve_count
-        self.__access = access
+        self.__groups = groups
         self.__x = x
         self.__y = y
 
@@ -53,12 +53,12 @@ class Equipment:
         self.__reserve_count = new_res_count
 
     @property
-    def access(self) -> int:
-        return self.__access
+    def groups(self) -> list:
+        return self.__groups
 
-    @access.setter
-    def access(self, new_access: int):
-        self.__access = new_access
+    @groups.setter
+    def groups(self, new_groups: list):
+        self.__groups = new_groups
 
     @property
     def x(self) -> int:
@@ -75,3 +75,4 @@ class Equipment:
     @y.setter
     def y(self, new_y: int):
         self.__y = new_y
+

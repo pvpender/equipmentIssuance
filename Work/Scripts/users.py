@@ -1,29 +1,35 @@
 from abc import ABC, abstractmethod
+from typing import Union
+
 from accesses import *
-#   Возможно стоит попробовать @mail.setter @property
 
 
 class User(ABC):
 
-    def __init__(self, user_id: int, mail: str):
-        self.__id = user_id
+    def __init__(self, pass_number: int, mail: str, base_id=None):
+        self.__pass_number = pass_number
         self.__mail = mail
+        self.__base_id = base_id
 
     @property
-    def id(self) -> int:
-        return self.__id
+    def pass_number(self) -> int:
+        return self.__pass_number
 
     @property
     def mail(self) -> str:
         return self.__mail
 
-    @id.setter
-    def id(self, new_id: int):
-        self.__id = new_id
+    @pass_number.setter
+    def pass_number(self, new_pass_number: int):
+        self.__pass_number = new_pass_number
 
     @mail.setter
     def mail(self, new_mail: str):
         self.__mail = new_mail
+
+    @property
+    def base_id(self) -> Union[None, int]:
+        return self.__base_id
 
     @abstractmethod
     def del_user(self):
@@ -32,18 +38,9 @@ class User(ABC):
 
 class Admin(User):
 
-    def __init__(self, user_id, mail, password: str, access: AdminAccess):
-        super().__init__(user_id, mail)
-        self.__password = password
+    def __init__(self, pass_nuber, mail, access: AdminAccess, base_id=None):
+        super().__init__(pass_nuber, mail, base_id)
         self.__access = access
-
-    @property
-    def password(self) -> str:
-        return self.__password
-
-    @password.setter
-    def password(self, new_password: str):
-        self.__password = new_password
 
     @property
     def access(self) -> AdminAccess:
@@ -54,14 +51,12 @@ class Admin(User):
         self.__access = new_access
 
     def del_user(self):
-        del self.__password
         del self.__access
 
 
 class CommonUser(User):
-
-    def __init__(self, user_id: int, mail: str, access: Access):
-        super().__init__(user_id, mail)
+    def __init__(self, pass_number: int, mail: str, access: Access, base_id=None):
+        super().__init__(pass_number, mail, base_id)
         self.__access = access
 
     @property

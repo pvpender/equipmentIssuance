@@ -10,17 +10,19 @@ class UserCollection:
         self.__count = 0
         mas = self.__db.get_all_users()
         for i in mas:
-            self.__objects.update({i[0].pass_number: CommonUser(i[0].pass_number, i[0].mail, Access(i[1].power))})
+            groups = [j.id for j in i.user_groups]
+            self.__objects.update({i.pass_number: CommonUser(i.pass_number, i.mail, Access(groups), i.id)})
             self.__count += 1
         mas = self.__db.get_all_admins()
         for i in mas:
-            self.__objects.update({i[0].pass_number: Admin(i[0].pass_number, i[0].mail, i[0].password,
-                                                           AdminAccess(i[1].power,
-                                                                       i[1].can_add_users,
-                                                                       i[1].can_change_users,
-                                                                       i[1].can_add_inventory,
-                                                                       i[1].can_change_inventory,
-                                                                       i[1].can_get_request))})
+            groups = [j.id for j in i.admin_groups]
+            self.__objects.update({i.pass_number: Admin(i.pass_number, i.mail,
+                                                           AdminAccess(groups,
+                                                                       i.access.can_add_users,
+                                                                       i.access.can_change_users,
+                                                                       i.access.can_add_inventory,
+                                                                       i.access.can_change_inventory,
+                                                                       i.access.can_get_request), i.id)})
             self.__count += 1
 
     @property
@@ -33,17 +35,17 @@ class UserCollection:
                 self.__db.add_user(user)
             else:
                 self.__db.add_admin(user)
-            self.__objects.update({user.id: user})
+            self.__objects.update({user.pass_number: user})
             self.__count += 1
         except ValueError:
             return -1
 
-    def get_user_by_id(self, user_id: int) -> CommonUser | Admin:
-        return self.__objects.get(user_id)
+    def get_user_by_id(self, pass_number: int) -> CommonUser | Admin:
+        return self.__objects.get(pass_number)
 
-    def check_user_by_id(self, user_id: int) -> bool:
+    def check_user_by_id(self, pass_number: int) -> bool:
         for i in self.__objects.values():
-            if i.id == user_id:
+            if i.pass_number == pass_number:
                 return True
             else:
                 return False
@@ -59,26 +61,48 @@ class UserCollection:
                 return True
         return False
 
-    def change_user(self, user_id: int, mail: str, user: CommonUser | Admin):
+    def change_user(self, pass_number: int, mail: str, user: CommonUser | Admin):
         if isinstance(user, CommonUser):
-            self.__db.update_user(user_id, mail, user)
+            self.__db.update_user(pass_number, mail, user)
         else:
-            self.__db.update_admin(user_id, mail, user)
-        del self.__objects[user_id]
-        self.__objects.update({user.id: user})
+            self.__db.update_admin(pass_number, mail, user)
+        del self.__objects[pass_number]
+        self.__objects.update({user.pass_number: user})
 
-    def del_user(self, user_id: str):
-        if isinstance(self.__objects[user_id], CommonUser):
-            self.__db.delete_user(self.__objects[user_id])
+    def del_user(self, pass_number: str):
+        if isinstance(self.__objects[pass_number], CommonUser):
+            self.__db.delete_user(self.__objects[pass_number])
         else:
-            self.__db.delete_admin(self.__objects[user_id])
-        del self.__objects[user_id]
+            self.__db.delete_admin(self.__objects[pass_number])
+        del self.__objects[pass_number]
         self.__count -= 1
 
     def get_user_list(self):
         return list(self.__objects.values())
 
-    def get_user_by_rights(self, rights: int) -> CommonUser | Admin:
+    def add_groups(self, pass_number, groups: list):
+        for i in groups:
+            if i not in self.__objects[pass_number].access.groups:
+                self.__objects[pass_number].access.groups.append(i)
+                self.__db.add_user_group(self.__objects[pass_number].base_id, i)
+
+    def del_groups(self, pass_number, groups: list):
+        if isinstance(self.__objects[pass_number], CommonUser):
+            self.__db.del_user_group(self.__objects[pass_number].base_id, groups)
+        else:
+            self.__db.del_admin_group(self.__objects[pass_number].base_id, groups)
+        for i in groups:
+            try:
+                self.__objects[pass_number].access.groups.remove(i)
+            except ValueError:
+                pass
+
+    def get_user_by_group(self, group_id: int) -> list:
+        mas = [i for i in self.__objects.values() if group_id in i.access.groups]
+        return mas
+
+
+    """def get_user_by_rights(self, rights: int) -> CommonUser | Admin:
         for i in self.__objects:
             if self.__objects[i].access.power == rights:
-                return self.__objects[i]
+                return self.__objects[i]"""

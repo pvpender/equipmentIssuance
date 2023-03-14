@@ -1,21 +1,23 @@
+from typing import Type
+
 
 class Access:
-    def __init__(self, power: int):
-        self.__power = power
+    def __init__(self, groups: list):
+        self.__groups = groups
 
     @property
-    def power(self) -> int:
-        return self.__power
+    def groups(self) -> list:
+        return self.__groups
 
-    @power.setter
-    def power(self, new_power: int):
-        self.__power = new_power
+    @groups.setter
+    def groups(self, new_groups: list):
+        self.__groups = new_groups
 
 
 class AdminAccess(Access):
-    def __init__(self, power: int, can_add_users: bool, can_change_users: bool, can_add_inventory: bool,
+    def __init__(self, groups: list, can_add_users: bool, can_change_users: bool, can_add_inventory: bool,
                  can_change_inventory: bool, can_get_request: bool):
-        super().__init__(power)
+        super().__init__(groups)
         self.__can_add_users = can_add_users
         self.__can_change_users = can_change_users
         self.__can_add_inventory = can_add_inventory

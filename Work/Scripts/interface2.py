@@ -83,8 +83,9 @@ class LogWindow(QMainWindow):
 
     def login(self):
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
-        if isinstance(user, Admin) and user.password == self.__password_field.text():
-            self.__db.change_user(user)
+   #     if isinstance(user, Admin) and user.password == self.__password_field.text():
+        if isinstance(user, Admin):
+            self.__db.change_user(user.mail, self.__password_field.text())
             self.hide()
             self.__main_window = MainWindow(self.__user_list, user, self.__db, user.access)
         else:
@@ -300,6 +301,7 @@ class MainWindow(QMainWindow):
         self.usradioButton_User.setObjectName("usradioButton_User")
         self.usradioButton_Admin = QtWidgets.QRadioButton(self.addHuman_groupBox_2)
         self.usradioButton_Admin.setGeometry(QtCore.QRect(220, 0, 141, 20))
+        self.usradioButton_Admin.setObjectName("usradioButton_Admin")
         self.usradioButton_Admin.setObjectName("usradioButton_Admin")
         self.adminRightsGroupBox_2 = QtWidgets.QGroupBox(self.addHuman_groupBox_2)
         self.adminRightsGroupBox_2.setGeometry(QtCore.QRect(0, 40, 411, 211))
