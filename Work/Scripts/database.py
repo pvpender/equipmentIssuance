@@ -246,6 +246,12 @@ class DataBase:
     def get_all_groups(self) -> list:
         return self.__session.query(Groups).all()
 
+    def get_group_by_id(self, group_id: int):
+        return self.__session.query(Groups).filter(Groups.id == group_id).first()
+
+    def get_group_by_name(self, group_name: str):
+        return self.__session.query(Groups).filter(Groups.group_name == group_name).first()
+
     def add_user_group(self, user_id: int, group_id: int):
         self.__session.add(UserGroups(user_id=user_id, group_id=group_id))
         self.__session.commit()
