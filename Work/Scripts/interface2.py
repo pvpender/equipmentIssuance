@@ -1245,6 +1245,12 @@ class MainWindow(QMainWindow):
         # self.uscommitchangesPushButton.doubleClicked.connect(self.testForDCButton)
         self.uscommitchangesPushButton.clicked.connect(self.changeUs)
         self.eqcommitchangesPushButton.clicked.connect(self.changeEq)
+        self.eqGrToSelected.clicked.connect(self.selected_to_eq_groups)
+        self.usGrToSelected.clicked.connect(self.selected_to_us_groups)
+        self.usDelFromSelectedGr.clicked.connect(self.del_from_us_selected_groups)
+        self.eqDelFromSelectedGr.clicked.connect(self.del_from_eq_selected_groups)
+        self.grAddPushButton.clicked.connect(self.add_group)
+        self.grSearchPushButton.clicked.connect(self.search_gr)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -1271,7 +1277,6 @@ class MainWindow(QMainWindow):
             self.tab_2.hide()
         if not admin_access.can_add_inventory:
             self.tab.hide()
-        self.grAddPushButton.clicked.connect(self.add_group)
         self.adminRightsGroupBox_2.hide()
         self.refresh_gr_view_table()
         self.refresh_requests_table()
@@ -1297,6 +1302,10 @@ class MainWindow(QMainWindow):
             show_message("Ошибка добавления", "Группа с таким номером уже есть в базе")
         elif code_error == 4:
             show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
+    def search_gr(self):
+        indexes = self.grTableView.selectionModel().selectedRows()
+        for i in indexes:
+            print(i.row())
     def refresh_gr_view_table(self):
         self.grTableView.clearSpans()
         self.eqAddAllGrTableView.clearSpans()
@@ -1312,6 +1321,46 @@ class MainWindow(QMainWindow):
         self.grTableView.setModel(model)
         self.eqAddAllGrTableView.setModel(model)
         self.usAddAllGrTableView.setModel(model)
+    def selected_to_us_groups(self):
+        indexes = self.usAddAllGrTableView.selectionModel().selectedRows()
+        if len(indexes)>0:
+            for i in indexes:
+                if self.__grTableContents[i.row()] not in self.__addUsTableContents:
+                    self.__addUsTableContents.append(self.__grTableContents[i.row()])
+            self.refresh_selected_us_groups()
+    def selected_to_eq_groups(self):
+        indexes = self.eqAddAllGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                if self.__grTableContents[i.row()] not in self.__addEqTableContents:
+                    self.__addEqTableContents.append(self.__grTableContents[i.row()])
+            self.refresh_selected_eq_groups()
+    def del_from_eq_selected_groups(self):
+        indexes = self.eqAddSelectedGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                self.__addEqTableContents.pop(i.row())
+            self.refresh_selected_eq_groups()
+    def del_from_us_selected_groups(self):
+        indexes = self.usAddSelectedGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                self.__addUsTableContents.pop(i.row())
+            self.refresh_selected_us_groups()
+    def refresh_selected_us_groups(self):
+        self.usAddSelectedGrTableView.clearSpans()
+        data_frame = pd.DataFrame(self.__addUsTableContents,
+                                  columns=["ID", "Название"],
+                                  index=[i for i in range(len(self.__addUsTableContents))])
+        model = TableModel(data_frame)
+        self.usAddSelectedGrTableView.setModel(model)
+    def refresh_selected_eq_groups(self):
+        self.eqAddSelectedGrTableView.clearSpans()
+        data_frame = pd.DataFrame(self.__addEqTableContents,
+                                  columns=["ID", "Название"],
+                                  index=[i for i in range(len(self.__addEqTableContents))])
+        model = TableModel(data_frame)
+        self.eqAddSelectedGrTableView.setModel(model)
     def add_equipment(self):
         code_error = -1
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
