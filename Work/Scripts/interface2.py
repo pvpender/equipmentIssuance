@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
     def __init__(self, user_list: UserCollection, current_user, db: DataBase, admin_access: AdminAccess):
         super(MainWindow, self).__init__()
         self.setWindowTitle("App")
-        self.setFixedSize(1550, 1000)
+        self.setFixedSize(1700, 1000)
         self.setStyleSheet("background-color:#F0F8FF;")
         self.__current_user = current_user
         self.__user_list = user_list
@@ -1625,7 +1625,6 @@ class MainWindow(QMainWindow):
         self.usGroupsTableView.hide()
         self.listLabel_4.hide()
         self.usSearchAllGrTableView.hide()
-        self.usAddAllGrTableView.hide()
         self.usSearchGrToSelected.hide()
         self.usSearchDelFromSelectedGr.hide()
         self.listLabel_2.hide()
@@ -1687,7 +1686,6 @@ class MainWindow(QMainWindow):
                 self.listLabel_2.show()
                 self.usTableView.setGeometry(QtCore.QRect(870, 30, 701, 721))
                 self.usSearchAllGrTableView.show()
-                self.usAddAllGrTableView.show()
                 self.usSearchGrToSelected.show()
                 self.usSearchDelFromSelectedGr.show()
         else:
@@ -1837,7 +1835,6 @@ class MainWindow(QMainWindow):
         self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
         # if self.__eqFoundTableContents[self.__eqnum][3] != '-1' and self.__eqFoundTableContents[self.__eqnum][3] != '0':
         self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][3]))
-
     def previousEq(self):
         if self.__eqnum > 0:
             self.__eqnum = self.__eqnum - 1
