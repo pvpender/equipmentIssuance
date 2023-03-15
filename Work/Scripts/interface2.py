@@ -1428,7 +1428,7 @@ class MainWindow(QMainWindow):
                 self.__currEqGroupsTableContents.pop(i.row())
             self.refresh_selected_eq_search_groups()
         if len(self.__currEqGroupsTableContents)==0:
-            self.eqSearchDelFromSelectedGr.hide()
+            self.eqSearchDelFromSelectedGr.hide()###
     def del_from_us_search_selected_groups(self):
         indexes = self.usGroupsTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
