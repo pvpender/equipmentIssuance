@@ -514,7 +514,7 @@ class DataBase:
         eq = self.get_equipment_by_title(request.what)
         eq.reserve_count += 1
         if isinstance(eq, Union[Equipments, Equipments]):
-            self.update_equipment(eq.id, eq)
+            self.update_equipment(eq)
         self.__session.add(db_request)
         self.__session.commit()
 

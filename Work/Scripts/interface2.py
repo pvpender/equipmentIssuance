@@ -1309,7 +1309,7 @@ class MainWindow(QMainWindow):
         self.usDelFromSelectedGr.clicked.connect(self.del_from_us_selected_groups)
         self.eqDelFromSelectedGr.clicked.connect(self.del_from_eq_selected_groups)
         self.grAddPushButton.clicked.connect(self.add_group)
-        self.grSearchPushButton.clicked.connect(self.search_gr)
+        #self.grSearchPushButton.clicked.connect(self.search_gr)
         self.eqSearchGrToSelected.clicked.connect(self.selected_to_eq_search_groups)
         self.usSearchGrToSelected.clicked.connect(self.selected_to_us_search_groups)
         self.eqSearchDelFromSelectedGr.clicked.connect(self.del_from_eq_search_selected_groups)

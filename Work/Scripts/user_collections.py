@@ -10,12 +10,12 @@ class UserCollection:
         self.__count = 0
         mas = self.__db.get_all_users()
         for i in mas:
-            groups = [j.id for j in i.user_groups]
+            groups = [j.group_id for j in i.user_groups]
             self.__objects.update({i.pass_number: CommonUser(i.pass_number, i.mail, Access(groups), i.id)})
             self.__count += 1
         mas = self.__db.get_all_admins()
         for i in mas:
-            groups = [j.id for j in i.admin_groups]
+            groups = [j.group_id for j in i.admin_groups]
             self.__objects.update({i.pass_number: Admin(i.pass_number, i.mail,
                                                            AdminAccess(groups,
                                                                        i.access.can_add_users,

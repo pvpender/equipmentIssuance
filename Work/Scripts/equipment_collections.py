@@ -14,7 +14,7 @@ class EquipmentCollection:
         self.__count = 0
         mas = db.get_all_equipment()
         for i in mas:
-            groups = [j.id for j in i.equipment_groups]
+            groups = [j.group_id for j in i.equipment_groups]
             self.__objects.update({i.id: Equipment(i.title,
                                                    i.description,
                                                    i.count,
