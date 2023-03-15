@@ -124,6 +124,8 @@ class MainWindow(QMainWindow):
         self.__usFoundGroups=[]
         self.__eqFoundGroups=[]
         self.__grTableContents=[]
+        self.__currUsGroupsTableContents=[]
+        self.__currEqGroupsTableContents=[]
         self.__addUsTableContents=[]
         self.__addEqTableContents=[]
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
@@ -1308,6 +1310,10 @@ class MainWindow(QMainWindow):
         self.eqDelFromSelectedGr.clicked.connect(self.del_from_eq_selected_groups)
         self.grAddPushButton.clicked.connect(self.add_group)
         self.grSearchPushButton.clicked.connect(self.search_gr)
+        self.eqSearchGrToSelected.clicked.connect(self.selected_to_eq_search_groups)
+        self.usSearchGrToSelected.clicked.connect(self.selected_to_us_search_groups)
+        self.eqSearchDelFromSelectedGr.clicked.connect(self.del_from_eq_search_selected_groups)
+        self.usSearchDelFromSelectedGr.clicked.connect(self.del_from_us_search_selected_groups)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -1339,6 +1345,10 @@ class MainWindow(QMainWindow):
         self.refresh_requests_table()
         self.refresh_equipment_table()
         self.refresh_users_table()
+        self.eqDelFromSelectedGr.hide()
+        self.usDelFromSelectedGr.hide()
+        self.eqSearchDelFromSelectedGr.hide()
+        self.usSearchDelFromSelectedGr.hide()
         self.show()
     def add_group(self):
         code_error = -1
@@ -1353,25 +1363,31 @@ class MainWindow(QMainWindow):
             show_message("Ошибка добавления", "Введите название группы")
         elif code_error == 4:
             show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
-    def search_gr(self):
-        indexes = self.grTableView.selectionModel().selectedRows()
-        for i in indexes:
-            print(i.row())
+   # def search_gr(self):
+        #indexes = self.grTableView.selectionModel().selectedRows()
+        #for i in indexes:
     def refresh_gr_view_table(self):
         self.grTableView.clearSpans()
         self.eqAddAllGrTableView.clearSpans()
         self.usAddAllGrTableView.clearSpans()
+        self.eqAddAllGrTableView.clearSpans()
+        self.usAddAllGrTableView.clearSpans()
+        self.usSearchAllGrTableView.clearSpans()
+        self.eqSearchAllGrTableView.clearSpans()
         for i in self.__db.get_all_groups():
-            self.__grTableContents.append([
-                str(i.id),
-                str(i.group_name)])
+            self.__grTableContents.append(
+                str(i.group_name))
         data_frame = pd.DataFrame(self.__grTableContents,
-                                  columns=["ID", "Название"],
+                                  columns=["Название группы"],
                                   index=[i for i in range(len(self.__grTableContents))])
         model = TableModel(data_frame)
         self.grTableView.setModel(model)
         self.eqAddAllGrTableView.setModel(model)
         self.usAddAllGrTableView.setModel(model)
+        self.eqAddAllGrTableView.setModel(model)
+        self.usAddAllGrTableView.setModel(model)
+        self.usSearchAllGrTableView.setModel(model)
+        self.eqSearchAllGrTableView.setModel(model)
     def selected_to_us_groups(self):
         indexes = self.usAddAllGrTableView.selectionModel().selectedRows()
         if len(indexes)>0:
@@ -1379,6 +1395,24 @@ class MainWindow(QMainWindow):
                 if self.__grTableContents[i.row()] not in self.__addUsTableContents:
                     self.__addUsTableContents.append(self.__grTableContents[i.row()])
             self.refresh_selected_us_groups()
+            self.usDelFromSelectedGr.show()
+    def selected_to_eq_search_groups(self):
+        indexes = self.eqSearchAllGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                if self.__grTableContents[i.row()] not in self.__currEqGroupsTableContents:
+                    self.__currEqGroupsTableContents.append(self.__grTableContents[i.row()])
+            self.refresh_selected_eq_search_groups()
+            self.eqSearchDelFromSelectedGr.show()
+    def selected_to_us_search_groups(self):
+        indexes = self.usSearchAllGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                if self.__grTableContents[i.row()] not in self.__currUsGroupsTableContents:
+                    self.__currUsGroupsTableContents.append(self.__grTableContents[i.row()])
+                    print(self.__currUsGroupsTableContents)
+            self.refresh_selected_us_search_groups()
+            self.usSearchDelFromSelectedGr.show()
     def selected_to_eq_groups(self):
         indexes = self.eqAddAllGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
@@ -1386,32 +1420,67 @@ class MainWindow(QMainWindow):
                 if self.__grTableContents[i.row()] not in self.__addEqTableContents:
                     self.__addEqTableContents.append(self.__grTableContents[i.row()])
             self.refresh_selected_eq_groups()
+            self.eqDelFromSelectedGr.show()
+    def del_from_eq_search_selected_groups(self):
+        indexes = self.eqGroupsTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                self.__currEqGroupsTableContents.pop(i.row())
+            self.refresh_selected_eq_search_groups()
+        if len(self.__currEqGroupsTableContents)==0:
+            self.eqSearchDelFromSelectedGr.hide()
+    def del_from_us_search_selected_groups(self):
+        indexes = self.usGroupsTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                self.__currUsGroupsTableContents.pop(i.row())
+            self.refresh_selected_us_search_groups()
+        if len(self.__currUsGroupsTableContents)==0:
+            self.usSearchDelFromSelectedGr.hide()
     def del_from_eq_selected_groups(self):
         indexes = self.eqAddSelectedGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in indexes:
                 self.__addEqTableContents.pop(i.row())
             self.refresh_selected_eq_groups()
+        if len(self.__addEqTableContents)==0:
+            self.eqDelFromSelectedGr.hide()
     def del_from_us_selected_groups(self):
         indexes = self.usAddSelectedGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in indexes:
                 self.__addUsTableContents.pop(i.row())
             self.refresh_selected_us_groups()
+        if len(self.__addUsTableContents)==0:
+            self.usDelFromSelectedGr.hide()
     def refresh_selected_us_groups(self):
         self.usAddSelectedGrTableView.clearSpans()
         data_frame = pd.DataFrame(self.__addUsTableContents,
-                                  columns=["ID", "Название"],
+                                  columns=["Название групп"],
                                   index=[i for i in range(len(self.__addUsTableContents))])
         model = TableModel(data_frame)
         self.usAddSelectedGrTableView.setModel(model)
     def refresh_selected_eq_groups(self):
         self.eqAddSelectedGrTableView.clearSpans()
         data_frame = pd.DataFrame(self.__addEqTableContents,
-                                  columns=["ID", "Название"],
+                                  columns=["Название групп"],
                                   index=[i for i in range(len(self.__addEqTableContents))])
         model = TableModel(data_frame)
         self.eqAddSelectedGrTableView.setModel(model)
+    def refresh_selected_eq_search_groups(self):
+        self.eqGroupsTableView.clearSpans()
+        data_frame = pd.DataFrame(self.__currEqGroupsTableContents,
+                                  columns=["Название групп"],
+                                  index=[i for i in range(len(self.__currEqGroupsTableContents))])
+        model = TableModel(data_frame)
+        self.eqGroupsTableView.setModel(model)
+    def refresh_selected_us_search_groups(self):
+        self.usGroupsTableView.clearSpans()
+        data_frame = pd.DataFrame(self.__currUsGroupsTableContents,
+                                  columns=["Название групп"],
+                                  index=[i for i in range(len(self.__currUsGroupsTableContents))])
+        model = TableModel(data_frame)
+        self.usGroupsTableView.setModel(model)
     def add_equipment(self):
         code_error = -1
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
@@ -1694,7 +1763,6 @@ class MainWindow(QMainWindow):
                 self.usTableView.setGeometry(QtCore.QRect(870, 30, 701, 721))
                 self.usSearchAllGrTableView.show()
                 self.usSearchGrToSelected.show()
-                self.usSearchDelFromSelectedGr.show()
         else:
             show_message("Проблема", "Ничего не найдено")
     def setUsInfo(self):
@@ -1815,17 +1883,14 @@ class MainWindow(QMainWindow):
             self.setEqInfo()
             if self.__admin_access.can_change_inventory:
                 self.eqchangerGroupBox.show()
-            print(self.__eqFoundTableContents)
             self.eqTableView.setGeometry(QtCore.QRect(840, 40, 781, 721))
             self.eqSearchAllGrTableView.show()
             self.eqGroupsTableView.show()
             self.eqSearchGrToSelected.show()
-            self.eqSearchDelFromSelectedGr.show()
             self.listLabel_3.show()
             self.listLabel_20.show()
         else:
             show_message("Проблема", "Ничего не найдено")
-
     def setEqInfo(self):
         self.eqTableView.selectRow(self.__eqnum)
         self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
@@ -1848,14 +1913,12 @@ class MainWindow(QMainWindow):
             self.setEqInfo()
         else:
             show_message("Ошибка", "Это первый элемент в списке")
-
     def nextEq(self):
         if self.__eqnum < len(self.__eqFoundTableContents) - 1:
             self.__eqnum = self.__eqnum + 1
             self.setEqInfo()
         else:
             show_message("Ошибка", "Элемент последний в списке")
-
     def search_request(self):
         tg = 0
         found = []
@@ -1940,7 +2003,6 @@ class MainWindow(QMainWindow):
             self.tableView2.setModel(model)
         else:
             show_message("Проблема", "Ничего не найдено")
-
     def refresh_requests_table(self):
         # self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
@@ -1966,7 +2028,6 @@ class MainWindow(QMainWindow):
         self.tableView2.setModel(model)
         self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         self.get_request()
-
     def get_request(self):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
@@ -1977,27 +2038,22 @@ class MainWindow(QMainWindow):
         else:
             self.__reqnum -= 1
             show_message("Сообщение", "Запросов нет")
-
     def previous_request(self):
         if self.__reqnum > 0:
             self.__reqnum = self.__reqnum - 1
             self.get_request()
         else:
             show_message("Ошибка", "Запрос уже первый в списке")
-
     def next_request(self):
         if self.__reqnum < len(self.__reqs):
             self.__reqnum = self.__reqnum + 1
             self.get_request()
         else:
             show_message("Ошибка", "Запрос последний в списке")
-
     def reject_request(self):
         self.decide_request(False)
-
     def approve_request(self):
         self.decide_request(True)
-
     def decide_request(self, decision):
         if len(self.__reqs) != 0:
             self.__reqs[self.__reqnum].approved = decision
@@ -2010,7 +2066,6 @@ class MainWindow(QMainWindow):
             self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         else:
             show_message("Ошибка", "Запросов нет")
-
     class TableModel(QtCore.QAbstractTableModel):
         def __init__(self, data):
             super(TableModel, self).__init__()
