@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox, QHeaderView
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer, pyqtSlot
 from PyQt6 import QtCore, QtGui, QtWidgets
-
+from equipment_collections import EquipmentCollection
 from Work.Scripts.interface import TableModel
 from user_collections import *
 from equipment import *
@@ -101,13 +101,19 @@ def show_message(title: str, info: str):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, user_list: UserCollection, current_user, db: DataBase, admin_access: AdminAccess):
+    def __init__(self,
+                 user_list: UserCollection,
+                 equipment_list: EquipmentCollection,
+                 current_user,
+                 db: DataBase,
+                 admin_access: AdminAccess):
         super(MainWindow, self).__init__()
         self.setWindowTitle("App")
         self.setFixedSize(1700, 1000)
         self.setStyleSheet("background-color:#F0F8FF;")
         self.__current_user = current_user
         self.__user_list = user_list
+        self.__equipment_list = equipment_list
         self.__db = db
         self.__eqTableContents = []
         self.__usTableContents = []
