@@ -240,7 +240,7 @@ class DataBase:
         self.__session.commit()
 
     def del_group(self, group_id: int):
-        self.__session.query(Groups).delete()
+        self.__session.query(Groups).filter(Groups.id == group_id).delete()
         self.__session.commit()
 
     def get_all_groups(self) -> list:
