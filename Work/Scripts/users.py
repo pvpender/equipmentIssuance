@@ -31,6 +31,13 @@ class User(ABC):
     def base_id(self) -> Union[None, int]:
         return self.__base_id
 
+    @base_id.setter
+    def base_id(self, base_id):
+        if self.__base_id is None:
+            self.__base_id = base_id
+        else:
+            raise Exception("Can set only empty id")
+
     @abstractmethod
     def del_user(self):
         pass

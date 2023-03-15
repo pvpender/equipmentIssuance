@@ -443,7 +443,7 @@ class DataBase:
         for i in equipment.groups:
             self.add_equipment_group(equipment_id=equipment_id, group_id=i)
 
-    def update_equipment(self, old_id: int, equipment: Union[Equipment, Equipments]):
+    def update_equipment(self, equipment: Union[Equipment, Equipments]):
         if not (equipment.x and equipment.y):
             exist = self.__session.query(Equipments).filter(
                 Equipments.x == equipment.x, Equipments.y == equipment.y
@@ -453,7 +453,7 @@ class DataBase:
         self.__session.query(EquipmentGroups).filter(EquipmentGroups.equipment_id == equipment.id).delete()
         for i in equipment.groups:
             self.__session.add(UserGroups(equipment_id=equipment.id, group_id=i))
-        self.__session.query(Equipments).filter(Equipments.id == old_id).update(
+        self.__session.query(Equipments).filter(Equipments.id == equipment.id).update(
             {"title": equipment.title, "description": equipment.description,
              "count": equipment.count, "reserve_count": equipment.reserve_count,
              "x": equipment.x, "y": equipment.y}, synchronize_session=False

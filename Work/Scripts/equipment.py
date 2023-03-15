@@ -18,7 +18,10 @@ class Equipment:
 
     @id.setter
     def id(self, new_id: int):
-        self.__id = new_id
+        if self.__id is None:
+            self.__id = new_id
+        else:
+            raise Exception("Can set only empty id")
 
     @property
     def title(self) -> str:
