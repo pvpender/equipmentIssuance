@@ -35,11 +35,12 @@ class QDoublePushButton(QPushButton):
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
-    def __init__(self, user_list: UserCollection, db: DataBase):
+    def __init__(self, user_list: UserCollection, db: DataBase, equipment_list: EquipmentCollection):
         super(LogWindow, self).__init__()
         self.__main_window = MainWindow
         self.__db = db
         self.__user_list = user_list
+        self.__equipment_list = equipment_list
         self.setFixedSize(720, 480)
         self.setWindowTitle("Log in")
         self.__label = QLabel(self)
@@ -87,7 +88,7 @@ class LogWindow(QMainWindow):
         if isinstance(user, Admin):
             self.__db.change_user(user.mail, self.__password_field.text())
             self.hide()
-            self.__main_window = MainWindow(self.__user_list, user, self.__db, user.access)
+            self.__main_window = MainWindow(self.__user_list, self.__equipment_list, user, self.__db, user.access)
         else:
             self.__label.setText("Введены неверные данные!")
             self.__password_field.setText("")

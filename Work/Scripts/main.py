@@ -3,6 +3,7 @@ from interface2 import LogWindow
 from users import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from equipment_collections import EquipmentCollection
 from user_collections import *
 from database import *
 from sqlalchemy import create_engine
@@ -22,6 +23,8 @@ sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
 #session = Session(engine)
 db = DataBase(engine)
+db.add_atest(1, 2)
+db.add_atest(4, 5)
 #db.del_group(2)
 #db.add_group("biv")
 #db.add_user(CommonUser(123, "test", [1]))
@@ -44,9 +47,12 @@ mas = user_list.get_user_list()
 #print(db.get_action_by_passes_as_df([1]))
 #print(db.get_inv_from_act_as_df(["test", "тестик"]))
 
+equipment_list = EquipmentCollection(db)
+
 app = QApplication([])
 
 
 window = LogWindow(user_list, db)
+
 
 app.exec()
