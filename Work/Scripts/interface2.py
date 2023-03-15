@@ -1498,17 +1498,21 @@ class MainWindow(QMainWindow):
         if code_error == -1 and self.__db.get_equipment_by_coordinates(from_left, height) is not None:
             code_error = 9
         if code_error == -1:
+            groups=[]
+            for i in self.__addEqTableContents:
+                groups.append(self.__db.get_group_by_name(i).id)
             eq = Equipment(self.eqNameOrEmailLineEdit.text(),
                            self.descriptionTextEdit.toPlainText(),
-                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(),[], height, from_left)
+                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), groups, height, from_left)
             show_message("Успех", "Оборудование добавлено в базу")
-            self.__db.add_equipment(eq)
+            self.__equipment_list.add_equipment(eq)
             self.heightSpinBox.setValue(-1)
             self.posFromLeftSpinBox.setValue(-1)
             self.eqNameOrEmailLineEdit.setText("")
             self.descriptionTextEdit.setText("")
             self.heightSpinBox.setValue(-1)
             self.posFromLeftSpinBox.setValue(-1)
+            self.refresh_equipment_table()
         else:
             if code_error == 1:
                 show_message("Ошибка добавления", "Введите название")
@@ -1557,7 +1561,10 @@ class MainWindow(QMainWindow):
             code_error = 8
         if code_error == -1:
             if self.usradioButton_User.isChecked():
-                ac=Access([])
+                groups=[]
+                for i in self.__addUsTableContents:
+                    groups.append(self.__db.get_group_by_name(i).id)
+                ac=Access(groups)
                 us = CommonUser(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), ac)
                 self.__user_list.append_user(us)
             if self.usradioButton_Admin.isChecked():
@@ -1569,6 +1576,7 @@ class MainWindow(QMainWindow):
             self.usnameOrEmailLineEdit.setText("")
             self.descriptionTextEdit.setText("")
             self.usIdCardLineEdit.setText("")
+            self.refresh_users_table()
         else:
             if code_error == 1:
                 show_message("Ошибка добавления", "Введите Email")
