@@ -1002,23 +1002,12 @@ class MainWindow(QMainWindow):
 
     def add_equipment(self):
         code_error = -1
-        tg = 0
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
             code_error = 1
         elif self.__db.get_equipment_by_title(self.eqNameOrEmailLineEdit.text()):
             code_error = 8
         if code_error == -1 and self.descriptionTextEdit.toPlainText() == "":
             code_error = 3
-        if code_error == -1 and self.eqfirstRightsCheckBox.isChecked():
-            tg += 1
-        if code_error == -1 and self.eqsecondRightsCheckBox.isChecked():
-            tg += 10
-        if code_error == -1 and self.eqthirdRightsCheckBox.isChecked():
-            tg += 100
-        if code_error == -1 and self.eqfourthRightsCheckBox.isChecked():
-            tg += 1000
-        if code_error == -1 and tg == 0:
-            code_error = 2
         from_left = self.posFromLeftSpinBox.value()
         if self.posFromLeftSpinBox.value() == 0 or self.posFromLeftSpinBox.value() == -1:
             from_left = -1
@@ -1030,13 +1019,7 @@ class MainWindow(QMainWindow):
         if code_error == -1:
             eq = Equipment(self.eqNameOrEmailLineEdit.text(),
                            self.descriptionTextEdit.toPlainText(),
-                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(), tg, height, from_left)
-            self.__db.add_action(
-                self.__current_user.id,
-                ActionTypes.INSERT,
-                WhatTypes.EQUIPMENT,
-                self.eqNameOrEmailLineEdit.text()
-            )
+                           self.ableNowSpinBox.value(), self.reservedSpinBox.value(),[], height, from_left)
             show_message("Успех", "Оборудование добавлено в базу")
             self.__db.add_equipment(eq)
             self.heightSpinBox.setValue(-1)
@@ -1052,8 +1035,6 @@ class MainWindow(QMainWindow):
         else:
             if code_error == 1:
                 show_message("Ошибка добавления", "Введите название")
-            elif code_error == 2:
-                show_message("Ошибка добавления", "Не отмечены требования выдачи")
             elif code_error == 3:
                 show_message("Ошибка добавления", "отсутствует описание")
             elif code_error == 8:
@@ -1063,7 +1044,6 @@ class MainWindow(QMainWindow):
 
     def add_user(self):
         code_error = -1
-        tg = 0
         add_users = False
         change_users = False
         add_equipment = False
@@ -1095,34 +1075,18 @@ class MainWindow(QMainWindow):
             add_equipment = False
             change_equipment = False
             get_request = False
-        if code_error == -1 and self.usfirstRightsCheckBox.isChecked():
-            tg += 1
-        if code_error == -1 and self.ussecondRightsCheckBox.isChecked():
-            tg += 10
-        if code_error == -1 and self.usthirdRightsCheckBox.isChecked():
-            tg += 100
-        if code_error == -1 and self.usfourthRightsCheckBox.isChecked():
-            tg += 1000
-        if code_error == -1 and tg == 0:
-            code_error = 2
         if code_error == -1 and self.__db.get_user_by_id(int(self.usIdCardLineEdit.text(), 16)) is not None:
             code_error = 7
         if code_error == -1 and self.__db.get_user_by_mail(self.usnameOrEmailLineEdit.text()) is not None:
             code_error = 8
         if code_error == -1:
-            self.__db.add_action(
-                self.__current_user.id,
-                ActionTypes.INSERT,
-                WhatTypes.USER,
-                self.usnameOrEmailLineEdit.text()
-            )
             if self.usradioButton_User.isChecked():
-                ac = Access(tg)
+                ac=Access([])
                 us = CommonUser(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), ac)
                 self.__user_list.append_user(us)
             if self.usradioButton_Admin.isChecked():
-                ac = AdminAccess(tg, add_users, change_users, add_equipment, change_equipment, get_request)
-                adm = Admin(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), "", ac)
+                ac = AdminAccess([], add_users, change_users, add_equipment, change_equipment, get_request)
+                adm = Admin(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), ac)
                 self.__user_list.append_user(adm)
             self.heightSpinBox.setValue(-1)
             self.posFromLeftSpinBox.setValue(-1)
@@ -1259,12 +1223,10 @@ class MainWindow(QMainWindow):
                 str(i.title),
                 str(i.count),
                 str(i.reserve_count),
-                str(i.access),
                 x,
                 y])
         data_frame = pd.DataFrame(self.__eqTableContents,
-                                  columns=["ID", "Название", "Количество", "Зарезервировано",
-                                           "Доступ", "От стены", "От пола"],
+                                  columns=["ID", "Название", "Количество", "Зарезервировано", "От стены", "От пола"],
                                   index=[i for i in range(len(self.__eqTableContents))])
         model = TableModel(data_frame)
         self.eqTableView.setModel(model)
@@ -1287,11 +1249,10 @@ class MainWindow(QMainWindow):
         self.__usTableContents.clear()
         for i in self.__user_list.get_user_list():
             self.__usTableContents.append([
-                str(hex(i.id)),
+                str(hex(i.pass_number)),
                 i.mail,
-                i.access.power
             ])
-        data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта", "Доступ"],
+        data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта"],
                                   index=[i for i in range(len(self.__usTableContents))])
         model = TableModel(data_frame)
         self.usTableView.setModel(model)
@@ -1717,12 +1678,6 @@ class MainWindow(QMainWindow):
             self.__reqs[self.__reqnum].approved = decision
             print(self.__reqnum)
             self.__reqs[self.__reqnum].approved_id = self.__current_user.id
-            self.__db.add_action(
-                self.__current_user.id,
-                ActionTypes.APPROVE if decision else ActionTypes.REJECT,
-                WhatTypes.REQUEST,
-                self.__reqs[self.__reqnum].id
-            )
             self.__db.update_request(self.__reqs[self.__reqnum])
             self.__reqs.remove(self.__reqs[self.__reqnum])
             self.tableView2.model().removeRow(self.__reqnum)

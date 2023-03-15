@@ -464,6 +464,17 @@ class MainWindow(QMainWindow):
         self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         self.getReq()
         self.RequestsGroupBox.show()
+    def searchUsOrEq(self):
+        if self.searchByNameOrEmailLineEdit.text!="":
+            model = self.tableView.model()
+            data = []
+            ind = []
+            for row in range(model.rowCount()):
+                data.append([])
+                ind.append([])
+                for column in range(model.columnCount()):
+                    index = model.index(row, column)
+                    data[row].append(str(model.data(index).toString()))
 
     def prevReq(self):
         if self.__reqnum > 0:
@@ -704,21 +715,6 @@ class MainWindow(QMainWindow):
                 else:
                     self.showMessage("Ошибка добавления", "Пользователь с таким email уже добавлен")
 
-
-    def searchUsOrEq(self):
-        if self.searchByNameOrEmailLineEdit.text!="":
-            model = self.tableView.model()
-            data = []
-            ind = []
-            for row in range(model.rowCount()):
-                data.append([])
-                ind.append([])
-                for column in range(model.columnCount()):
-                    index = model.index(row, column)
-                    # We suppose data are strings
-                    data[row].append(str(model.data(index).toString()))
-
-
     def getReq(self):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
@@ -730,9 +726,9 @@ class MainWindow(QMainWindow):
             self.__reqnum -= 1
             self.showMessage("Сообщение", "Запросов нет")
     def viewEqOrUser(self):
+        self.__tableContents.clear()
         if self.__viewingEq:
             all_eq = self.__db.get_all_equipment()
-            data = []
             for i in all_eq:
                 x = ""
                 y = ""
@@ -744,7 +740,7 @@ class MainWindow(QMainWindow):
                     y = "--"
                 else:
                     y = str(i.y)
-                data.append([
+                self.__tableContents.append([
                     str(i.id),
                     str(i.title),
                     str(i.count),
@@ -753,27 +749,26 @@ class MainWindow(QMainWindow):
                     x,
                     y
                 ])
-            data_frame = pd.DataFrame(data,
+            data_frame = pd.DataFrame(self.__tableContents,
                                       columns=["ID", "Название", "Количество", "Зарезервировано",
                                                "Доступ", "От стены", "От пола"],
-                                      index=[i for i in range(len(data))])
+                                      index=[i for i in range(len(self.__tableContents))])
             model = TableModel(data_frame)
             self.tableView.setModel(model)
         else:
             listText = ""
             ref = AdminAccess
-            data = []
             for i in self.__user_list.get_user_list():
-                data.append([
+                self.__tableContents.append([
                     str(hex(i.id)),
                     i.mail,
                     i.access.power
                 ])
-            data_frame = pd.DataFrame(data, columns=["ID карты", "Почта", "Доступ"],
-                                      index=[i for i in range(len(data))])
+            data_frame = pd.DataFrame(self.__tableContents, columns=["ID карты", "Почта", "Доступ"],
+                                      index=[i for i in range(len(self.__tableContents))])
             model = TableModel(data_frame)
             self.tableView.setModel(model)
-            # self.tableView.model().removeRow()
+            self.tableView.selectRow(1)
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
