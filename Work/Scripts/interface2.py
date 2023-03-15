@@ -1309,7 +1309,7 @@ class MainWindow(QMainWindow):
         self.usDelFromSelectedGr.clicked.connect(self.del_from_us_selected_groups)
         self.eqDelFromSelectedGr.clicked.connect(self.del_from_eq_selected_groups)
         self.grAddPushButton.clicked.connect(self.add_group)
-        self.grSearchPushButton.clicked.connect(self.search_gr)
+       # self.grSearchPushButton.clicked.connect(self.search_gr)
         self.eqSearchGrToSelected.clicked.connect(self.selected_to_eq_search_groups)
         self.usSearchGrToSelected.clicked.connect(self.selected_to_us_search_groups)
         self.eqSearchDelFromSelectedGr.clicked.connect(self.del_from_eq_search_selected_groups)
@@ -1602,6 +1602,8 @@ class MainWindow(QMainWindow):
             user_to_change = self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16))
             user_to_change.id = int(self.ussearchByNameOrEmailLineEdit.text(), 16)
             user_to_change.mail = self.ussearchByEmailOrNameLineEdit.text()
+            for i in self.__currUsGroupsTableContents:
+                user_to_change.access.groups.append(self.__db.get_group_by_name(i))
             self.__user_list.change_user(int(self.__usFoundTableContents[self.__usnum][0], 16),
                                          self.__usFoundTableContents[self.__usnum][1],
                                          user_to_change)
