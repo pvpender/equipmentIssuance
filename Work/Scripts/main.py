@@ -23,16 +23,12 @@ sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
 #session = Session(engine)
 db = DataBase(engine)
-db.add_atest(1, 2)
-db.add_atest(4, 5)
+
 #db.del_group(2)
 #db.add_group("biv")
 #db.add_user(CommonUser(123, "test", [1]))
 #db.delete_user(db.get_user_by_id(123))
 #db.add_equipment(Equipment("test", "test", 2, 0, []))
-e = db.get_equipment_by_title("test")
-db.add_equipment_group(e.id, 1)
-m = db.get_all_users()
 #print(m[0][1].power)
 f = db.get_all_actions()
 for i in f:
@@ -52,7 +48,7 @@ equipment_list = EquipmentCollection(db)
 app = QApplication([])
 
 
-window = LogWindow(user_list, db)
+window = LogWindow(user_list, equipment_list, db)
 
 
 app.exec()

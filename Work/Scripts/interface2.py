@@ -35,7 +35,7 @@ class QDoublePushButton(QPushButton):
 class LogWindow(QMainWindow):
     loggedSignal = QtCore.pyqtSignal()
 
-    def __init__(self, user_list: UserCollection, db: DataBase, equipment_list: EquipmentCollection):
+    def __init__(self, user_list: UserCollection, equipment_list: EquipmentCollection, db: DataBase):
         super(LogWindow, self).__init__()
         self.__main_window = MainWindow
         self.__db = db
