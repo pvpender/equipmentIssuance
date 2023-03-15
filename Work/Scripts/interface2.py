@@ -114,6 +114,8 @@ class MainWindow(QMainWindow):
         self.__reqTableContents = []
         self.__usFoundTableContents = []
         self.__eqFoundTableContents = []
+        self.__usFoundGroups=[]
+        self.__eqFoundGroups=[]
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
@@ -160,7 +162,7 @@ class MainWindow(QMainWindow):
         self.eqNameOrEmailLineEdit.setGeometry(QtCore.QRect(90, 30, 341, 22))
         self.eqNameOrEmailLineEdit.setObjectName("eqNameOrEmailLineEdit")
         self.eqaddUserOrInvButton = QtWidgets.QPushButton(parent=self.addSmthBox)
-        self.eqaddUserOrInvButton.setGeometry(QtCore.QRect(10, 360, 401, 41))
+        self.eqaddUserOrInvButton.setGeometry(QtCore.QRect(10, 410, 401, 41))
         self.eqaddUserOrInvButton.setStyleSheet("QPushButton{\n"
                                                 " background-color: #081f2d; \n"
                                                 " border-radius: 8px; \n"
@@ -214,13 +216,9 @@ class MainWindow(QMainWindow):
         self.radioButton_setPos = QtWidgets.QRadioButton(parent=self.addSmthBox)
         self.radioButton_setPos.setGeometry(QtCore.QRect(80, 190, 251, 20))
         self.radioButton_setPos.setObjectName("radioButton_setPos")
-        self.eqAddTableView = QtWidgets.QTableView(parent=self.addSmthBox)
-        self.eqAddTableView.setGeometry(QtCore.QRect(490, 10, 621, 681))
-        self.eqAddTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
-        self.eqAddTableView.setObjectName("eqAddTableView")
-        self.eqSearchGroupButton = QtWidgets.QPushButton(parent=self.addSmthBox)
-        self.eqSearchGroupButton.setGeometry(QtCore.QRect(10, 310, 401, 41))
-        self.eqSearchGroupButton.setStyleSheet("QPushButton{\n"
+        self.eqDelFromSelectedGr = QtWidgets.QPushButton(parent=self.addSmthBox)
+        self.eqDelFromSelectedGr.setGeometry(QtCore.QRect(630, 330, 61, 41))
+        self.eqDelFromSelectedGr.setStyleSheet("QPushButton{\n"
                                                " background-color: #081f2d; \n"
                                                " border-radius: 8px; \n"
                                                " border: 2px solid #081F2D; \n"
@@ -236,7 +234,7 @@ class MainWindow(QMainWindow):
                                                " border-color: #081F2D;\n"
                                                " transition: 0.9s; \n"
                                                "}")
-        self.eqSearchGroupButton.setObjectName("eqSearchGroupButton")
+        self.eqDelFromSelectedGr.setObjectName("eqDelFromSelectedGr")
         self.eqAddGroupByIdSpinBox = QtWidgets.QSpinBox(parent=self.addSmthBox)
         self.eqAddGroupByIdSpinBox.setGeometry(QtCore.QRect(180, 250, 191, 22))
         self.eqAddGroupByIdSpinBox.setObjectName("eqAddGroupByIdSpinBox")
@@ -249,11 +247,77 @@ class MainWindow(QMainWindow):
         self.searchByEmailOrNameLabel_4 = QtWidgets.QLabel(parent=self.addSmthBox)
         self.searchByEmailOrNameLabel_4.setGeometry(QtCore.QRect(20, 280, 161, 16))
         self.searchByEmailOrNameLabel_4.setObjectName("searchByEmailOrNameLabel_4")
+        self.eqRefreshGroupButton = QtWidgets.QPushButton(parent=self.addSmthBox)
+        self.eqRefreshGroupButton.setGeometry(QtCore.QRect(10, 360, 401, 41))
+        self.eqRefreshGroupButton.setStyleSheet("QPushButton{\n"
+                                                " background-color: #081f2d; \n"
+                                                " border-radius: 8px; \n"
+                                                " border: 2px solid #081F2D; \n"
+                                                " color: white; \n"
+                                                " font-size: 15px;  \n"
+                                                " cursor: pointer; \n"
+                                                " transition: 0.3s; \n"
+                                                " }\n"
+                                                " \n"
+                                                "QPushButton:hover{ \n"
+                                                " background-color: white; \n"
+                                                " color: #081F2D; \n"
+                                                " border-color: #081F2D;\n"
+                                                " transition: 0.9s; \n"
+                                                "}")
+        self.eqRefreshGroupButton.setObjectName("eqRefreshGroupButton")
+        self.eqAddAllGrTableView = QtWidgets.QTableView(parent=self.addSmthBox)
+        self.eqAddAllGrTableView.setGeometry(QtCore.QRect(700, 20, 421, 681))
+        self.eqAddAllGrTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+        self.eqAddAllGrTableView.setObjectName("eqAddAllGrTableView")
+        self.eqAddSelectedGrTableView = QtWidgets.QTableView(parent=self.addSmthBox)
+        self.eqAddSelectedGrTableView.setGeometry(QtCore.QRect(450, 20, 171, 681))
+        self.eqAddSelectedGrTableView.setSizeAdjustPolicy(
+            QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+        self.eqAddSelectedGrTableView.setObjectName("eqAddSelectedGrTableView")
+        self.eqGrToSelected = QtWidgets.QPushButton(parent=self.addSmthBox)
+        self.eqGrToSelected.setGeometry(QtCore.QRect(630, 380, 61, 41))
+        self.eqGrToSelected.setStyleSheet("QPushButton{\n"
+                                          " background-color: #081f2d; \n"
+                                          " border-radius: 8px; \n"
+                                          " border: 2px solid #081F2D; \n"
+                                          " color: white; \n"
+                                          " font-size: 15px;  \n"
+                                          " cursor: pointer; \n"
+                                          " transition: 0.3s; \n"
+                                          " }\n"
+                                          " \n"
+                                          "QPushButton:hover{ \n"
+                                          " background-color: white; \n"
+                                          " color: #081F2D; \n"
+                                          " border-color: #081F2D;\n"
+                                          " transition: 0.9s; \n"
+                                          "}")
+        self.eqGrToSelected.setObjectName("eqGrToSelected")
+        self.eqRefreshGroupButton_2 = QtWidgets.QPushButton(parent=self.addSmthBox)
+        self.eqRefreshGroupButton_2.setGeometry(QtCore.QRect(10, 310, 401, 41))
+        self.eqRefreshGroupButton_2.setStyleSheet("QPushButton{\n"
+                                                  " background-color: #081f2d; \n"
+                                                  " border-radius: 8px; \n"
+                                                  " border: 2px solid #081F2D; \n"
+                                                  " color: white; \n"
+                                                  " font-size: 15px;  \n"
+                                                  " cursor: pointer; \n"
+                                                  " transition: 0.3s; \n"
+                                                  " }\n"
+                                                  " \n"
+                                                  "QPushButton:hover{ \n"
+                                                  " background-color: white; \n"
+                                                  " color: #081F2D; \n"
+                                                  " border-color: #081F2D;\n"
+                                                  " transition: 0.9s; \n"
+                                                  "}")
+        self.eqRefreshGroupButton_2.setObjectName("eqRefreshGroupButton_2")
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.addSmthBox_2 = QtWidgets.QGroupBox(parent=self.tab_2)
-        self.addSmthBox_2.setGeometry(QtCore.QRect(20, 10, 1101, 711))
+        self.addSmthBox_2.setGeometry(QtCore.QRect(20, 10, 1211, 711))
         self.addSmthBox_2.setStyleSheet("QGroupBox#addSmthBox_2{\n"
                                         "    border: 0;\n"
                                         "}")
@@ -320,7 +384,7 @@ class MainWindow(QMainWindow):
         self.rightsLabel_4.setGeometry(QtCore.QRect(20, 10, 101, 16))
         self.rightsLabel_4.setObjectName("rightsLabel_4")
         self.usaddUserOrInvButton = QtWidgets.QPushButton(parent=self.addSmthBox_2)
-        self.usaddUserOrInvButton.setGeometry(QtCore.QRect(30, 450, 401, 41))
+        self.usaddUserOrInvButton.setGeometry(QtCore.QRect(30, 490, 401, 41))
         self.usaddUserOrInvButton.setStyleSheet("QPushButton{\n"
                                                 " background-color: #081f2d; \n"
                                                 " border-radius: 8px; \n"
@@ -338,10 +402,6 @@ class MainWindow(QMainWindow):
                                                 " transition: 0.9s; \n"
                                                 "}")
         self.usaddUserOrInvButton.setObjectName("usaddUserOrInvButton")
-        self.usAddTableView = QtWidgets.QTableView(parent=self.addSmthBox_2)
-        self.usAddTableView.setGeometry(QtCore.QRect(480, 10, 621, 681))
-        self.usAddTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
-        self.usAddTableView.setObjectName("usAddTableView")
         self.searchByEmailOrNameLabel_3 = QtWidgets.QLabel(parent=self.addSmthBox_2)
         self.searchByEmailOrNameLabel_3.setGeometry(QtCore.QRect(40, 360, 161, 16))
         self.searchByEmailOrNameLabel_3.setObjectName("searchByEmailOrNameLabel_3")
@@ -373,7 +433,133 @@ class MainWindow(QMainWindow):
                                                " transition: 0.9s; \n"
                                                "}")
         self.usSearchGroupButton.setObjectName("usSearchGroupButton")
+        self.usRefreshGroupButton = QtWidgets.QPushButton(parent=self.addSmthBox_2)
+        self.usRefreshGroupButton.setGeometry(QtCore.QRect(30, 440, 401, 41))
+        self.usRefreshGroupButton.setStyleSheet("QPushButton{\n"
+                                                " background-color: #081f2d; \n"
+                                                " border-radius: 8px; \n"
+                                                " border: 2px solid #081F2D; \n"
+                                                " color: white; \n"
+                                                " font-size: 15px;  \n"
+                                                " cursor: pointer; \n"
+                                                " transition: 0.3s; \n"
+                                                " }\n"
+                                                " \n"
+                                                "QPushButton:hover{ \n"
+                                                " background-color: white; \n"
+                                                " color: #081F2D; \n"
+                                                " border-color: #081F2D;\n"
+                                                " transition: 0.9s; \n"
+                                                "}")
+        self.usRefreshGroupButton.setObjectName("usRefreshGroupButton")
+        self.usDelFromSelectedGr = QtWidgets.QPushButton(parent=self.addSmthBox_2)
+        self.usDelFromSelectedGr.setGeometry(QtCore.QRect(660, 320, 61, 41))
+        self.usDelFromSelectedGr.setStyleSheet("QPushButton{\n"
+                                               " background-color: #081f2d; \n"
+                                               " border-radius: 8px; \n"
+                                               " border: 2px solid #081F2D; \n"
+                                               " color: white; \n"
+                                               " font-size: 15px;  \n"
+                                               " cursor: pointer; \n"
+                                               " transition: 0.3s; \n"
+                                               " }\n"
+                                               " \n"
+                                               "QPushButton:hover{ \n"
+                                               " background-color: white; \n"
+                                               " color: #081F2D; \n"
+                                               " border-color: #081F2D;\n"
+                                               " transition: 0.9s; \n"
+                                               "}")
+        self.usDelFromSelectedGr.setObjectName("usDelFromSelectedGr")
+        self.usGrToSelected = QtWidgets.QPushButton(parent=self.addSmthBox_2)
+        self.usGrToSelected.setGeometry(QtCore.QRect(660, 370, 61, 41))
+        self.usGrToSelected.setStyleSheet("QPushButton{\n"
+                                          " background-color: #081f2d; \n"
+                                          " border-radius: 8px; \n"
+                                          " border: 2px solid #081F2D; \n"
+                                          " color: white; \n"
+                                          " font-size: 15px;  \n"
+                                          " cursor: pointer; \n"
+                                          " transition: 0.3s; \n"
+                                          " }\n"
+                                          " \n"
+                                          "QPushButton:hover{ \n"
+                                          " background-color: white; \n"
+                                          " color: #081F2D; \n"
+                                          " border-color: #081F2D;\n"
+                                          " transition: 0.9s; \n"
+                                          "}")
+        self.usGrToSelected.setObjectName("usGrToSelected")
+        self.usAddSelectedGrTableView = QtWidgets.QTableView(parent=self.addSmthBox_2)
+        self.usAddSelectedGrTableView.setGeometry(QtCore.QRect(480, 10, 171, 681))
+        self.usAddSelectedGrTableView.setSizeAdjustPolicy(
+            QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+        self.usAddSelectedGrTableView.setObjectName("usAddSelectedGrTableView")
+        self.usAddAllGrTableView = QtWidgets.QTableView(parent=self.addSmthBox_2)
+        self.usAddAllGrTableView.setGeometry(QtCore.QRect(730, 10, 431, 681))
+        self.usAddAllGrTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+        self.usAddAllGrTableView.setObjectName("usAddAllGrTableView")
         self.tabWidget.addTab(self.tab_2, "")
+        self.tab_16 = QtWidgets.QWidget()
+        self.tab_16.setObjectName("tab_16")
+        self.nameOrEmailLabel_8 = QtWidgets.QLabel(parent=self.tab_16)
+        self.nameOrEmailLabel_8.setGeometry(QtCore.QRect(30, 30, 71, 16))
+        self.nameOrEmailLabel_8.setObjectName("nameOrEmailLabel_8")
+        self.grAddLineEdit = QtWidgets.QLineEdit(parent=self.tab_16)
+        self.grAddLineEdit.setGeometry(QtCore.QRect(110, 30, 311, 22))
+        self.grAddLineEdit.setObjectName("grAddLineEdit")
+        self.label_35 = QtWidgets.QLabel(parent=self.tab_16)
+        self.label_35.setGeometry(QtCore.QRect(30, 60, 111, 16))
+        self.label_35.setObjectName("label_35")
+        self.grAddPushButton = QtWidgets.QPushButton(parent=self.tab_16)
+        self.grAddPushButton.setGeometry(QtCore.QRect(20, 90, 401, 41))
+        self.grAddPushButton.setStyleSheet("QPushButton{\n"
+                                           " background-color: #081f2d; \n"
+                                           " border-radius: 8px; \n"
+                                           " border: 2px solid #081F2D; \n"
+                                           " color: white; \n"
+                                           " font-size: 15px;  \n"
+                                           " cursor: pointer; \n"
+                                           " transition: 0.3s; \n"
+                                           " }\n"
+                                           " \n"
+                                           "QPushButton:hover{ \n"
+                                           " background-color: white; \n"
+                                           " color: #081F2D; \n"
+                                           " border-color: #081F2D;\n"
+                                           " transition: 0.9s; \n"
+                                           "}")
+        self.grAddPushButton.setObjectName("grAddPushButton")
+        self.grAddSpinBox = QtWidgets.QSpinBox(parent=self.tab_16)
+        self.grAddSpinBox.setGeometry(QtCore.QRect(150, 60, 271, 22))
+        self.grAddSpinBox.setObjectName("grAddSpinBox")
+        self.grTableView = QtWidgets.QTableView(parent=self.tab_16)
+        self.grTableView.setGeometry(QtCore.QRect(440, 40, 661, 661))
+        self.grTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+        self.grTableView.setObjectName("grTableView")
+        self.grSearchPushButton = QtWidgets.QPushButton(parent=self.tab_16)
+        self.grSearchPushButton.setGeometry(QtCore.QRect(20, 140, 401, 41))
+        self.grSearchPushButton.setStyleSheet("QPushButton{\n"
+                                              " background-color: #081f2d; \n"
+                                              " border-radius: 8px; \n"
+                                              " border: 2px solid #081F2D; \n"
+                                              " color: white; \n"
+                                              " font-size: 15px;  \n"
+                                              " cursor: pointer; \n"
+                                              " transition: 0.3s; \n"
+                                              " }\n"
+                                              " \n"
+                                              "QPushButton:hover{ \n"
+                                              " background-color: white; \n"
+                                              " color: #081F2D; \n"
+                                              " border-color: #081F2D;\n"
+                                              " transition: 0.9s; \n"
+                                              "}")
+        self.grSearchPushButton.setObjectName("grSearchPushButton")
+        self.listLabel_13 = QtWidgets.QLabel(parent=self.tab_16)
+        self.listLabel_13.setGeometry(QtCore.QRect(440, 10, 161, 20))
+        self.listLabel_13.setObjectName("listLabel_13")
+        self.tabWidget.addTab(self.tab_16, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.viewInvOrUserBox = QtWidgets.QGroupBox(parent=self.tab_3)
@@ -396,7 +582,7 @@ class MainWindow(QMainWindow):
         self.eqsearchByEmailOrNameLineEdit.setGeometry(QtCore.QRect(90, 60, 211, 22))
         self.eqsearchByEmailOrNameLineEdit.setObjectName("eqsearchByEmailOrNameLineEdit")
         self.listLabel = QtWidgets.QLabel(parent=self.viewInvOrUserBox)
-        self.listLabel.setGeometry(QtCore.QRect(600, 20, 111, 16))
+        self.listLabel.setGeometry(QtCore.QRect(600, 20, 351, 16))
         self.listLabel.setObjectName("listLabel")
         self.searchByPosGroupBox = QtWidgets.QGroupBox(parent=self.viewInvOrUserBox)
         self.searchByPosGroupBox.setGeometry(QtCore.QRect(10, 190, 441, 61))
@@ -588,9 +774,6 @@ class MainWindow(QMainWindow):
         self.ussearchByEmailOrNameLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox_2)
         self.ussearchByEmailOrNameLineEdit.setGeometry(QtCore.QRect(80, 60, 161, 22))
         self.ussearchByEmailOrNameLineEdit.setObjectName("ussearchByEmailOrNameLineEdit")
-        self.listLabel_2 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
-        self.listLabel_2.setGeometry(QtCore.QRect(620, 10, 111, 16))
-        self.listLabel_2.setObjectName("listLabel_2")
         self.verticalLayoutWidget_14 = QtWidgets.QWidget(parent=self.viewInvOrUserBox_2)
         self.verticalLayoutWidget_14.setGeometry(QtCore.QRect(150, 120, 197, 119))
         self.verticalLayoutWidget_14.setObjectName("verticalLayoutWidget_14")
@@ -756,6 +939,9 @@ class MainWindow(QMainWindow):
                                                      " transition: 0.9s; \n"
                                                      "}")
         self.eqCreateStatsPushButton_2.setObjectName("eqCreateStatsPushButton_2")
+        self.listLabel_2 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
+        self.listLabel_2.setGeometry(QtCore.QRect(620, 10, 351, 16))
+        self.listLabel_2.setObjectName("listLabel_2")
         self.tabWidget.addTab(self.tab_4, "")
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
@@ -941,7 +1127,6 @@ class MainWindow(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(self)
 
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.nameOrEmailLabel_2.setText(_translate("MainWindow", "Название"))
         self.eqaddUserOrInvButton.setText(_translate("MainWindow", "Добавить"))
         self.label_27.setText(_translate("MainWindow", "Номер от левого края"))
@@ -950,9 +1135,12 @@ class MainWindow(QMainWindow):
         self.label_26.setText(_translate("MainWindow", "Высота(от пола)"))
         self.label_10.setText(_translate("MainWindow", "Зарезервированное  количество"))
         self.radioButton_setPos.setText(_translate("MainWindow", "Указать расположение в шкафу"))
-        self.eqSearchGroupButton.setText(_translate("MainWindow", "Поиск группы"))
+        self.eqDelFromSelectedGr.setText(_translate("MainWindow", "==>"))
         self.eqsearchByIdLabel_5.setText(_translate("MainWindow", "ID группы"))
         self.searchByEmailOrNameLabel_4.setText(_translate("MainWindow", "Название группы"))
+        self.eqRefreshGroupButton.setText(_translate("MainWindow", "Вернуть полный список групп"))
+        self.eqGrToSelected.setText(_translate("MainWindow", "<=="))
+        self.eqRefreshGroupButton_2.setText(_translate("MainWindow", "Поиск групп"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Добавление инвентаря"))
         self.nameOrEmailLabel_3.setText(_translate("MainWindow", "Email"))
         self.label_9.setText(_translate("MainWindow", "ID карты сотрудника"))
@@ -968,11 +1156,20 @@ class MainWindow(QMainWindow):
         self.searchByEmailOrNameLabel_3.setText(_translate("MainWindow", "Название группы"))
         self.eqsearchByIdLabel_4.setText(_translate("MainWindow", "ID группы"))
         self.usSearchGroupButton.setText(_translate("MainWindow", "Поиск группы"))
+        self.usRefreshGroupButton.setText(_translate("MainWindow", "Вернуть полный список групп"))
+        self.usDelFromSelectedGr.setText(_translate("MainWindow", "==>"))
+        self.usGrToSelected.setText(_translate("MainWindow", "<=="))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2),
                                   _translate("MainWindow", "Добавление пользователей"))
+        self.nameOrEmailLabel_8.setText(_translate("MainWindow", "Название"))
+        self.label_35.setText(_translate("MainWindow", "Номер группы"))
+        self.grAddPushButton.setText(_translate("MainWindow", "Добавить"))
+        self.grSearchPushButton.setText(_translate("MainWindow", "Найти"))
+        self.listLabel_13.setText(_translate("MainWindow", "Все группы"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_16), _translate("MainWindow", "Добавление групп"))
         self.eqsearchByIdLabel.setText(_translate("MainWindow", "ID"))
         self.searchByEmailOrNameLabel.setText(_translate("MainWindow", "Название"))
-        self.listLabel.setText(_translate("MainWindow", "Все элементы"))
+        self.listLabel.setText(_translate("MainWindow", "Все/найденные элементы оборудования в базе"))
         self.searchByPosGroupBox.setTitle(_translate("MainWindow", "Поиск по расположению в шкафу"))
         self.label_36.setText(_translate("MainWindow", "Высота(от пола)"))
         self.label_37.setText(_translate("MainWindow", "Номер от левого края"))
@@ -990,7 +1187,6 @@ class MainWindow(QMainWindow):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Просмотр инвентаря"))
         self.searchByIdLabel_2.setText(_translate("MainWindow", "ID карты пропуска"))
         self.searchByEmailOrNameLabel_2.setText(_translate("MainWindow", "Email"))
-        self.listLabel_2.setText(_translate("MainWindow", "Все элементы"))
         self.ussearchByFirstRightsCheckBox.setText(_translate("MainWindow", "Обычный пользователь"))
         self.ussearchBySecondRightsCheckBox.setText(_translate("MainWindow", "Редактор-модератор"))
         self.ussearchByThirdRightsCheckBox.setText(_translate("MainWindow", "Инженер"))
@@ -1005,6 +1201,7 @@ class MainWindow(QMainWindow):
         self.eqsearchByIdLabel_11.setText(_translate("MainWindow", "ID группы"))
         self.label_43.setText(_translate("MainWindow", "количество дней"))
         self.eqCreateStatsPushButton_2.setText(_translate("MainWindow", "Выгрузить статистику в файл"))
+        self.listLabel_2.setText(_translate("MainWindow", "Все/найденные элементы оборудования в базе"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4),
                                   _translate("MainWindow", "Просмотр пользователей"))
         self.AcceptReqPushButton.setText(_translate("MainWindow", "Одобрить запрос"))
@@ -1311,12 +1508,13 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__usTableContents))])
         model = TableModel(data_frame)
         self.usTableView.setModel(model)
-
+        self.usGroupsTableView.hide()
+        self.listLabel_4.hide()
     def search_users(self):
-        tg = 0
         found = []
         found2 = []
         found3 = []
+        found4 = []
         foundres = []
         if self.ussearchByNameOrEmailLineEdit.text() != "":
             id = self.ussearchByNameOrEmailLineEdit.text()
@@ -1328,18 +1526,12 @@ class MainWindow(QMainWindow):
             for i in self.__usTableContents:
                 if i[1] == self.ussearchByEmailOrNameLineEdit.text():
                     found2.append(i)
-        if self.ussearchByFirstRightsCheckBox.isChecked():
-            tg += 1
-        if self.ussearchBySecondRightsCheckBox.isChecked():
-            tg += 10
-        if self.ussearchByThirdRightsCheckBox.isChecked():
-            tg += 100
-        if self.ussearchByFourthRightsCheckBox.isChecked():
-            tg += 1000
-        if tg != 0:
-            for i in self.__usTableContents:
-                if i[2] == tg:
-                    found3.append(i)
+        if self.ussearchByGroupIdSpinBox.value()!=0:
+            for i in self.__user_list.get_user_by_group(int(self.ussearchByGroupIdSpinBox.value())):
+                found4.append([
+                    str(hex(i.pass_number)),
+                    i.mail,
+                ])
         if len(found) != 0:
             foundres = found
             if len(found2) != 0:
@@ -1352,17 +1544,23 @@ class MainWindow(QMainWindow):
                 foundres = [x for x in foundres if x in found3]
         if len(found3) != 0 and len(found2) == 0 and len(found) == 0:
             foundres = found3
+            if len(found3) != 0:
+                foundres = [x for x in foundres if x in found4]
+        if len(found4) != 0 and len(found3) == 0 and len(found2) == 0 and len(found) == 0:
+            foundres = found4
         if len(foundres) != 0:
             self.usTableView.clearSpans()
             self.__usFoundTableContents = foundres
             self.__usnum = 0
-            data_frame = pd.DataFrame(foundres, columns=["ID карты", "Почта", "Доступ"],
+            data_frame = pd.DataFrame(foundres, columns=["ID карты", "Почта"],
                                       index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
             self.usTableView.setModel(model)
             self.setUsInfo()
             if self.__admin_access.can_change_users:
                 self.uschangerGroupBox.show()
+                self.usGroupsTableView.show()
+                self.listLabel_4.show()
         else:
             show_message("Проблема", "Ничего не найдено")
 
@@ -1370,28 +1568,11 @@ class MainWindow(QMainWindow):
         self.usTableView.selectRow(self.__usnum)
         self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
         self.ussearchByEmailOrNameLineEdit.setText(self.__usFoundTableContents[self.__usnum][1])
-        if len(str(self.__usFoundTableContents[self.__usnum][2])) == 1:
-            self.__usFoundTableContents[self.__usnum][2] = '000' + str(self.__usFoundTableContents[self.__usnum][2])
-        elif len(str(self.__usFoundTableContents[self.__usnum][2])) == 2:
-            self.__usFoundTableContents[self.__usnum][2] = '00' + str(self.__usFoundTableContents[self.__usnum][2])
-        elif len(str(self.__usFoundTableContents[self.__usnum][2])) == 3:
-            self.__usFoundTableContents[self.__usnum][2] = '0' + str(self.__usFoundTableContents[self.__usnum][2])
-        if str(self.__usFoundTableContents[self.__usnum][2])[3] == '1':
-            self.ussearchByFirstRightsCheckBox.setChecked(True)
-        else:
-            self.ussearchByFirstRightsCheckBox.setChecked(False)
-        if str(self.__usFoundTableContents[self.__usnum][2])[2] == '1':
-            self.ussearchBySecondRightsCheckBox.setChecked(True)
-        else:
-            self.ussearchBySecondRightsCheckBox.setChecked(False)
-        if str(self.__usFoundTableContents[self.__usnum][2])[1] == '1':
-            self.ussearchByThirdRightsCheckBox.setChecked(True)
-        else:
-            self.ussearchByThirdRightsCheckBox.setChecked(False)
-        if str(self.__usFoundTableContents[self.__usnum][2])[0] == '1':
-            self.ussearchByFourthRightsCheckBox.setChecked(True)
-        else:
-            self.ussearchByFourthRightsCheckBox.setChecked(False)
+        self.__usFoundGroups=self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups
+        data_frame = pd.DataFrame(self.__usFoundGroups, columns=["Номер группы"],
+                                  index=[i for i in range(len(self.__usFoundGroups))])
+        model = TableModel(data_frame)
+        self.usGroupsTableView.setModel(model)
 
     def previousUs(self):
         if self.__usnum > 0:
@@ -1468,16 +1649,6 @@ class MainWindow(QMainWindow):
                 foundres = [x for x in foundres if x in found6]
             if len(found7) != 0:
                 foundres = [x for x in foundres if x in found7]
-       # if len(found3) != 0 and len(found2) == 0 and len(found) == 0:
-           # foundres = found3
-            #if len(found4) != 0:
-            #    foundres = [x for x in foundres if x in found4]
-           # if len(found5) != 0:
-           #     foundres = [x for x in foundres if x in found5]
-           # if len(found6) != 0:
-           #     foundres = [x for x in foundres if x in found6]
-           # if len(found7) != 0:
-            #    foundres = [x for x in foundres if x in found7]
         if len(found4) != 0:
             foundres = found4
             if len(found5) != 0:
@@ -1519,7 +1690,6 @@ class MainWindow(QMainWindow):
             show_message("Проблема", "Ничего не найдено")
 
     def setEqInfo(self):
-        print(self.__eqnum)
         self.eqTableView.selectRow(self.__eqnum)
         self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
         self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[self.__eqnum][1])
