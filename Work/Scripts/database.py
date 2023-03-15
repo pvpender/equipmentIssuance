@@ -282,7 +282,7 @@ class DataBase:
 
     def change_user(self, login: str, password: str):
         self.__engine.dispose()
-        self.__engine = create_engine(f"mysql+pymysql://{login}:{password}@194.67.206.233:3306/test_base")
+        self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
         self.__session.close()
         self.__session = Session(self.__engine)
 
