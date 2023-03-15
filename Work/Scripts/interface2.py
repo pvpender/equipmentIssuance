@@ -116,6 +116,9 @@ class MainWindow(QMainWindow):
         self.__eqFoundTableContents = []
         self.__usFoundGroups=[]
         self.__eqFoundGroups=[]
+        self.__grTableContents=[]
+        self.__addUsTableContents=[]
+        self.__addEqTableContents=[]
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
@@ -530,9 +533,6 @@ class MainWindow(QMainWindow):
                                            " transition: 0.9s; \n"
                                            "}")
         self.grAddPushButton.setObjectName("grAddPushButton")
-        self.grAddSpinBox = QtWidgets.QSpinBox(parent=self.tab_16)
-        self.grAddSpinBox.setGeometry(QtCore.QRect(150, 60, 271, 22))
-        self.grAddSpinBox.setObjectName("grAddSpinBox")
         self.grTableView = QtWidgets.QTableView(parent=self.tab_16)
         self.grTableView.setGeometry(QtCore.QRect(440, 40, 661, 661))
         self.grTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
@@ -1271,12 +1271,47 @@ class MainWindow(QMainWindow):
             self.tab_2.hide()
         if not admin_access.can_add_inventory:
             self.tab.hide()
+        self.grAddPushButton.clicked.connect(self.add_group)
         self.adminRightsGroupBox_2.hide()
+        self.refresh_gr_view_table()
         self.refresh_requests_table()
         self.refresh_equipment_table()
         self.refresh_users_table()
         self.show()
-
+    def add_group(self):
+        code_error = -1
+        if self.grAddSpinBox.value()==0:
+            code_error = 1
+        elif self.grAddLineEdit.text()=='':
+            code_error = 2
+        elif self.__db.get_group_by_name(self.grAddLineEdit.text())!=None:
+            code_error =4
+        if code_error == -1:
+            self.__db.add_group(self.grAddLineEdit.text())
+            self.refresh_gr_view_table()
+        elif code_error == 2:
+            show_message("Ошибка добавления", "Введите название группы")
+        elif code_error == 1:
+            show_message("Ошибка добавления", "Введите номер группы")
+        elif code_error == 3:
+            show_message("Ошибка добавления", "Группа с таким номером уже есть в базе")
+        elif code_error == 4:
+            show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
+    def refresh_gr_view_table(self):
+        self.grTableView.clearSpans()
+        self.eqAddAllGrTableView.clearSpans()
+        self.usAddAllGrTableView.clearSpans()
+        for i in self.__db.get_all_groups():
+            self.__grTableContents.append([
+                str(i.id),
+                str(i.group_name)])
+        data_frame = pd.DataFrame(self.__grTableContents,
+                                  columns=["ID", "Название"],
+                                  index=[i for i in range(len(self.__grTableContents))])
+        model = TableModel(data_frame)
+        self.grTableView.setModel(model)
+        self.eqAddAllGrTableView.setModel(model)
+        self.usAddAllGrTableView.setModel(model)
     def add_equipment(self):
         code_error = -1
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
