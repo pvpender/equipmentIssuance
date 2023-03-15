@@ -116,6 +116,9 @@ class MainWindow(QMainWindow):
         self.__eqFoundTableContents = []
         self.__usFoundGroups=[]
         self.__eqFoundGroups=[]
+        self.__grTableContents=[]
+        self.__addUsTableContents=[]
+        self.__addEqTableContents=[]
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
@@ -530,9 +533,6 @@ class MainWindow(QMainWindow):
                                            " transition: 0.9s; \n"
                                            "}")
         self.grAddPushButton.setObjectName("grAddPushButton")
-        self.grAddSpinBox = QtWidgets.QSpinBox(parent=self.tab_16)
-        self.grAddSpinBox.setGeometry(QtCore.QRect(150, 60, 271, 22))
-        self.grAddSpinBox.setObjectName("grAddSpinBox")
         self.grTableView = QtWidgets.QTableView(parent=self.tab_16)
         self.grTableView.setGeometry(QtCore.QRect(440, 40, 661, 661))
         self.grTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
@@ -1245,6 +1245,12 @@ class MainWindow(QMainWindow):
         # self.uscommitchangesPushButton.doubleClicked.connect(self.testForDCButton)
         self.uscommitchangesPushButton.clicked.connect(self.changeUs)
         self.eqcommitchangesPushButton.clicked.connect(self.changeEq)
+        self.eqGrToSelected.clicked.connect(self.selected_to_eq_groups)
+        self.usGrToSelected.clicked.connect(self.selected_to_us_groups)
+        self.usDelFromSelectedGr.clicked.connect(self.del_from_us_selected_groups)
+        self.eqDelFromSelectedGr.clicked.connect(self.del_from_eq_selected_groups)
+        self.grAddPushButton.clicked.connect(self.add_group)
+        self.grSearchPushButton.clicked.connect(self.search_gr)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.heightSpinBox.setValue(-1)
@@ -1272,11 +1278,89 @@ class MainWindow(QMainWindow):
         if not admin_access.can_add_inventory:
             self.tab.hide()
         self.adminRightsGroupBox_2.hide()
+        self.refresh_gr_view_table()
         self.refresh_requests_table()
         self.refresh_equipment_table()
         self.refresh_users_table()
         self.show()
-
+    def add_group(self):
+        code_error = -1
+        if self.grAddSpinBox.value()==0:
+            code_error = 1
+        elif self.grAddLineEdit.text()=='':
+            code_error = 2
+        elif self.__db.get_group_by_name(self.grAddLineEdit.text())!=None:
+            code_error =4
+        if code_error == -1:
+            self.__db.add_group(self.grAddLineEdit.text())
+            self.refresh_gr_view_table()
+        elif code_error == 2:
+            show_message("Ошибка добавления", "Введите название группы")
+        elif code_error == 1:
+            show_message("Ошибка добавления", "Введите номер группы")
+        elif code_error == 3:
+            show_message("Ошибка добавления", "Группа с таким номером уже есть в базе")
+        elif code_error == 4:
+            show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
+    def search_gr(self):
+        indexes = self.grTableView.selectionModel().selectedRows()
+        for i in indexes:
+            print(i.row())
+    def refresh_gr_view_table(self):
+        self.grTableView.clearSpans()
+        self.eqAddAllGrTableView.clearSpans()
+        self.usAddAllGrTableView.clearSpans()
+        for i in self.__db.get_all_groups():
+            self.__grTableContents.append([
+                str(i.id),
+                str(i.group_name)])
+        data_frame = pd.DataFrame(self.__grTableContents,
+                                  columns=["ID", "Название"],
+                                  index=[i for i in range(len(self.__grTableContents))])
+        model = TableModel(data_frame)
+        self.grTableView.setModel(model)
+        self.eqAddAllGrTableView.setModel(model)
+        self.usAddAllGrTableView.setModel(model)
+    def selected_to_us_groups(self):
+        indexes = self.usAddAllGrTableView.selectionModel().selectedRows()
+        if len(indexes)>0:
+            for i in indexes:
+                if self.__grTableContents[i.row()] not in self.__addUsTableContents:
+                    self.__addUsTableContents.append(self.__grTableContents[i.row()])
+            self.refresh_selected_us_groups()
+    def selected_to_eq_groups(self):
+        indexes = self.eqAddAllGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                if self.__grTableContents[i.row()] not in self.__addEqTableContents:
+                    self.__addEqTableContents.append(self.__grTableContents[i.row()])
+            self.refresh_selected_eq_groups()
+    def del_from_eq_selected_groups(self):
+        indexes = self.eqAddSelectedGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                self.__addEqTableContents.pop(i.row())
+            self.refresh_selected_eq_groups()
+    def del_from_us_selected_groups(self):
+        indexes = self.usAddSelectedGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                self.__addUsTableContents.pop(i.row())
+            self.refresh_selected_us_groups()
+    def refresh_selected_us_groups(self):
+        self.usAddSelectedGrTableView.clearSpans()
+        data_frame = pd.DataFrame(self.__addUsTableContents,
+                                  columns=["ID", "Название"],
+                                  index=[i for i in range(len(self.__addUsTableContents))])
+        model = TableModel(data_frame)
+        self.usAddSelectedGrTableView.setModel(model)
+    def refresh_selected_eq_groups(self):
+        self.eqAddSelectedGrTableView.clearSpans()
+        data_frame = pd.DataFrame(self.__addEqTableContents,
+                                  columns=["ID", "Название"],
+                                  index=[i for i in range(len(self.__addEqTableContents))])
+        model = TableModel(data_frame)
+        self.eqAddSelectedGrTableView.setModel(model)
     def add_equipment(self):
         code_error = -1
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
