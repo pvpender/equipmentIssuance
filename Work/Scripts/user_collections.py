@@ -33,8 +33,11 @@ class UserCollection:
         try:
             if isinstance(user, CommonUser):
                 self.__db.add_user(user)
+                base_id = self.__db.get_user_by_mail(user.mail).id
             else:
                 self.__db.add_admin(user)
+                base_id = self.__db.get_admin_by_mail(user.mail).id
+            user.base_id = base_id
             self.__objects.update({user.pass_number: user})
             self.__count += 1
         except ValueError:
