@@ -1309,7 +1309,7 @@ class MainWindow(QMainWindow):
         self.usDelFromSelectedGr.clicked.connect(self.del_from_us_selected_groups)
         self.eqDelFromSelectedGr.clicked.connect(self.del_from_eq_selected_groups)
         self.grAddPushButton.clicked.connect(self.add_group)
-        #self.grSearchPushButton.clicked.connect(self.search_gr)
+       # self.grSearchPushButton.clicked.connect(self.search_gr)
         self.eqSearchGrToSelected.clicked.connect(self.selected_to_eq_search_groups)
         self.usSearchGrToSelected.clicked.connect(self.selected_to_us_search_groups)
         self.eqSearchDelFromSelectedGr.clicked.connect(self.del_from_eq_search_selected_groups)
@@ -1602,6 +1602,9 @@ class MainWindow(QMainWindow):
             user_to_change = self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16))
             user_to_change.id = int(self.ussearchByNameOrEmailLineEdit.text(), 16)
             user_to_change.mail = self.ussearchByEmailOrNameLineEdit.text()
+            user_to_change.access.groups.clear()
+            for i in self.__currUsGroupsTableContents:
+                    user_to_change.access.groups.append(self.__db.get_group_by_name(i).id)
             self.__user_list.change_user(int(self.__usFoundTableContents[self.__usnum][0], 16),
                                          self.__usFoundTableContents[self.__usnum][1],
                                          user_to_change)
@@ -1619,7 +1622,7 @@ class MainWindow(QMainWindow):
         if code_error == -1 and (self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()).id != int(self.__eqFoundTableContents[self.__eqnum][0]):
             code_error = 7
         if code_error == -1:
-            eq_to_change = self.__db.get_equipment_by_id(int(self.__eqFoundTableContents[self.__eqnum][0]))
+            eq_to_change = self.__equipment_list.get_equipment_by_id(int(self.__eqFoundTableContents[self.__eqnum][0]))
             eq_to_change.title = self.eqsearchByEmailOrNameLineEdit.text()
             #eq_to_change.access = tg
             if self.eqsearchByNumberSpinBox.value()>-1:
@@ -1630,8 +1633,10 @@ class MainWindow(QMainWindow):
                 eq_to_change.count = self.reqsearchByCount.value()
             else:
                 eq_to_change.reserve_count = 0
-
-            self.__db.update_equipment(int(self.__eqFoundTableContents[self.__eqnum][0]),eq_to_change)
+            eq_to_change.groups.clear()
+            for i in self.__currEqGroupsTableContents:
+                eq_to_change.groups.append(self.__db.get_group_by_name(i).id)
+            self.__equipment_list.change_equipment(eq_to_change)
         else:
             if code_error == 1:
                 show_message("Ошибка изменения", "Введите название")
@@ -1769,9 +1774,12 @@ class MainWindow(QMainWindow):
         self.usTableView.selectRow(self.__usnum)
         self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
         self.ussearchByEmailOrNameLineEdit.setText(self.__usFoundTableContents[self.__usnum][1])
+        self.__currUsGroupsTableContents.clear()
         self.__usFoundGroups=self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups
-        data_frame = pd.DataFrame(self.__usFoundGroups, columns=["Номер группы"],
-                                  index=[i for i in range(len(self.__usFoundGroups))])
+        for i in self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups:
+            self.__currUsGroupsTableContents.append(self.__db.get_group_by_id(i).group_name)
+        data_frame = pd.DataFrame(self.__currUsGroupsTableContents, columns=["Номер группы"],
+                                  index=[i for i in range(len(self.__currUsGroupsTableContents))])
         model = TableModel(data_frame)
         self.usGroupsTableView.setModel(model)
     def previousUs(self):
@@ -1903,10 +1911,18 @@ class MainWindow(QMainWindow):
             self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
         else:
             self.searchByPosFromLeftSpinBox.setValue(-1)
-        # if self.__eqFoundTableContents[self.__eqnum][2] != '-1' and self.__eqFoundTableContents[self.__eqnum][2] != '0':
         self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
-        # if self.__eqFoundTableContents[self.__eqnum][3] != '-1' and self.__eqFoundTableContents[self.__eqnum][3] != '0':
         self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][3]))
+        self.__eqFoundGroups = self.__equipment_list.get_equipment_by_id(
+            int(self.__eqFoundTableContents[self.__usnum][0])).groups
+        self.__currEqGroupsTableContents.clear()
+        for i in self.__eqFoundGroups:
+            self.__currEqGroupsTableContents.append(self.__db.get_group_by_id(i).group_name)
+        data_frame = pd.DataFrame(self.__currEqGroupsTableContents, columns=["Номер группы"],
+                                  index=[i for i in range(len(self.__currEqGroupsTableContents))])
+        print(self.__currEqGroupsTableContents)
+        model = TableModel(data_frame)
+        self.eqGroupsTableView.setModel(model)
     def previousEq(self):
         if self.__eqnum > 0:
             self.__eqnum = self.__eqnum - 1
