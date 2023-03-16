@@ -128,6 +128,7 @@ class MainWindow(QMainWindow):
         self.__currEqGroupsTableContents=[]
         self.__addUsTableContents=[]
         self.__addEqTableContents=[]
+        self.__allGroups={}
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_requests()
         self.__reqnum = 0
@@ -1350,22 +1351,140 @@ class MainWindow(QMainWindow):
         self.eqSearchDelFromSelectedGr.hide()
         self.usSearchDelFromSelectedGr.hide()
         self.show()
-    def add_group(self):
-        code_error = -1
-        if self.grAddLineEdit.text()=='':
-            code_error = 2
-        elif self.__db.get_group_by_name(self.grAddLineEdit.text())!=None:
-            code_error =4
-        if code_error == -1:
-            self.__db.add_group(self.grAddLineEdit.text())
-            self.refresh_gr_view_table()
-        elif code_error == 2:
-            show_message("Ошибка добавления", "Введите название группы")
-        elif code_error == 4:
-            show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
-   # def search_gr(self):
-        #indexes = self.grTableView.selectionModel().selectedRows()
-        #for i in indexes:
+    def selected_to_us_groups(self):
+        indexes = self.usAddAllGrTableView.selectionModel().selectedRows()
+        if len(indexes)>0:
+            for i in indexes:
+                if i.data(0) not in self.__addUsTableContents:
+                   self.__addUsTableContents.append(i.data(0))
+            self.refresh_selected_us_groups()
+            self.usDelFromSelectedGr.show()
+    def selected_to_eq_search_groups(self):
+        indexes = self.eqSearchAllGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                if i.data(0) not in self.__currEqGroupsTableContents:
+                    self.__currEqGroupsTableContents.append(i.data(0))
+            self.refresh_selected_eq_search_groups()
+            self.eqSearchDelFromSelectedGr.show()
+    def selected_to_us_search_groups(self):
+        indexes = self.usSearchAllGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                if i.data(0) not in self.__currUsGroupsTableContents:
+                    self.__currUsGroupsTableContents.append(i.data(0))
+                    print(self.__currUsGroupsTableContents)
+            self.refresh_selected_us_search_groups()
+            self.usSearchDelFromSelectedGr.show()
+    def selected_to_eq_groups(self):
+        indexes = self.eqAddAllGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in indexes:
+                if i.data(0) not in self.__addEqTableContents:
+                    self.__addEqTableContents.append(i.data(0))
+            self.refresh_selected_eq_groups()
+            self.eqDelFromSelectedGr.show()
+    def del_from_eq_search_selected_groups(self):
+        indexes = self.eqGroupsTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in reversed(indexes):
+                self.__currEqGroupsTableContents.remove(i.data(0))
+        self.refresh_selected_eq_search_groups()
+        if len(self.__currEqGroupsTableContents) == 0:
+            self.eqSearchDelFromSelectedGr.hide()
+    def del_from_us_search_selected_groups(self):
+        indexes = self.usGroupsTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in reversed(indexes):
+                self.__currUsGroupsTableContents.remove(i.data(0))
+        self.refresh_selected_us_search_groups()
+        if len(self.__currUsGroupsTableContents)==0:
+            self.usSearchDelFromSelectedGr.hide()
+    def del_from_eq_selected_groups(self):
+        indexes = self.eqAddSelectedGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in reversed(indexes):
+                self.__addEqTableContents.remove(i.data(0))
+        self.refresh_selected_eq_groups()
+        if len(self.__addEqTableContents) == 0:
+            self.eqDelFromSelectedGr.hide()
+    def del_from_us_selected_groups(self):
+        indexes = self.usAddSelectedGrTableView.selectionModel().selectedRows()
+        if len(indexes) > 0:
+            for i in reversed(indexes):
+                self.__addUsTableContents.remove(i.data(0))
+        self.refresh_selected_us_groups()
+        if len(self.__addUsTableContents)==0:
+            self.usDelFromSelectedGr.hide()
+    def refresh_equipment_table(self):
+        self.eqchangerGroupBox.hide()
+        self.__eqFoundTableContents = []
+        self.eqsearchByIdSpinBox.setValue(-1)
+        self.searchByHeightSpinBox.setValue(-1)
+        self.eqTableView.clearSpans()
+        self.__eqTableContents.clear()
+        all_eq = self.__db.get_all_equipment()
+        for i in all_eq:
+            x = ""
+            y = ""
+            if i.x == -1:
+                x = "--"
+            else:
+                x = str(i.x)
+            if i.y == -1:
+                y = "--"
+            else:
+                y = str(i.y)
+            self.__eqTableContents.append([
+                str(i.id),
+                str(i.title),
+                str(i.count),
+                str(i.reserve_count),
+                x,
+                y])
+        data_frame = pd.DataFrame(self.__eqTableContents,
+                                  columns=["ID", "Название", "Количество", "Зарезервировано", "От стены", "От пола"],
+                                  index=[i for i in range(len(self.__eqTableContents))])
+        model = TableModel(data_frame)
+        self.eqTableView.setModel(model)
+        self.eqsearchByIdSpinBox.setValue(-1)
+        self.eqsearchByEmailOrNameLineEdit.setText('')
+        self.searchByHeightSpinBox.setValue(-1)
+        self.searchByPosFromLeftSpinBox.setValue(-1)
+        self.eqsearchByReservedSpinBox.setValue(-1)
+        self.eqsearchByNumberSpinBox.setValue(-1)
+        self.eqSearchAllGrTableView.hide()
+        self.eqGroupsTableView.hide()
+        self.eqSearchGrToSelected.hide()
+        self.eqSearchDelFromSelectedGr.hide()
+        self.listLabel_3.hide()
+        self.listLabel_20.hide()
+        self.eqTableView.setGeometry(QtCore.QRect(420, 40, 1201, 721))
+    def refresh_users_table(self):
+        self.uschangerGroupBox.hide()
+        self.__usFoundTableContents = []
+        self.usTableView.clearSpans()
+        ref = AdminAccess
+        self.__usTableContents.clear()
+        for i in self.__user_list.get_user_list():
+            self.__usTableContents.append([
+                str(hex(i.pass_number)),
+                i.mail,
+            ])
+        data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта"],
+                                  index=[i for i in range(len(self.__usTableContents))])
+        model = TableModel(data_frame)
+        self.usTableView.setModel(model)
+        self.usGroupsTableView.hide()
+        self.listLabel_4.hide()
+        self.usSearchAllGrTableView.hide()
+        self.usSearchGrToSelected.hide()
+        self.usSearchDelFromSelectedGr.hide()
+        self.listLabel_2.hide()
+        self.usTableView.setGeometry(QtCore.QRect(470, 30, 1101, 721))
+        self.ussearchByGroupIdSpinBox.setValue(-1)
+        self.ussearchByNameOrEmailLineEdit.setText("")
+        self.ussearchByEmailOrNameLineEdit.setText("")
     def refresh_gr_view_table(self):
         self.grTableView.clearSpans()
         self.eqAddAllGrTableView.clearSpans()
@@ -1375,11 +1494,10 @@ class MainWindow(QMainWindow):
         self.usSearchAllGrTableView.clearSpans()
         self.eqSearchAllGrTableView.clearSpans()
         for i in self.__db.get_all_groups():
-            self.__grTableContents.append(
-                str(i.group_name))
-        data_frame = pd.DataFrame(self.__grTableContents,
+            self.__allGroups[i.group_name]=i.id
+        data_frame = pd.DataFrame(self.__allGroups.keys(),
                                   columns=["Название группы"],
-                                  index=[i for i in range(len(self.__grTableContents))])
+                                  index=[i for i in range(len(self.__allGroups.keys()))])
         model = TableModel(data_frame)
         self.grTableView.setModel(model)
         self.eqAddAllGrTableView.setModel(model)
@@ -1388,71 +1506,7 @@ class MainWindow(QMainWindow):
         self.usAddAllGrTableView.setModel(model)
         self.usSearchAllGrTableView.setModel(model)
         self.eqSearchAllGrTableView.setModel(model)
-    def selected_to_us_groups(self):
-        indexes = self.usAddAllGrTableView.selectionModel().selectedRows()
-        if len(indexes)>0:
-            for i in indexes:
-                if self.__grTableContents[i.row()] not in self.__addUsTableContents:
-                    self.__addUsTableContents.append(self.__grTableContents[i.row()])
-            self.refresh_selected_us_groups()
-            self.usDelFromSelectedGr.show()
-    def selected_to_eq_search_groups(self):
-        indexes = self.eqSearchAllGrTableView.selectionModel().selectedRows()
-        if len(indexes) > 0:
-            for i in indexes:
-                if self.__grTableContents[i.row()] not in self.__currEqGroupsTableContents:
-                    self.__currEqGroupsTableContents.append(self.__grTableContents[i.row()])
-            self.refresh_selected_eq_search_groups()
-            self.eqSearchDelFromSelectedGr.show()
-    def selected_to_us_search_groups(self):
-        indexes = self.usSearchAllGrTableView.selectionModel().selectedRows()
-        if len(indexes) > 0:
-            for i in indexes:
-                if self.__grTableContents[i.row()] not in self.__currUsGroupsTableContents:
-                    self.__currUsGroupsTableContents.append(self.__grTableContents[i.row()])
-                    print(self.__currUsGroupsTableContents)
-            self.refresh_selected_us_search_groups()
-            self.usSearchDelFromSelectedGr.show()
-    def selected_to_eq_groups(self):
-        indexes = self.eqAddAllGrTableView.selectionModel().selectedRows()
-        if len(indexes) > 0:
-            for i in indexes:
-                if self.__grTableContents[i.row()] not in self.__addEqTableContents:
-                    self.__addEqTableContents.append(self.__grTableContents[i.row()])
-            self.refresh_selected_eq_groups()
-            self.eqDelFromSelectedGr.show()
-    def del_from_eq_search_selected_groups(self):
-        indexes = self.eqGroupsTableView.selectionModel().selectedRows()
-        if len(indexes) > 0:
-            for i in indexes:
-                self.__currEqGroupsTableContents.pop(i.row())
-            self.refresh_selected_eq_search_groups()
-        if len(self.__currEqGroupsTableContents)==0:
-            self.eqSearchDelFromSelectedGr.hide()###
-    def del_from_us_search_selected_groups(self):
-        indexes = self.usGroupsTableView.selectionModel().selectedRows()
-        if len(indexes) > 0:
-            for i in indexes:
-                self.__currUsGroupsTableContents.pop(i.row())
-            self.refresh_selected_us_search_groups()
-        if len(self.__currUsGroupsTableContents)==0:
-            self.usSearchDelFromSelectedGr.hide()
-    def del_from_eq_selected_groups(self):
-        indexes = self.eqAddSelectedGrTableView.selectionModel().selectedRows()
-        if len(indexes) > 0:
-            for i in indexes:
-                self.__addEqTableContents.pop(i.row())
-            self.refresh_selected_eq_groups()
-        if len(self.__addEqTableContents)==0:
-            self.eqDelFromSelectedGr.hide()
-    def del_from_us_selected_groups(self):
-        indexes = self.usAddSelectedGrTableView.selectionModel().selectedRows()
-        if len(indexes) > 0:
-            for i in indexes:
-                self.__addUsTableContents.pop(i.row())
-            self.refresh_selected_us_groups()
-        if len(self.__addUsTableContents)==0:
-            self.usDelFromSelectedGr.hide()
+
     def refresh_selected_us_groups(self):
         self.usAddSelectedGrTableView.clearSpans()
         data_frame = pd.DataFrame(self.__addUsTableContents,
@@ -1481,6 +1535,32 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__currUsGroupsTableContents))])
         model = TableModel(data_frame)
         self.usGroupsTableView.setModel(model)
+    def refresh_requests_table(self):
+        # self.__reqs = self.__db.get_unsolved_requests()
+        self.tableView2.clearSpans()
+        self.__reqs = self.__db.get_all_requests()
+        if (len(self.__reqs)) == 0:
+            print("0 requests")
+        self.__reqnum = 0
+        self.__reqTableContents.clear()
+        for i in self.__reqs:
+            self.__reqTableContents.append([
+                str(i.id),
+                str(i.title),
+                str(i.count),
+                str(i.purpose),
+                str(hex(i.sender_tg_id)),
+                str(i.sender_mail)
+            ])
+        data_frame = pd.DataFrame(self.__reqTableContents,
+                                  columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
+                                  index=[i for i in range(len(self.__reqTableContents))]
+                                  )
+        model = TableModel(data_frame)
+        self.tableView2.setModel(model)
+        self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
+        self.get_request()
+
     def add_equipment(self):
         code_error = -1
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
@@ -1594,14 +1674,31 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "пользователь с такой картой уже добавлен")
             elif code_error == 8:
                 show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
+    def add_group(self):
+        code_error = -1
+        if self.grAddLineEdit.text() == '':
+            code_error = 2
+        elif self.__db.get_group_by_name(self.grAddLineEdit.text()) != None:
+            code_error = 4
+        if code_error == -1:
+            self.__db.add_group(self.grAddLineEdit.text())
+            self.refresh_gr_view_table()
+        elif code_error == 2:
+            show_message("Ошибка добавления", "Введите название группы")
+        elif code_error == 4:
+            show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
+
+    # def search_gr(self):
+    # indexes = self.grTableView.selectionModel().selectedRows()
+    # for i in indexes:
     def changeUs(self):
         code_error = -1
-        if code_error == -1 and (self.__db.get_user_by_id(
+        if (self.__db.get_user_by_id(
                 int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and \
                 self.__db.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).mail != self.__usFoundTableContents[self.__usnum][
             1]:
             code_error = 7
-        if code_error == -1 and (self.__db.get_user_by_mail(
+        elif(self.__db.get_user_by_mail(
                 self.ussearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_user_by_mail(
                 self.ussearchByEmailOrNameLineEdit.text()).id != int(self.__usFoundTableContents[self.__usnum][0],
                                                                        16):
@@ -1610,12 +1707,15 @@ class MainWindow(QMainWindow):
             user_to_change = self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16))
             user_to_change.id = int(self.ussearchByNameOrEmailLineEdit.text(), 16)
             user_to_change.mail = self.ussearchByEmailOrNameLineEdit.text()
-            user_to_change.access.groups.clear()
             for i in self.__currUsGroupsTableContents:
-                    user_to_change.access.groups.append(self.__db.get_group_by_name(i).id)
+                if self.__allGroups[i] not in user_to_change.access.groups:
+                    user_to_change.access.groups.append(self.__allGroups[i])
+            for i in user_to_change.access.groups:
+                if self.__db.get_group_by_id(i).group_name not in self.__currUsGroupsTableContents:
+                    user_to_change.access.groups.remove(i)
             self.__user_list.change_user(int(self.__usFoundTableContents[self.__usnum][0], 16),
-                                         self.__usFoundTableContents[self.__usnum][1],
-                                         user_to_change)
+                                             self.__usFoundTableContents[self.__usnum][1],
+                                             user_to_change)
         else:
             if code_error == 1:
                 show_message("Ошибка изменения", "Введите ID карты сотрудника")
@@ -1627,7 +1727,7 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка изменения", "Другой пользователь с таким email уже добавлен")
     def changeEq(self):
         code_error = -1
-        if code_error == -1 and (self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()).id != int(self.__eqFoundTableContents[self.__eqnum][0]):
+        if (self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()).id != int(self.__eqFoundTableContents[self.__eqnum][0]):
             code_error = 7
         if code_error == -1:
             eq_to_change = self.__equipment_list.get_equipment_by_id(int(self.__eqFoundTableContents[self.__eqnum][0]))
@@ -1641,10 +1741,13 @@ class MainWindow(QMainWindow):
                 eq_to_change.count = self.reqsearchByCount.value()
             else:
                 eq_to_change.reserve_count = 0
-            eq_to_change.groups.clear()
+            print(self.__allGroups)
             for i in self.__currEqGroupsTableContents:
-                eq_to_change.groups.append(self.__db.get_group_by_name(i).id)
-            self.__equipment_list.change_equipment(eq_to_change)
+                if self.__allGroups[i] not in eq_to_change.groups:
+                    eq_to_change.groups.append(self.__allGroups[i])
+            for i in eq_to_change.groups:
+                if self.__db.get_group_by_id(i).group_name not in self.__currEqGroupsTableContents:
+                    eq_to_change.groups.remove(i)
         else:
             if code_error == 1:
                 show_message("Ошибка изменения", "Введите название")
@@ -1652,75 +1755,45 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка изменения", "Не отмечены права для получения")
             elif code_error == 8:
                 show_message("Ошибка изменения", "Уже существует оборудование с таким названием")
-    def refresh_equipment_table(self):
-        self.eqchangerGroupBox.hide()
-        self.__eqFoundTableContents = []
-        self.eqsearchByIdSpinBox.setValue(-1)
-        self.searchByHeightSpinBox.setValue(-1)
-        self.eqTableView.clearSpans()
-        self.__eqTableContents.clear()
-        all_eq = self.__db.get_all_equipment()
-        for i in all_eq:
-            x = ""
-            y = ""
-            if i.x == -1:
-                x = "--"
-            else:
-                x = str(i.x)
-            if i.y == -1:
-                y = "--"
-            else:
-                y = str(i.y)
-            self.__eqTableContents.append([
-                str(i.id),
-                str(i.title),
-                str(i.count),
-                str(i.reserve_count),
-                x,
-                y])
-        data_frame = pd.DataFrame(self.__eqTableContents,
-                                  columns=["ID", "Название", "Количество", "Зарезервировано", "От стены", "От пола"],
-                                  index=[i for i in range(len(self.__eqTableContents))])
+    def setUsInfo(self):
+        self.usTableView.selectRow(self.__usnum)
+        self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
+        self.ussearchByEmailOrNameLineEdit.setText(self.__usFoundTableContents[self.__usnum][1])
+        self.__currUsGroupsTableContents.clear()
+        self.__usFoundGroups=self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups
+        for i in self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups:
+            self.__currUsGroupsTableContents.append(self.__db.get_group_by_id(i).group_name)
+        data_frame = pd.DataFrame(self.__currUsGroupsTableContents, columns=["Номер группы"],
+                                  index=[i for i in range(len(self.__currUsGroupsTableContents))])
         model = TableModel(data_frame)
-        self.eqTableView.setModel(model)
-        self.eqsearchByIdSpinBox.setValue(-1)
-        self.eqsearchByEmailOrNameLineEdit.setText('')
-        self.searchByHeightSpinBox.setValue(-1)
-        self.searchByPosFromLeftSpinBox.setValue(-1)
-        self.eqsearchByReservedSpinBox.setValue(-1)
-        self.eqsearchByNumberSpinBox.setValue(-1)
-        self.eqSearchAllGrTableView.hide()
-        self.eqGroupsTableView.hide()
-        self.eqSearchGrToSelected.hide()
-        self.eqSearchDelFromSelectedGr.hide()
-        self.listLabel_3.hide()
-        self.listLabel_20.hide()
-        self.eqTableView.setGeometry(QtCore.QRect(420, 40, 1201, 721))
-    def refresh_users_table(self):
-        self.uschangerGroupBox.hide()
-        self.__usFoundTableContents = []
-        self.usTableView.clearSpans()
-        ref = AdminAccess
-        self.__usTableContents.clear()
-        for i in self.__user_list.get_user_list():
-            self.__usTableContents.append([
-                str(hex(i.pass_number)),
-                i.mail,
-            ])
-        data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта"],
-                                  index=[i for i in range(len(self.__usTableContents))])
+        self.usGroupsTableView.setModel(model)
+        if len(self.__usFoundGroups)>0:
+            self.usSearchDelFromSelectedGr.show()
+    def setEqInfo(self):
+        self.eqTableView.selectRow(self.__eqnum)
+        self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
+        self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[self.__eqnum][1])
+        if self.__eqFoundTableContents[self.__eqnum][5] != '--':
+            self.searchByHeightSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][6]))
+        else:
+            self.searchByHeightSpinBox.setValue(-1)
+        if self.__eqFoundTableContents[self.__eqnum][4] != '--':
+            self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
+        else:
+            self.searchByPosFromLeftSpinBox.setValue(-1)
+        self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
+        self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][3]))
+        self.__eqFoundGroups = self.__equipment_list.get_equipment_by_id(
+            int(self.__eqFoundTableContents[self.__usnum][0])).groups
+        self.__currEqGroupsTableContents.clear()
+        for i in self.__eqFoundGroups:
+            self.__currEqGroupsTableContents.append(self.__db.get_group_by_id(i).group_name)
+        data_frame = pd.DataFrame(self.__currEqGroupsTableContents, columns=["Номер группы"],
+                                  index=[i for i in range(len(self.__currEqGroupsTableContents))])
         model = TableModel(data_frame)
-        self.usTableView.setModel(model)
-        self.usGroupsTableView.hide()
-        self.listLabel_4.hide()
-        self.usSearchAllGrTableView.hide()
-        self.usSearchGrToSelected.hide()
-        self.usSearchDelFromSelectedGr.hide()
-        self.listLabel_2.hide()
-        self.usTableView.setGeometry(QtCore.QRect(470, 30, 1101, 721))
-        self.ussearchByGroupIdSpinBox.setValue(-1)
-        self.ussearchByNameOrEmailLineEdit.setText("")
-        self.ussearchByEmailOrNameLineEdit.setText("")
+        self.eqGroupsTableView.setModel(model)
+        if len(self.__eqFoundGroups)>0:
+            self.eqSearchDelFromSelectedGr.show()
     def search_users(self):
         found = []
         found2 = []
@@ -1778,30 +1851,6 @@ class MainWindow(QMainWindow):
                 self.usSearchGrToSelected.show()
         else:
             show_message("Проблема", "Ничего не найдено")
-    def setUsInfo(self):
-        self.usTableView.selectRow(self.__usnum)
-        self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
-        self.ussearchByEmailOrNameLineEdit.setText(self.__usFoundTableContents[self.__usnum][1])
-        self.__currUsGroupsTableContents.clear()
-        self.__usFoundGroups=self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups
-        for i in self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups:
-            self.__currUsGroupsTableContents.append(self.__db.get_group_by_id(i).group_name)
-        data_frame = pd.DataFrame(self.__currUsGroupsTableContents, columns=["Номер группы"],
-                                  index=[i for i in range(len(self.__currUsGroupsTableContents))])
-        model = TableModel(data_frame)
-        self.usGroupsTableView.setModel(model)
-    def previousUs(self):
-        if self.__usnum > 0:
-            self.__usnum = self.__usnum - 1
-            self.setUsInfo()
-        else:
-            show_message("Ошибка", "Это первый элемент в списке")
-    def nextUs(self):
-        if self.__usnum < len(self.__usFoundTableContents) - 1:
-            self.__usnum = self.__usnum + 1
-            self.setUsInfo()
-        else:
-            show_message("Ошибка", "Элемент последний в списке")
     def searchEq(self):
         found = []
         found2 = []
@@ -1907,44 +1956,7 @@ class MainWindow(QMainWindow):
             self.listLabel_20.show()
         else:
             show_message("Проблема", "Ничего не найдено")
-    def setEqInfo(self):
-        self.eqTableView.selectRow(self.__eqnum)
-        self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
-        self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[self.__eqnum][1])
-        if self.__eqFoundTableContents[self.__eqnum][5] != '--':
-            self.searchByHeightSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][6]))
-        else:
-            self.searchByHeightSpinBox.setValue(-1)
-        if self.__eqFoundTableContents[self.__eqnum][4] != '--':
-            self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
-        else:
-            self.searchByPosFromLeftSpinBox.setValue(-1)
-        self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
-        self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][3]))
-        self.__eqFoundGroups = self.__equipment_list.get_equipment_by_id(
-            int(self.__eqFoundTableContents[self.__usnum][0])).groups
-        self.__currEqGroupsTableContents.clear()
-        for i in self.__eqFoundGroups:
-            self.__currEqGroupsTableContents.append(self.__db.get_group_by_id(i).group_name)
-        data_frame = pd.DataFrame(self.__currEqGroupsTableContents, columns=["Номер группы"],
-                                  index=[i for i in range(len(self.__currEqGroupsTableContents))])
-        print(self.__currEqGroupsTableContents)
-        model = TableModel(data_frame)
-        self.eqGroupsTableView.setModel(model)
-    def previousEq(self):
-        if self.__eqnum > 0:
-            self.__eqnum = self.__eqnum - 1
-            self.setEqInfo()
-        else:
-            show_message("Ошибка", "Это первый элемент в списке")
-    def nextEq(self):
-        if self.__eqnum < len(self.__eqFoundTableContents) - 1:
-            self.__eqnum = self.__eqnum + 1
-            self.setEqInfo()
-        else:
-            show_message("Ошибка", "Элемент последний в списке")
     def search_request(self):
-        tg = 0
         found = []
         found2 = []
         found3 = []
@@ -2027,31 +2039,31 @@ class MainWindow(QMainWindow):
             self.tableView2.setModel(model)
         else:
             show_message("Проблема", "Ничего не найдено")
-    def refresh_requests_table(self):
-        # self.__reqs = self.__db.get_unsolved_requests()
-        self.tableView2.clearSpans()
-        self.__reqs = self.__db.get_all_requests()
-        if (len(self.__reqs)) == 0:
-            print("0 requests")
-        self.__reqnum = 0
-        self.__reqTableContents.clear()
-        for i in self.__reqs:
-            self.__reqTableContents.append([
-                str(i.id),
-                str(i.title),
-                str(i.count),
-                str(i.purpose),
-                str(hex(i.sender_tg_id)),
-                str(i.sender_mail)
-            ])
-        data_frame = pd.DataFrame(self.__reqTableContents,
-                                  columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
-                                  index=[i for i in range(len(self.__reqTableContents))]
-                                  )
-        model = TableModel(data_frame)
-        self.tableView2.setModel(model)
-        self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
-        self.get_request()
+    def previousEq(self):
+        if self.__eqnum > 0:
+            self.__eqnum = self.__eqnum - 1
+            self.setEqInfo()
+        else:
+            show_message("Ошибка", "Это первый элемент в списке")
+
+    def nextEq(self):
+        if self.__eqnum < len(self.__eqFoundTableContents) - 1:
+            self.__eqnum = self.__eqnum + 1
+            self.setEqInfo()
+        else:
+            show_message("Ошибка", "Элемент последний в списке")
+    def previousUs(self):
+        if self.__usnum > 0:
+            self.__usnum = self.__usnum - 1
+            self.setUsInfo()
+        else:
+            show_message("Ошибка", "Это первый элемент в списке")
+    def nextUs(self):
+        if self.__usnum < len(self.__usFoundTableContents) - 1:
+            self.__usnum = self.__usnum + 1
+            self.setUsInfo()
+        else:
+            show_message("Ошибка", "Элемент последний в списке")
     def get_request(self):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
