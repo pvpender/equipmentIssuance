@@ -1580,7 +1580,7 @@ class MainWindow(QMainWindow):
         if code_error == -1:
             groups=[]
             for i in self.__addEqTableContents:
-                groups.append(self.__db.get_group_by_name(i).id)
+                groups.append(self.__allGroups[i])
             eq = Equipment(self.eqNameOrEmailLineEdit.text(),
                            self.descriptionTextEdit.toPlainText(),
                            self.ableNowSpinBox.value(), self.reservedSpinBox.value(), groups, height, from_left)
@@ -1593,6 +1593,8 @@ class MainWindow(QMainWindow):
             self.heightSpinBox.setValue(-1)
             self.posFromLeftSpinBox.setValue(-1)
             self.refresh_equipment_table()
+            self.eqAddSelectedGrTableView.clearSpans()
+            self.__addEqTableContents.clear()
         else:
             if code_error == 1:
                 show_message("Ошибка добавления", "Введите название")
@@ -1643,7 +1645,7 @@ class MainWindow(QMainWindow):
             if self.usradioButton_User.isChecked():
                 groups=[]
                 for i in self.__addUsTableContents:
-                    groups.append(self.__db.get_group_by_name(i).id)
+                    groups.append(self.__allGroups[i])
                 ac=Access(groups)
                 us = CommonUser(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), ac)
                 self.__user_list.append_user(us)
@@ -1657,6 +1659,8 @@ class MainWindow(QMainWindow):
             self.descriptionTextEdit.setText("")
             self.usIdCardLineEdit.setText("")
             self.refresh_users_table()
+            self.usAddSelectedGrTableView.clearSpans()
+            self.__addUsTableContents.clear()
         else:
             if code_error == 1:
                 show_message("Ошибка добавления", "Введите Email")
