@@ -37,6 +37,10 @@ class EquipmentCollection:
             if i.title == title:
                 return i
 
+    def get_equipment_by_coordinates(self, x: int, y: int):
+        mas = [i for i in self.__objects.values() if i.x == x and i.y == y]
+        return mas
+
     def get_equipment_list(self) -> list:
         return list(self.__objects.values())
 

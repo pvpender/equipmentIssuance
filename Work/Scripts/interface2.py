@@ -1401,7 +1401,7 @@ class MainWindow(QMainWindow):
         self.searchByHeightSpinBox.setValue(-1)
         self.eqTableView.clearSpans()
         self.__eqTableContents.clear()
-        all_eq = self.__db.get_all_equipment()
+        all_eq = self.__equipment_list.get_equipment_list()
         for i in all_eq:
             x = ""
             y = ""
@@ -1542,7 +1542,7 @@ class MainWindow(QMainWindow):
         code_error = -1
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
             code_error = 1
-        elif self.__db.get_equipment_by_title(self.eqNameOrEmailLineEdit.text()):
+        elif self.__equipment_list.get_equipment_by_title(self.eqNameOrEmailLineEdit.text()):
             code_error = 8
         if code_error == -1 and self.descriptionTextEdit.toPlainText() == "":
             code_error = 3
@@ -1552,7 +1552,7 @@ class MainWindow(QMainWindow):
         height = self.heightSpinBox.value()
         if self.heightSpinBox.value() == 0 or self.heightSpinBox.value() == -1:
             height = -1
-        if code_error == -1 and self.__db.get_equipment_by_coordinates(from_left, height) is not None:
+        if code_error == -1 and self.__equipment_list.get_equipment_by_coordinates(from_left, height) is not None:
             code_error = 9
         if code_error == -1:
             groups=[]
@@ -1614,9 +1614,9 @@ class MainWindow(QMainWindow):
             add_equipment = False
             change_equipment = False
             get_request = False
-        if code_error == -1 and self.__db.get_user_by_id(int(self.usIdCardLineEdit.text(), 16)) is not None:
+        if code_error == -1 and self.__user_list.get_user_by_id(int(self.usIdCardLineEdit.text(), 16)) is not None:
             code_error = 7
-        if code_error == -1 and self.__db.get_user_by_mail(self.usnameOrEmailLineEdit.text()) is not None:
+        if code_error == -1 and self.__user_list.get_user_by_mail(self.usnameOrEmailLineEdit.text()) is not None:
             code_error = 8
         if code_error == -1:
             if self.usradioButton_User.isChecked():
@@ -1674,14 +1674,14 @@ class MainWindow(QMainWindow):
     # for i in indexes:
     def changeUs(self):
         code_error = -1
-        if (self.__db.get_user_by_id(
+        if (self.__user_list.get_user_by_id(
                 int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and \
-                self.__db.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).mail != self.__usFoundTableContents[self.__usnum][
+                self.__user_list.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).mail != self.__usFoundTableContents[self.__usnum][
             1]:
             code_error = 7
-        elif(self.__db.get_user_by_mail(
-                self.ussearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_user_by_mail(
-                self.ussearchByEmailOrNameLineEdit.text()).id != int(self.__usFoundTableContents[self.__usnum][0],
+        elif(self.__user_list.get_user_by_mail(
+                self.ussearchByEmailOrNameLineEdit.text()) is not None) and self.__user_list.get_user_by_mail(
+                self.ussearchByEmailOrNameLineEdit.text()).pass_number != int(self.__usFoundTableContents[self.__usnum][0],
                                                                        16):
             code_error = 8
         if code_error == -1:
@@ -1708,7 +1708,7 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка изменения", "Другой пользователь с таким email уже добавлен")
     def changeEq(self):
         code_error = -1
-        if (self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()) is not None) and self.__db.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()).id != int(self.__eqFoundTableContents[self.__eqnum][0]):
+        if (self.__equipment_list.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()) is not None) and self.__equipment_list.get_equipment_by_title(self.eqsearchByEmailOrNameLineEdit.text()).id != int(self.__eqFoundTableContents[self.__eqnum][0]):
             code_error = 7
         if code_error == -1:
             eq_to_change = self.__equipment_list.get_equipment_by_id(int(self.__eqFoundTableContents[self.__eqnum][0]))
@@ -1728,6 +1728,7 @@ class MainWindow(QMainWindow):
             for i in eq_to_change.groups:
                 if self.__db.get_group_by_id(i).group_name not in self.__currEqGroupsTableContents:
                     eq_to_change.groups.remove(i)
+            self.__equipment_list.change_equipment(eq_to_change)
         else:
             if code_error == 1:
                 show_message("Ошибка изменения", "Введите название")
@@ -1843,13 +1844,15 @@ class MainWindow(QMainWindow):
         if self.eqsearchByIdSpinBox.value() != -1:
             id = self.eqsearchByIdSpinBox.value()
             for i in self.__eqTableContents:
-                if i[0] == str(self.eqsearchByIdSpinBox.value()):
+                if i[0] == str(id):
                     found.append(i)
+                    break
         if self.eqsearchByEmailOrNameLineEdit.text() != "":
             name = self.eqsearchByEmailOrNameLineEdit.text()
             for i in self.__eqTableContents:
-                if i[1] == self.eqsearchByEmailOrNameLineEdit.text():
+                if i[1] == name:
                     found2.append(i)
+                    break
         if self.eqsearchByGroupNameLineEdit.text()!='':
             for i in self.__equipment_list.get_equipment_by_group(self.__allGroups[self.eqsearchByGroupNameLineEdit.text()]):
                 x = ""
