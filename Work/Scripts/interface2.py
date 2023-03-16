@@ -1782,9 +1782,9 @@ class MainWindow(QMainWindow):
         found4 = []
         foundres = []
         if self.ussearchByNameOrEmailLineEdit.text() != "":
-            id = self.ussearchByNameOrEmailLineEdit.text()
+            id = int(self.ussearchByNameOrEmailLineEdit.text())
             for i in self.__usTableContents:
-                if i[0] == id:
+                if int(i[0], 16) == id:
                     found.append(i)
         if self.ussearchByEmailOrNameLineEdit.text() != "":
             name = self.ussearchByEmailOrNameLineEdit.text()
