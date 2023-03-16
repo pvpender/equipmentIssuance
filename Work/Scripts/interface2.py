@@ -534,25 +534,6 @@ class MainWindow(QMainWindow):
         self.grTableView.setGeometry(QtCore.QRect(440, 40, 661, 661))
         self.grTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.grTableView.setObjectName("grTableView")
-        self.grSearchPushButton = QtWidgets.QPushButton(parent=self.tab_16)
-        self.grSearchPushButton.setGeometry(QtCore.QRect(20, 140, 401, 41))
-        self.grSearchPushButton.setStyleSheet("QPushButton{\n"
-                                              " background-color: #081f2d; \n"
-                                              " border-radius: 8px; \n"
-                                              " border: 2px solid #081F2D; \n"
-                                              " color: white; \n"
-                                              " font-size: 15px;  \n"
-                                              " cursor: pointer; \n"
-                                              " transition: 0.3s; \n"
-                                              " }\n"
-                                              " \n"
-                                              "QPushButton:hover{ \n"
-                                              " background-color: white; \n"
-                                              " color: #081F2D; \n"
-                                              " border-color: #081F2D;\n"
-                                              " transition: 0.9s; \n"
-                                              "}")
-        self.grSearchPushButton.setObjectName("grSearchPushButton")
         self.listLabel_13 = QtWidgets.QLabel(parent=self.tab_16)
         self.listLabel_13.setGeometry(QtCore.QRect(440, 10, 161, 20))
         self.listLabel_13.setObjectName("listLabel_13")
@@ -1223,7 +1204,6 @@ class MainWindow(QMainWindow):
                                   _translate("MainWindow", "Добавление пользователей"))
         self.nameOrEmailLabel_8.setText(_translate("MainWindow", "Название"))
         self.grAddPushButton.setText(_translate("MainWindow", "Добавить"))
-        self.grSearchPushButton.setText(_translate("MainWindow", "Найти"))
         self.listLabel_13.setText(_translate("MainWindow", "Все группы"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_16), _translate("MainWindow", "Добавление групп"))
         self.eqsearchByIdLabel.setText(_translate("MainWindow", "ID"))
@@ -1310,7 +1290,6 @@ class MainWindow(QMainWindow):
         self.usDelFromSelectedGr.clicked.connect(self.del_from_us_selected_groups)
         self.eqDelFromSelectedGr.clicked.connect(self.del_from_eq_selected_groups)
         self.grAddPushButton.clicked.connect(self.add_group)
-       # self.grSearchPushButton.clicked.connect(self.search_gr)
         self.eqSearchGrToSelected.clicked.connect(self.selected_to_eq_search_groups)
         self.usSearchGrToSelected.clicked.connect(self.selected_to_us_search_groups)
         self.eqSearchDelFromSelectedGr.clicked.connect(self.del_from_eq_search_selected_groups)
