@@ -724,9 +724,9 @@ class MainWindow(QMainWindow):
         self.eqsearchByIdLabel_18 = QtWidgets.QLabel(parent=self.viewInvOrUserBox)
         self.eqsearchByIdLabel_18.setGeometry(QtCore.QRect(10, 90, 81, 21))
         self.eqsearchByIdLabel_18.setObjectName("eqsearchByIdLabel_18")
-        self.eqsearchByGroupIdSpinBox = QtWidgets.QSpinBox(parent=self.viewInvOrUserBox)
-        self.eqsearchByGroupIdSpinBox.setGeometry(QtCore.QRect(100, 90, 201, 22))
-        self.eqsearchByGroupIdSpinBox.setObjectName("eqsearchByGroupIdSpinBox")
+        self.eqsearchByGroupNameLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox)
+        self.eqsearchByGroupNameLineEdit.setGeometry(QtCore.QRect(100, 90, 201, 22))
+        self.eqsearchByGroupNameLineEdit.setObjectName("eqsearchByGroupNameLineEdit")
         self.eqCreateStatsPushButton = QtWidgets.QPushButton(parent=self.viewInvOrUserBox)
         self.eqCreateStatsPushButton.setGeometry(QtCore.QRect(20, 470, 231, 28))
         self.eqCreateStatsPushButton.setStyleSheet("QPushButton{\n"
@@ -1373,7 +1373,6 @@ class MainWindow(QMainWindow):
             for i in indexes:
                 if i.data(0) not in self.__currUsGroupsTableContents:
                     self.__currUsGroupsTableContents.append(i.data(0))
-                    print(self.__currUsGroupsTableContents)
             self.refresh_selected_us_search_groups()
             self.usSearchDelFromSelectedGr.show()
     def selected_to_eq_groups(self):
@@ -1744,7 +1743,6 @@ class MainWindow(QMainWindow):
                 eq_to_change.count = self.reqsearchByCount.value()
             else:
                 eq_to_change.reserve_count = 0
-            print(self.__allGroups)
             for i in self.__currEqGroupsTableContents:
                 if self.__allGroups[i] not in eq_to_change.groups:
                     eq_to_change.groups.append(self.__allGroups[i])
@@ -1787,7 +1785,7 @@ class MainWindow(QMainWindow):
         self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))
         self.eqsearchByReservedSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][3]))
         self.__eqFoundGroups = self.__equipment_list.get_equipment_by_id(
-            int(self.__eqFoundTableContents[self.__usnum][0])).groups
+            int(self.__eqFoundTableContents[self.__eqnum][0])).groups
         self.__currEqGroupsTableContents.clear()
         for i in self.__eqFoundGroups:
             self.__currEqGroupsTableContents.append(self.__db.get_group_by_id(i).group_name)
@@ -1873,6 +1871,25 @@ class MainWindow(QMainWindow):
             for i in self.__eqTableContents:
                 if i[1] == self.eqsearchByEmailOrNameLineEdit.text():
                     found2.append(i)
+        if self.eqsearchByGroupNameLineEdit.text()!='':
+            for i in self.__equipment_list.get_equipment_by_group(self.__allGroups[self.eqsearchByGroupNameLineEdit.text()]):
+                x = ""
+                y = ""
+                if i.x == -1:
+                    x = "--"
+                else:
+                    x = str(i.x)
+                if i.y == -1:
+                    y = "--"
+                else:
+                    y = str(i.y)
+                found3.append([
+                    str(i.id),
+                    str(i.title),
+                    str(i.count),
+                    str(i.reserve_count),
+                    x,
+                    y])
         if self.searchByHeightSpinBox.value() != -1:
             for i in self.__eqTableContents:
                 if i[6] == str(self.searchByHeightSpinBox.value()):
@@ -1893,8 +1910,8 @@ class MainWindow(QMainWindow):
             foundres = found
             if len(found2) != 0:
                 foundres = [x for x in foundres if x in found2]
-            #if len(found3) != 0:
-               # foundres = [x for x in foundres if x in found3]
+            if len(found3) != 0:
+               foundres = [x for x in foundres if x in found3]
             if len(found4) != 0:
                 foundres = [x for x in foundres if x in found4]
             if len(found5) != 0:
@@ -1905,8 +1922,18 @@ class MainWindow(QMainWindow):
                 foundres = [x for x in foundres if x in found7]
         if len(found2) != 0 and len(found) == 0:
             foundres = found2
-            #if len(found3) != 0:
-               # foundres = [x for x in foundres if x in found3]
+            if len(found3) != 0:
+                foundres = [x for x in foundres if x in found3]
+            if len(found4) != 0:
+                foundres = [x for x in foundres if x in found4]
+            if len(found5) != 0:
+                foundres = [x for x in foundres if x in found5]
+            if len(found6) != 0:
+                foundres = [x for x in foundres if x in found6]
+            if len(found7) != 0:
+                foundres = [x for x in foundres if x in found7]
+        if len(found3) != 0 and len(found) == 0 and len(found2) == 0:
+            foundres = found3
             if len(found4) != 0:
                 foundres = [x for x in foundres if x in found4]
             if len(found5) != 0:
@@ -2096,7 +2123,6 @@ class MainWindow(QMainWindow):
     def decide_request(self, decision):
         if len(self.__reqs) != 0:
             self.__reqs[self.__reqnum].approved = decision
-            print(self.__reqnum)
             self.__reqs[self.__reqnum].approved_id = self.__current_user.id
             self.__db.update_request(self.__reqs[self.__reqnum])
             self.__reqs.remove(self.__reqs[self.__reqnum])
