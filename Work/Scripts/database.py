@@ -452,7 +452,7 @@ class DataBase:
                 raise ValueError("This cell is occupied!")
         self.__session.query(EquipmentGroups).filter(EquipmentGroups.equipment_id == equipment.id).delete()
         for i in equipment.groups:
-            self.__session.add(UserGroups(equipment_id=equipment.id, group_id=i))
+            self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
         self.__session.query(Equipments).filter(Equipments.id == equipment.id).update(
             {"title": equipment.title, "description": equipment.description,
              "count": equipment.count, "reserve_count": equipment.reserve_count,
