@@ -929,9 +929,9 @@ class MainWindow(QMainWindow):
         self.listLabel_4 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
         self.listLabel_4.setGeometry(QtCore.QRect(440, 10, 161, 20))
         self.listLabel_4.setObjectName("listLabel_4")
-        self.ussearchByGroupIdSpinBox = QtWidgets.QSpinBox(parent=self.viewInvOrUserBox_2)
-        self.ussearchByGroupIdSpinBox.setGeometry(QtCore.QRect(90, 90, 161, 22))
-        self.ussearchByGroupIdSpinBox.setObjectName("ussearchByGroupIdSpinBox")
+        self.ussearchByGroupNameLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox_2)
+        self.ussearchByGroupNameLineEdit.setGeometry(QtCore.QRect(90, 90, 161, 22))
+        self.ussearchByGroupNameLineEdit.setObjectName("ussearchByGroupNameLineEdit")
         self.eqsearchByIdLabel_11 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
         self.eqsearchByIdLabel_11.setGeometry(QtCore.QRect(10, 90, 81, 21))
         self.eqsearchByIdLabel_11.setObjectName("eqsearchByIdLabel_11")
@@ -1482,7 +1482,6 @@ class MainWindow(QMainWindow):
         self.usSearchDelFromSelectedGr.hide()
         self.listLabel_2.hide()
         self.usTableView.setGeometry(QtCore.QRect(470, 30, 1101, 721))
-        self.ussearchByGroupIdSpinBox.setValue(-1)
         self.ussearchByNameOrEmailLineEdit.setText("")
         self.ussearchByEmailOrNameLineEdit.setText("")
     def refresh_gr_view_table(self):
@@ -1814,8 +1813,8 @@ class MainWindow(QMainWindow):
             for i in self.__usTableContents:
                 if i[1] == self.ussearchByEmailOrNameLineEdit.text():
                     found2.append(i)
-        if self.ussearchByGroupIdSpinBox.value()!=0:
-            for i in self.__user_list.get_user_by_group(int(self.ussearchByGroupIdSpinBox.value())):
+        if self.ussearchByGroupNameLineEdit.text()!='':
+            for i in self.__user_list.get_user_by_group(self.__allGroups[self.ussearchByGroupNameLineEdit.text()]):
                 found4.append([
                     str(hex(i.pass_number)),
                     i.mail,
