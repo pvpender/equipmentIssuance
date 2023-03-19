@@ -458,6 +458,7 @@ class DataBase:
              "count": equipment.count, "reserve_count": equipment.reserve_count,
              "x": equipment.x, "y": equipment.y}, synchronize_session=False
         )
+        self.__session.commit()
 
     def delete_equipment(self, equipment: Equipment):
         self.__session.query(Equipments).filter(Equipments.title == equipment.title).delete()
@@ -558,6 +559,7 @@ class DataBase:
                 "approved": request.approved,
                 "approved_id": request.approved_id
             }, synchronize_session=False)
+        self.__session.commit()
 
     """def add_action(self, user_mail_or_id: str | int, action: ActionTypes, what: WhatTypes, what_id: str | int):
         if isinstance(user_mail_or_id, str):

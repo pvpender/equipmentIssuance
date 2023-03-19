@@ -1680,20 +1680,17 @@ class MainWindow(QMainWindow):
             1]:
             code_error = 7
         elif(self.__user_list.get_user_by_mail(
-                self.ussearchByEmailOrNameLineEdit.text()) is not None) and self.__user_list.get_user_by_mail(
-                self.ussearchByEmailOrNameLineEdit.text()).pass_number != int(self.__usFoundTableContents[self.__usnum][0],
-                                                                       16):
+                self.ussearchByEmailOrNameLineEdit.text()) is not None) and \
+                (self.__user_list.get_user_by_mail(self.ussearchByEmailOrNameLineEdit.text()).pass_number !=
+                int(self.__usFoundTableContents[self.__usnum][0], 16)):
             code_error = 8
         if code_error == -1:
             user_to_change = self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16))
-            user_to_change.id = int(self.ussearchByNameOrEmailLineEdit.text(), 16)
+            user_to_change.pass_number = int(self.ussearchByNameOrEmailLineEdit.text(), 16)
             user_to_change.mail = self.ussearchByEmailOrNameLineEdit.text()
+            user_to_change.access.groups.clear()
             for i in self.__currUsGroupsTableContents:
-                if self.__allGroups[i] not in user_to_change.access.groups:
-                    user_to_change.access.groups.append(self.__allGroups[i])
-            for i in user_to_change.access.groups:
-                if self.__db.get_group_by_id(i).group_name not in self.__currUsGroupsTableContents:
-                    user_to_change.access.groups.remove(i)
+                user_to_change.access.groups.append(self.__allGroups[i])
             self.__user_list.change_user(int(self.__usFoundTableContents[self.__usnum][0], 16),
                                              self.__usFoundTableContents[self.__usnum][1],
                                              user_to_change)
@@ -1722,12 +1719,9 @@ class MainWindow(QMainWindow):
                 eq_to_change.count = self.reqsearchByCount.value()
             else:
                 eq_to_change.reserve_count = 0
+            eq_to_change.groups.clear()
             for i in self.__currEqGroupsTableContents:
-                if self.__allGroups[i] not in eq_to_change.groups:
-                    eq_to_change.groups.append(self.__allGroups[i])
-            for i in eq_to_change.groups:
-                if self.__db.get_group_by_id(i).group_name not in self.__currEqGroupsTableContents:
-                    eq_to_change.groups.remove(i)
+                eq_to_change.groups.append(self.__allGroups[i])
             self.__equipment_list.change_equipment(eq_to_change)
         else:
             if code_error == 1:
