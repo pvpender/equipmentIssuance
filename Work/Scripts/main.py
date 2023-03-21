@@ -30,9 +30,9 @@ db = DataBase(engine)
 #db.delete_user(db.get_user_by_id(123))
 #db.add_equipment(Equipment("test", "test", 2, 0, []))
 #print(m[0][1].power)
-f = db.get_all_actions()
-for i in f:
-    print(i.user_id, i.action, i.what, i.what_id, i.action_time)
+#f = db.get_all_actions()
+#for i in f:
+#    print(i.user_id, i.action, i.what, i.what_id, i.action_time)
 zero_admin = Admin(1, "superuser", AdminAccess([1], True, True, True, True, True))
 user_list = UserCollection(db)
 user_list.append_user(zero_admin)

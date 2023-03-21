@@ -131,7 +131,7 @@ class UserRequests(Base):
     approved_id: Mapped[int]
 
 
-class Actions(Base):
+"""class Actions(Base):    # trash
     __tablename__ = "actions"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int]
@@ -140,31 +140,38 @@ class Actions(Base):
     users_row_id: Mapped[int] = mapped_column(ForeignKey("users_backup.id"))
     admins_row_id: Mapped[int] = mapped_column(ForeignKey("admins_backup.id"))
     equipments_row_id: Mapped[int] = mapped_column(ForeignKey("equipments_backup.id"))
-    action_time: Mapped[datetime.datetime] = mapped_column(DateTime)
+    action_time: Mapped[datetime.datetime] = mapped_column(DateTime)"""
 
 
 class UsersBackUp(Base):
     __tablename__ = "users_backup"
     id: Mapped[int] = mapped_column(primary_key=True)
+    user: Mapped[int]
+    action: Mapped[str] = mapped_column(Text)
+    action_time: Mapped[datetime.datetime] = mapped_column(DateTime)
     id_in_table: Mapped[int]
     pass_number: Mapped[int] = mapped_column(BigInteger)
     mail: Mapped[str] = mapped_column(Text)
-    action: Mapped["Actions"] = relationship()
 
 
 class AdminsBackUp(Base):
     __tablename__ = "admins_backup"
     id: Mapped[int] = mapped_column(primary_key=True)
+    user: Mapped[int]
+    action: Mapped[str] = mapped_column(Text)
+    action_time: Mapped[datetime.datetime] = mapped_column(DateTime)
     id_in_table: Mapped[int]
     pass_number: Mapped[int] = mapped_column(BigInteger)
     mail: Mapped[str] = mapped_column(Text)
-    access_id: Mapped[int] = mapped_column(ForeignKey("admin_accesses.id"))
-    action: Mapped["Actions"] = relationship()
+    access_id: Mapped[int]
 
 
 class EquipmentBackUp(Base):
     __tablename__ = "equipments_backup"
     id: Mapped[int] = mapped_column(primary_key=True)
+    user: Mapped[int]
+    action: Mapped[str] = mapped_column(Text)
+    action_time: Mapped[datetime.datetime] = mapped_column(DateTime)
     id_in_table: Mapped[int]
     title: Mapped[str] = mapped_column(Text)
     description: Mapped[str] = mapped_column(Text)
@@ -172,7 +179,6 @@ class EquipmentBackUp(Base):
     reserve_count: Mapped[int]
     x: Mapped[int]
     y: Mapped[int]
-    action: Mapped["Actions"] = relationship()
 
 
 class ActionTypes(Enum):
@@ -190,6 +196,11 @@ class WhatTypes(Enum):
 
 
 def restart_if_except(function):
+    """
+    Decorator for reconnecting
+    :param function:
+    :return:
+    """
     def check(*args, **kwargs):
         self = args[0]
         try:
@@ -202,6 +213,11 @@ def restart_if_except(function):
 
 
 def for_all_methods(decorator):
+    """
+    Decorate all class methods
+    :param decorator:
+    :return:
+    """
     def decorate(cls):
         print(cls.__dict__)
         for attr in cls.__dict__:
@@ -214,13 +230,17 @@ def for_all_methods(decorator):
 
 @for_all_methods(restart_if_except)
 class DataBase:
-
+    """Class for working with database"""
     def __init__(self, engine: Engine):
         self.__engine = engine
         self.__session = Session(engine)
 
     @property
-    def session(self):
+    def session(self) -> Session:
+        """
+        Get current session
+        :return: session
+        """
         return self.__session
 
     """@staticmethod
@@ -236,6 +256,11 @@ class DataBase:
         return check
         """
     def add_group(self, group_name: str):
+        """
+        Add new group to base
+        :param group_name: str
+        :return: None
+        """
         self.__session.add(Groups(group_name=group_name))
         self.__session.commit()
 
@@ -305,9 +330,15 @@ class DataBase:
         self.__session.commit()
 
     def update_user(self, old_id: int, old_mail: str, user: CommonUser):
-        self.__session.query(UserGroups).filter(UserGroups.user_id == user.base_id).delete()
+        self.__session.query(UserGroups).filter(
+            UserGroups.user_id == user.base_id,
+            UserGroups.group_id.notin_(user.access.groups)
+        ).delete()
+        exists = list(map(list, zip(*self.__session.query(UserGroups.group_id).filter(
+            UserGroups.user_id == user.base_id).all())))[0]
         for i in user.access.groups:
-            self.__session.add(UserGroups(user_id=user.base_id, group_id=i))
+            if i not in exists:
+                self.__session.add(UserGroups(user_id=user.base_id, group_id=i))
         self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
             {"pass_number": user.pass_number, "mail": user.mail}, synchronize_session=False
         )
@@ -400,9 +431,17 @@ class DataBase:
                 AdminAccesses.can_add_inventory == access.can_add_inventory,
                 AdminAccesses.can_get_request == access.can_get_request,
             ).one()
-        self.__session.query(AdminGroups).filter(AdminGroups.admin_id == admin.base_id).delete()
+        self.__session.query(AdminGroups).filter(
+            AdminGroups.admin_id == admin.base_id,
+            AdminGroups.group_id.notin_(admin.access.groups)
+        ).delete()
+        exists = list(map(
+            list,
+            zip(*self.__session.query(AdminGroups.group_id).filter(AdminGroups.admin_id == admin.base_id).all())
+        ))[0]
         for i in admin.access.groups:
-            self.__session.add(AdminGroups(admin_id=admin.base_id, group_id=i))
+            if i not in exists:
+                self.__session.add(AdminGroups(admin_id=admin.base_id, group_id=i))
         self.__session.query(Admins).filter(Admins.mail == old_mail, Admins.pass_number == old_id).update(
             {"pass_number": admin.pass_number, "mail": admin.mail, "access_id": access_id[0]},
             synchronize_session=False
@@ -450,9 +489,16 @@ class DataBase:
             ).first()
             if exist:
                 raise ValueError("This cell is occupied!")
-        self.__session.query(EquipmentGroups).filter(EquipmentGroups.equipment_id == equipment.id).delete()
+        self.__session.query(EquipmentGroups).filter(
+            EquipmentGroups.equipment_id == equipment.id,
+            EquipmentGroups.group_id.notin_(equipment.groups)
+        ).delete()
+        exist_groups = list(map(list, zip(*self.__session.query(EquipmentGroups.group_id).filter(
+            EquipmentGroups.equipment_id == equipment.id
+        ).all())))[0]
         for i in equipment.groups:
-            self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
+            if i not in exist_groups:
+                self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
         self.__session.query(Equipments).filter(Equipments.id == equipment.id).update(
             {"title": equipment.title, "description": equipment.description,
              "count": equipment.count, "reserve_count": equipment.reserve_count,
@@ -575,12 +621,12 @@ class DataBase:
         )
         self.__session.add(new_action)
         self.__session.commit()
-        """
+    
 
     def get_all_actions(self):
-        return self.__session.query(Actions).all()
+        return self.__session.query(Actions).all()"""
 
-""""    def get_action_by_passes(self, pass_numbers: list):
+"""    def get_action_by_passes(self, pass_numbers: list):
         return self.__session.query(Actions).filter(Actions.user_id.in_(pass_numbers)).all()
 
     def get_action_by_passes_as_df(self, pass_numbers: list):

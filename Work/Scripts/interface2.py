@@ -1674,6 +1674,7 @@ class MainWindow(QMainWindow):
     # for i in indexes:
     def changeUs(self):
         code_error = -1
+
         if (self.__user_list.get_user_by_id(
                 int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and \
                 self.__user_list.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).mail != self.__usFoundTableContents[self.__usnum][
@@ -1712,11 +1713,11 @@ class MainWindow(QMainWindow):
             eq_to_change.title = self.eqsearchByEmailOrNameLineEdit.text()
             #eq_to_change.access = tg
             if self.eqsearchByNumberSpinBox.value()>-1:
-                eq_to_change.count=self.reqsearchByCount.value()
+                eq_to_change.count=self.eqsearchByNumberSpinBox.value()
             else:
                 eq_to_change.count=0
             if self.eqsearchByReservedSpinBox.value() > -1:
-                eq_to_change.count = self.reqsearchByCount.value()
+                eq_to_change.reserve_count = self.eqsearchByReservedSpinBox.value()
             else:
                 eq_to_change.reserve_count = 0
             eq_to_change.groups.clear()
@@ -1776,10 +1777,13 @@ class MainWindow(QMainWindow):
         found4 = []
         foundres = []
         if self.ussearchByNameOrEmailLineEdit.text() != "":
-            id = int(self.ussearchByNameOrEmailLineEdit.text())
-            for i in self.__usTableContents:
-                if int(i[0], 16) == id:
-                    found.append(i)
+            try:
+                user_id = int(self.ussearchByNameOrEmailLineEdit.text())
+                for i in self.__usTableContents:
+                    if int(i[0], 16) == user_id:
+                        found.append(i)
+            except ValueError:
+                show_message("Ошибка", "ID должен быть числом")
         if self.ussearchByEmailOrNameLineEdit.text() != "":
             name = self.ussearchByEmailOrNameLineEdit.text()
             for i in self.__usTableContents:
