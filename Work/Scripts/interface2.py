@@ -2111,6 +2111,7 @@ class MainWindow(QMainWindow):
             self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         else:
             show_message("Ошибка", "Запросов нет")
+
     class TableModel(QtCore.QAbstractTableModel):
         def __init__(self, data):
             super(TableModel, self).__init__()

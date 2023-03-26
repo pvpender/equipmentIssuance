@@ -127,8 +127,8 @@ class UserRequests(Base):
     sender_tg_id: Mapped[int] = mapped_column(BigInteger)
     sender_mail: Mapped[str] = mapped_column(Text)
     solved: Mapped[bool]
-    approved: Mapped[bool]
-    approved_id: Mapped[int]
+    approved: Mapped[bool] = mapped_column(nullable=True)
+    approved_id: Mapped[int] = mapped_column(nullable=True)
 
 
 """class Actions(Base):    # trash
@@ -489,16 +489,17 @@ class DataBase:
             ).first()
             if exist:
                 raise ValueError("This cell is occupied!")
-        self.__session.query(EquipmentGroups).filter(
-            EquipmentGroups.equipment_id == equipment.id,
-            EquipmentGroups.group_id.notin_(equipment.groups)
-        ).delete()
-        exist_groups = list(map(list, zip(*self.__session.query(EquipmentGroups.group_id).filter(
-            EquipmentGroups.equipment_id == equipment.id
-        ).all())))[0]
-        for i in equipment.groups:
-            if i not in exist_groups:
-                self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
+        if isinstance(equipment, Equipment):
+            self.__session.query(EquipmentGroups).filter(
+                EquipmentGroups.equipment_id == equipment.id,
+                EquipmentGroups.group_id.notin_(equipment.groups)
+            ).delete()
+            exist_groups = list(map(list, zip(*self.__session.query(EquipmentGroups.group_id).filter(
+                EquipmentGroups.equipment_id == equipment.id
+            ).all())))[0]
+            for i in equipment.groups:
+                if i not in exist_groups:
+                    self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
         self.__session.query(Equipments).filter(Equipments.id == equipment.id).update(
             {"title": equipment.title, "description": equipment.description,
              "count": equipment.count, "reserve_count": equipment.reserve_count,
@@ -538,7 +539,7 @@ class DataBase:
 
     def add_tg_user(self, tg_id, mail):
         db_user = TelegramLogins(
-            user_id=tg_id,
+            tg_id=tg_id,
             mail=mail,
         )
         if not self.get_tg_user(tg_id):
@@ -586,7 +587,7 @@ class DataBase:
     def add_last_request(self, tg_id: int, title: str):
         self.__session.query(LastRequest).filter(LastRequest.tg_id == tg_id).delete()
         last_request = LastRequest(
-            user_id=tg_id,
+            tg_id=tg_id,
             title=title,
         )
         self.__session.add(last_request)

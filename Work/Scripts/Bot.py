@@ -22,12 +22,12 @@ dp = Dispatcher(bot, storage=storage)
 registry = DialogRegistry(dp)
 scheduler = AsyncIOScheduler()
 #engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
-engine = create_engine("mysql+pymysql://admin:testpassword!@194.67.206.233:3306/test_base")
+engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 1
 sqlalchemy.pool_timeout = 20
-session = Session(engine)
-db = DataBase(session)
+#session = Session(engine)
+db = DataBase(engine)
 
 
 class LoginFilter(BoundFilter):
@@ -63,7 +63,7 @@ async def on_input(msg: Message, dialog: Dialog, manager: DialogManager):
     adm = db.get_admin_by_mail(msg.text)
     if usr or adm:
         await msg.answer("Успех!")
-        db.add_tg_user(msg.from_user.id, usr[0].mail if usr else adm[0].mail, usr[1].power if usr else adm[1].power)
+        db.add_tg_user(msg.from_user.id, usr.mail if usr else adm.mail)
         await manager.done()
     else:
         await msg.answer("Нет пользователя с такой почтой! Пожалуйста, повторите ввод")
@@ -90,11 +90,7 @@ async def end(c: CallbackQuery, button: Button, manager: DialogManager):
 
 
 async def get_data(**kwargs):
-    try:
-        mas = db.get_all_equipment()
-    except OperationalError:
-        session.rollback()
-        mas = db.get_all_equipment()
+    mas = db.get_all_equipment()
     out_list = []
     for i in mas:
         if i.count - i.reserve_count > 0:
@@ -105,15 +101,20 @@ async def get_data(**kwargs):
 async def ans(c: CallbackQuery, button: Button, manager: DialogManager, button_id):
     user = db.get_tg_user(c.from_user.id)
     eq = db.get_equipment_by_id(button_id)
+    user = db.get_user_by_mail(user.mail) if db.get_user_by_mail(user.mail) else db.get_admin_by_mail(user.mail)
+    if isinstance(user, Users):
+        mas = [j.group_id for j in user.user_groups]
+    else:
+        mas = [j.group_id for j in user.admin_groups]
     manager.data["title"] = eq.title
     manager.data["description"] = eq.description
-    if eq.access > user.power:
+    if not any(x in [j.group_id for j in eq.equipment_groups] for x in mas):
         manager.data["possible"] = "Вы не можете запросить это оборудование."
         manager.data["extend"] = False
     else:
         manager.data["possible"] = "Вы можете запросить это оборудование"
         manager.data["extend"] = True
-        db.add_last_request(c.from_user.id, eq.title, eq.description)
+        db.add_last_request(c.from_user.id, eq.title)
     await manager.dialog().switch_to(MySG.preview)
 
 
@@ -142,7 +143,6 @@ async def send_request(c: CallbackQuery, button: Button, manager: DialogManager)
     mail = db.get_tg_user(c.from_user.id).mail
     request = req.Request(c.from_user.id, mail, r.title,
                           1, c.message.text[c.message.text.find(":")+2: c.message.text.find("Продолжить?")])
-    db.add_action(mail, ActionTypes.INSERT, WhatTypes.REQUEST, r.title)
     db.add_request(request)
     await c.message.edit_text(f"Оборудование {r.title} заказано!\nКак только администратор ответит на ваш запрос "
                               f"- вы получите уведомление")
