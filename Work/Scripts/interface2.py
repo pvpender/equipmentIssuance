@@ -534,6 +534,25 @@ class MainWindow(QMainWindow):
         self.grTableView.setGeometry(QtCore.QRect(440, 40, 661, 661))
         self.grTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.grTableView.setObjectName("grTableView")
+        self.grSearchPushButton = QtWidgets.QPushButton(parent=self.tab_16)
+        self.grSearchPushButton.setGeometry(QtCore.QRect(20, 140, 401, 41))
+        self.grSearchPushButton.setStyleSheet("QPushButton{\n"
+                                              " background-color: #081f2d; \n"
+                                              " border-radius: 8px; \n"
+                                              " border: 2px solid #081F2D; \n"
+                                              " color: white; \n"
+                                              " font-size: 15px;  \n"
+                                              " cursor: pointer; \n"
+                                              " transition: 0.3s; \n"
+                                              " }\n"
+                                              " \n"
+                                              "QPushButton:hover{ \n"
+                                              " background-color: white; \n"
+                                              " color: #081F2D; \n"
+                                              " border-color: #081F2D;\n"
+                                              " transition: 0.9s; \n"
+                                              "}")
+        self.grSearchPushButton.setObjectName("grSearchPushButton")
         self.listLabel_13 = QtWidgets.QLabel(parent=self.tab_16)
         self.listLabel_13.setGeometry(QtCore.QRect(440, 10, 161, 20))
         self.listLabel_13.setObjectName("listLabel_13")
@@ -705,9 +724,9 @@ class MainWindow(QMainWindow):
         self.eqsearchByIdLabel_18 = QtWidgets.QLabel(parent=self.viewInvOrUserBox)
         self.eqsearchByIdLabel_18.setGeometry(QtCore.QRect(10, 90, 81, 21))
         self.eqsearchByIdLabel_18.setObjectName("eqsearchByIdLabel_18")
-        self.eqsearchByGroupNameLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox)
-        self.eqsearchByGroupNameLineEdit.setGeometry(QtCore.QRect(100, 90, 201, 22))
-        self.eqsearchByGroupNameLineEdit.setObjectName("eqsearchByGroupNameLineEdit")
+        self.eqsearchByGroupIdSpinBox = QtWidgets.QSpinBox(parent=self.viewInvOrUserBox)
+        self.eqsearchByGroupIdSpinBox.setGeometry(QtCore.QRect(100, 90, 201, 22))
+        self.eqsearchByGroupIdSpinBox.setObjectName("eqsearchByGroupIdSpinBox")
         self.eqCreateStatsPushButton = QtWidgets.QPushButton(parent=self.viewInvOrUserBox)
         self.eqCreateStatsPushButton.setGeometry(QtCore.QRect(20, 470, 231, 28))
         self.eqCreateStatsPushButton.setStyleSheet("QPushButton{\n"
@@ -910,9 +929,9 @@ class MainWindow(QMainWindow):
         self.listLabel_4 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
         self.listLabel_4.setGeometry(QtCore.QRect(440, 10, 161, 20))
         self.listLabel_4.setObjectName("listLabel_4")
-        self.ussearchByGroupNameLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox_2)
-        self.ussearchByGroupNameLineEdit.setGeometry(QtCore.QRect(90, 90, 161, 22))
-        self.ussearchByGroupNameLineEdit.setObjectName("ussearchByGroupNameLineEdit")
+        self.ussearchByGroupIdSpinBox = QtWidgets.QSpinBox(parent=self.viewInvOrUserBox_2)
+        self.ussearchByGroupIdSpinBox.setGeometry(QtCore.QRect(90, 90, 161, 22))
+        self.ussearchByGroupIdSpinBox.setObjectName("ussearchByGroupIdSpinBox")
         self.eqsearchByIdLabel_11 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
         self.eqsearchByIdLabel_11.setGeometry(QtCore.QRect(10, 90, 81, 21))
         self.eqsearchByIdLabel_11.setObjectName("eqsearchByIdLabel_11")
@@ -1165,11 +1184,13 @@ class MainWindow(QMainWindow):
         self.reqsearchByCount = QtWidgets.QSpinBox(parent=self.RequestsGroupBox)
         self.reqsearchByCount.setGeometry(QtCore.QRect(180, 440, 81, 22))
         self.reqsearchByCount.setObjectName("reqsearchByCount")
+        self.tabWidget.addTab(self.tab_5, "")
         self.setCentralWidget(self.centralwidget)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(self)
 
         _translate = QtCore.QCoreApplication.translate
+        self.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.nameOrEmailLabel_2.setText(_translate("MainWindow", "Название"))
         self.eqaddUserOrInvButton.setText(_translate("MainWindow", "Добавить"))
         self.label_27.setText(_translate("MainWindow", "Номер от левого края"))
@@ -1204,6 +1225,7 @@ class MainWindow(QMainWindow):
                                   _translate("MainWindow", "Добавление пользователей"))
         self.nameOrEmailLabel_8.setText(_translate("MainWindow", "Название"))
         self.grAddPushButton.setText(_translate("MainWindow", "Добавить"))
+        self.grSearchPushButton.setText(_translate("MainWindow", "Найти"))
         self.listLabel_13.setText(_translate("MainWindow", "Все группы"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_16), _translate("MainWindow", "Добавление групп"))
         self.eqsearchByIdLabel.setText(_translate("MainWindow", "ID"))
