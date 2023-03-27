@@ -229,18 +229,20 @@ async def get_equipment(msg: Message, dialog_manager: DialogManager):
 
 
 async def send_notification(dp: Dispatcher):
+    print("khh")
     mas = db.get_solved_requests()
     for i in mas:
         if i.approved is False:
-            db.del_request(i.user_id, i.title)
-            await dp.bot.send_message(i.user_id, f"Ваш запрос на выдачу {i.tittle} отклонён!")
+            db.del_request(i.id)
+            await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {i.title} отклонён!")
         else:
-            await dp.bot.send_message(i.user_id, f"Ваш запрос на выдачу {i.tittle} принят! Вы можете забрать "
+            await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {i.title} принят! Вы можете забрать "
                                                  f"своё оборудование уже сейчас!")
 
-scheduler.add_job(send_notification, "interval", seconds=600, args=(dp,))
+scheduler.add_job(send_notification, "interval", seconds=10, args=(dp,))
 if __name__ == '__main__':
     registry.register(dialog)
     registry.register(log_menu)
     scheduler.start()
     executor.start_polling(dp, skip_updates=True)
+

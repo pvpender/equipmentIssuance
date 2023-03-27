@@ -1537,7 +1537,7 @@ class MainWindow(QMainWindow):
     def refresh_requests_table(self):
         # self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
-        self.__reqs = self.__db.get_all_requests()
+        self.__reqs = self.__db.get_unsolved_requests()
         if (len(self.__reqs)) == 0:
             print("0 requests")
         self.__reqnum = 0
@@ -2124,8 +2124,9 @@ class MainWindow(QMainWindow):
         self.decide_request(True)
     def decide_request(self, decision):
         if len(self.__reqs) != 0:
+            self.__reqs[self.__reqnum].solved = True
             self.__reqs[self.__reqnum].approved = decision
-            self.__reqs[self.__reqnum].approved_id = self.__current_user.id
+            self.__reqs[self.__reqnum].approved_id = self.__current_user.base_id
             self.__db.update_request(self.__reqs[self.__reqnum])
             self.__reqs.remove(self.__reqs[self.__reqnum])
             self.tableView2.model().removeRow(self.__reqnum)

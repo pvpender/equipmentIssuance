@@ -567,20 +567,17 @@ class DataBase:
         self.__session.commit()
 
     def get_all_requests(self):
-        self.__session.commit()
         return self.__session.query(UserRequests).all()
 
     def get_solved_requests(self):
         self.__session.commit()
-        return self.__session.query(UserRequests).filter(UserRequests.solved is True).all()
+        return self.__session.query(UserRequests).filter(UserRequests.solved.is_(True)).all()
 
     def get_unsolved_requests(self):
         self.__session.commit()
-        return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
-                                                         (UserRequests.solved.is_(None))).all()
+        return self.__session.query(UserRequests).filter(UserRequests.solved.is_(False)).all()
 
     def get_first_unsolved_request(self):
-        self.__session.commit()
         return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
                                                          (UserRequests.solved.is_(None))).first()
 
@@ -606,6 +603,10 @@ class DataBase:
                 "approved": request.approved,
                 "approved_id": request.approved_id
             }, synchronize_session=False)
+        self.__session.commit()
+
+    def del_request(self, req_id: int):
+        self.__session.query(UserRequests).filter(UserRequests.id == req_id).delete()
         self.__session.commit()
 
     """def add_action(self, user_mail_or_id: str | int, action: ActionTypes, what: WhatTypes, what_id: str | int):
