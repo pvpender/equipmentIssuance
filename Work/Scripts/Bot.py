@@ -1,32 +1,32 @@
+import operator
+
+import aiogram.utils.exceptions
+import sqlalchemy
 from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher.filters import BoundFilter
-from aiogram.types import Message, CallbackQuery, BotCommand
-import operator
+from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Window, Dialog, DialogRegistry, DialogManager, StartMode
+from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, ScrollingGroup, Select
 from aiogram_dialog.widgets.text import Const, Format
-from aiogram_dialog.widgets.input import MessageInput
-from sqlalchemy import create_engine
-from database import *
-import sqlalchemy
-from sqlalchemy.exc import OperationalError
-import pymysql
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 import request as req
+from database import *
 
 storage = MemoryStorage()
 bot = Bot(token='5655746725:AAEa9x8W9pwFKIRe13rg04zz5BZ3vwUGxig')
 dp = Dispatcher(bot, storage=storage)
 registry = DialogRegistry(dp)
 scheduler = AsyncIOScheduler()
-#engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
+# engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 1
 sqlalchemy.pool_timeout = 20
-#session = Session(engine)
+# session = Session(engine)
 db = DataBase(engine)
 
 
@@ -37,7 +37,7 @@ class LoginFilter(BoundFilter):
         self.is_login = is_login
 
     async def check(self, message: Message):
-        if db.get_tg_user(message.from_user.id):
+        if db.get_tg_user(message.from_user.id) or db.get_tg_admin(message.from_user.id):
             return True
         else:
             return False
@@ -61,9 +61,13 @@ async def on_input(msg: Message, dialog: Dialog, manager: DialogManager):
     manager.current_context().dialog_data["mail"] = msg.text
     usr = db.get_user_by_mail(msg.text)
     adm = db.get_admin_by_mail(msg.text)
-    if usr or adm:
+    if usr:
         await msg.answer("Успех!")
-        db.add_tg_user(msg.from_user.id, usr.mail if usr else adm.mail)
+        db.add_tg_user(msg.from_user.id, usr.id)
+        await manager.done()
+    elif adm:
+        await msg.answer("Успех!")
+        db.add_tg_admin(msg.from_user.id, adm.id)
         await manager.done()
     else:
         await msg.answer("Нет пользователя с такой почтой! Пожалуйста, повторите ввод")
@@ -100,12 +104,12 @@ async def get_data(**kwargs):
 
 async def ans(c: CallbackQuery, button: Button, manager: DialogManager, button_id):
     user = db.get_tg_user(c.from_user.id)
+    admin = db.get_tg_admin(c.from_user.id)
     eq = db.get_equipment_by_id(button_id)
-    user = db.get_user_by_mail(user.mail) if db.get_user_by_mail(user.mail) else db.get_admin_by_mail(user.mail)
-    if isinstance(user, Users):
-        mas = [j.group_id for j in user.user_groups]
+    if user:
+        mas = [j.group_id for j in user.user.user_groups]
     else:
-        mas = [j.group_id for j in user.admin_groups]
+        mas = [j.group_id for j in admin.admin.admin_groups]
     manager.data["title"] = eq.title
     manager.data["description"] = eq.description
     if not any(x in [j.group_id for j in eq.equipment_groups] for x in mas):
@@ -140,13 +144,21 @@ async def switch_to_confirm(msg: Message, dialog: Dialog, manager: DialogManager
 
 async def send_request(c: CallbackQuery, button: Button, manager: DialogManager):
     r = db.get_last_request(c.from_user.id)
-    mail = db.get_tg_user(c.from_user.id).mail
-    request = req.Request(c.from_user.id, mail, r.title,
-                          1, c.message.text[c.message.text.find(":")+2: c.message.text.find("Продолжить?")])
-    db.add_request(request)
-    await c.message.edit_text(f"Оборудование {r.title} заказано!\nКак только администратор ответит на ваш запрос "
-                              f"- вы получите уведомление")
-    await manager.done()
+    usr = db.get_tg_user(c.from_user.id)
+    adm = db.get_tg_admin(c.from_user.id)
+    if adm:
+        db.add_admin_request(req.Request(c.from_user.id, adm.admin.id, db.get_equipment_by_title(r.title).id, 1,
+                                         c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
+        await c.message.edit_text(f"Оборудование {r.title} заказано!\nНа правах администратора система вам автоматически"
+                                  f"одобрила запрос! Вы можете забрать оборудование уже сейчас!")
+        await manager.done()
+    else:
+        request = req.Request(c.from_user.id, usr.user.id, db.get_equipment_by_title(r.title).id,
+                              1, c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")])
+        db.add_user_request(request)
+        await c.message.edit_text(f"Оборудование {r.title} заказано!\nКак только администратор ответит на ваш запрос "
+                                  f"- вы получите уведомление")
+        await manager.done()
 
 
 async def switch_to_input(c: CallbackQuery, button: Button, manager: DialogManager):
@@ -229,15 +241,20 @@ async def get_equipment(msg: Message, dialog_manager: DialogManager):
 
 
 async def send_notification(dp: Dispatcher):
-    print("khh")
-    mas = db.get_solved_requests()
+    mas = db.get_solved_unannounced_users_request()
     for i in mas:
-        if i.approved is False:
-            db.del_request(i.id)
-            await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {i.title} отклонён!")
-        else:
-            await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {i.title} принят! Вы можете забрать "
-                                                 f"своё оборудование уже сейчас!")
+        try:
+            if i.approved is False:
+                db.del_request(i.id)
+                await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title}")
+            else:
+                await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title} принят! Вы можете забрать "
+                                                          f"своё оборудование уже сейчас!")
+                i.notified = True
+                db.update_user_request(i)
+        except aiogram.utils.exceptions.ChatNotFound:
+            pass
+
 
 scheduler.add_job(send_notification, "interval", seconds=10, args=(dp,))
 if __name__ == '__main__':
@@ -245,4 +262,3 @@ if __name__ == '__main__':
     registry.register(log_menu)
     scheduler.start()
     executor.start_polling(dp, skip_updates=True)
-

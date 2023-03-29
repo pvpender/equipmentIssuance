@@ -130,7 +130,7 @@ class MainWindow(QMainWindow):
         self.__addEqTableContents=[]
         self.__allGroups={}
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
-        self.__reqs = self.__db.get_unsolved_requests()
+        self.__reqs = self.__db.get_unsolved_users_requests()
         self.__reqnum = 0
         self.__eqnum = -1
         self.__usnum = -1
@@ -1537,7 +1537,7 @@ class MainWindow(QMainWindow):
     def refresh_requests_table(self):
         # self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
-        self.__reqs = self.__db.get_unsolved_requests()
+        self.__reqs = self.__db.get_unsolved_users_requests()
         if (len(self.__reqs)) == 0:
             print("0 requests")
         self.__reqnum = 0
@@ -1545,11 +1545,11 @@ class MainWindow(QMainWindow):
         for i in self.__reqs:
             self.__reqTableContents.append([
                 str(i.id),
-                str(i.title),
+                str(self.__equipment_list.get_equipment_by_id(i.equipment_id).title),
                 str(i.count),
                 str(i.purpose),
                 str(hex(i.sender_tg_id)),
-                str(i.sender_mail)
+                str(self.__user_list.get_user_by_id(i.sender_id).mail)
             ])
         data_frame = pd.DataFrame(self.__reqTableContents,
                                   columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
@@ -1873,8 +1873,8 @@ class MainWindow(QMainWindow):
                 if i[1] == name:
                     found2.append(i)
                     break
-        if self.eqsearchByGroupNameLineEdit.text()!='':
-            for i in self.__equipment_list.get_equipment_by_group(self.__allGroups[self.eqsearchByGroupNameLineEdit.text()]):
+        if self.eqsearchByGroupIdSpinBox.text() != "0": # Забаговано словарь у тебя по имени
+            for i in self.__equipment_list.get_equipment_by_group(self.__allGroups[self.eqsearchByGroupIdSpinBox.text()]):
                 x = ""
                 y = ""
                 if i.x == -1:
@@ -2098,9 +2098,9 @@ class MainWindow(QMainWindow):
             show_message("Ошибка", "Элемент последний в списке")
     def get_request(self):
         if self.__reqnum < len(self.__reqs):
-            a = "EMAIL: " + str(self.__reqs[self.__reqnum].sender_mail) + "\n ID запросившего: " + str(
+            a = "EMAIL: " + str(self.__user_list.get_user_by_id(self.__reqs[self.__reqnum].sender_id).mail) + "\n ID запросившего: " + str(
                 self.__reqs[self.__reqnum].sender_tg_id) + "\n Что запрашивается: " + str(
-                self.__reqs[self.__reqnum].title) + "\n Сколько: " + str(
+               self.__equipment_list.get_equipment_by_id(self.__reqs[self.__reqnum].equipment_id).title) + "\n Сколько: " + str(
                 self.__reqs[self.__reqnum].count) + "\n Цель: " + str(self.__reqs[self.__reqnum].purpose)
             self.textBrowser.setText(a)
         else:
@@ -2127,7 +2127,7 @@ class MainWindow(QMainWindow):
             self.__reqs[self.__reqnum].solved = True
             self.__reqs[self.__reqnum].approved = decision
             self.__reqs[self.__reqnum].approved_id = self.__current_user.base_id
-            self.__db.update_request(self.__reqs[self.__reqnum])
+            self.__db.update_user_request(self.__reqs[self.__reqnum])
             self.__reqs.remove(self.__reqs[self.__reqnum])
             self.tableView2.model().removeRow(self.__reqnum)
             self.tableView2.update()

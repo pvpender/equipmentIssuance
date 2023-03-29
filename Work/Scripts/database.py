@@ -80,14 +80,14 @@ class Admins(Base):
 
 class UserLogins(Base):
     __tablename__ = "user_logins"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
     login: Mapped[str] = mapped_column(Text)
     password: Mapped[str] = mapped_column(Text)
 
 
 class AdminLogins(Base):
     __tablename__ = "admin_logins"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(ForeignKey("admins.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
     login: Mapped[str] = mapped_column(Text)
     password: Mapped[str] = mapped_column(Text)
 
@@ -104,11 +104,18 @@ class Equipments(Base):
     equipment_groups: Mapped[List["EquipmentGroups"]] = relationship(back_populates="equipment")
 
 
-class TelegramLogins(Base):
-    __tablename__ = "telegram_logins"
-    id: Mapped[int] = mapped_column(primary_key=True)
+class TelegramUserLogins(Base):
+    __tablename__ = "telegram_user_logins"
+    id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
     tg_id: Mapped[int] = mapped_column(BigInteger)
-    mail: Mapped[str] = mapped_column(Text)  # нерационально, может измениться
+    user: Mapped[List["Users"]] = relationship()
+
+
+class TelegramAdminLogins(Base):
+    __tablename__ = "telegram_admin_logins"
+    id: Mapped[int] = mapped_column(ForeignKey("admins.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
+    tg_id: Mapped[int] = mapped_column(BigInteger)
+    admin: Mapped[List["Admins"]] = relationship()
 
 
 class LastRequest(Base):
@@ -121,14 +128,27 @@ class LastRequest(Base):
 class UserRequests(Base):
     __tablename__ = "user_requests"
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(Text)
-    count: Mapped[int]
+    equipment_id: Mapped[int]
+    count: Mapped[int] = mapped_column(default=1)
     purpose: Mapped[str] = mapped_column(Text)
     sender_tg_id: Mapped[int] = mapped_column(BigInteger)
-    sender_mail: Mapped[str] = mapped_column(Text)
-    solved: Mapped[bool]
+    sender_id: Mapped[int]
+    solved: Mapped[bool] = mapped_column(default=False)
     approved: Mapped[bool] = mapped_column(nullable=True)
     approved_id: Mapped[int] = mapped_column(nullable=True)
+    notified: Mapped[bool] = mapped_column(default=False)
+    taken: Mapped[bool] = mapped_column(default=False)
+
+
+class AdminRequests(Base):
+    __tablename__ = "admin_requests"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    equipment_id: Mapped[int]
+    count: Mapped[int] = mapped_column(default=1)
+    purpose: Mapped[str] = mapped_column(Text)
+    sender_tg_id: Mapped[int] = mapped_column(BigInteger)
+    sender_id: Mapped[int]
+    taken: Mapped[bool] = mapped_column(default=False)
 
 
 """class Actions(Base):    # trash
@@ -356,11 +376,11 @@ class DataBase:
         self.__session.commit()
         return self.__session.query(Users).filter(Users.pass_number == pass_number).first()
 
-    def get_user_by_mail(self, mail: str):
+    def get_user_by_mail(self, mail: str) -> Union[Users, None]:
         self.__session.commit()
         return self.__session.query(Users).filter(Users.mail == mail).first()
 
-    def get_all_users(self):
+    def get_all_users(self) -> List[Type[Users]]:
         self.__session.commit()
         return self.__session.query(Users).all()
 
@@ -456,7 +476,7 @@ class DataBase:
         self.__session.commit()
         return self.__session.query(Admins).filter(Admins.pass_number == pass_number).first()
 
-    def get_admin_by_mail(self, mail: str):
+    def get_admin_by_mail(self, mail: str) -> Union[Admins, None]:
         self.__session.commit()
         return self.__session.query(Admins).filter(Admins.mail == mail).first()
 
@@ -511,7 +531,11 @@ class DataBase:
         self.__session.query(Equipments).filter(Equipments.title == equipment.title).delete()
         self.__session.commit()
 
-    def get_equipment_by_title(self, title: str):
+    def get_equipment_by_id(self, eq_id: int):
+        self.__session.commit()
+        return self.__session.query(Equipments).filter(Equipments.id == eq_id).first()
+
+    def get_equipment_by_title(self, title: str) -> Union[Equipments, None]:
         self.__session.commit()
         return self.__session.query(Equipments).filter(Equipments.title == title).first()
 
@@ -533,51 +557,82 @@ class DataBase:
         self.__session.commit()
         return self.__session.query(Equipments).filter(Equipments.id == eq_id).first()
 
-    def get_tg_user(self, tg_id):
+    def get_tg_user(self, tg_id) -> Union[TelegramUserLogins, None]:
         self.__session.commit()
-        return self.__session.query(TelegramLogins).filter(TelegramLogins.tg_id == tg_id).first()
+        return self.__session.query(TelegramUserLogins).filter(TelegramUserLogins.tg_id == tg_id).first()
 
-    def add_tg_user(self, tg_id, mail):
-        db_user = TelegramLogins(
-            tg_id=tg_id,
-            mail=mail,
-        )
-        if not self.get_tg_user(tg_id):
-            self.__session.add(db_user)
-        else:
-            self.__session.query(TelegramLogins).filter(TelegramLogins.tg_id == tg_id).update(
-                {"mail": mail}, synchronize_session=False
+    def get_tg_admin(self, tg_id) -> Union[TelegramAdminLogins, None]:
+        self.__session.commit()
+        return self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).first()
+
+    def add_tg_user(self, tg_id: int, user_id: int):
+        self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).delete()
+        if self.get_tg_user(tg_id):
+            self.__session.query(TelegramUserLogins).filter(TelegramUserLogins.tg_id == tg_id).update(
+                {"id": user_id}
             )
+        else:
+            self.__session.add(TelegramUserLogins(id=user_id, tg_id=tg_id))
         self.__session.commit()
 
-    def add_request(self, request: req.Request):
+    def add_tg_admin(self, tg_id, admin_id):
+        self.__session.query(TelegramUserLogins).filter(TelegramUserLogins.tg_id == tg_id).delete()
+        if self.get_tg_admin(tg_id):
+            self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).update(
+                {"id": admin_id}
+            )
+        else:
+            self.__session.add(TelegramAdminLogins(id=admin_id, tg_id=tg_id))
+        self.__session.commit()
+
+    def add_user_request(self, request: req.Request):
         db_request = UserRequests(
             sender_tg_id=request.sender_tg_id,
-            sender_mail=request.sender_mail,
-            title=request.what,
+            sender_id=request.sender_id,
+            equipment_id=request.equipment_id,
             count=request.count,
             purpose=request.purpose,
             solved=False
         )
-        eq = self.get_equipment_by_title(request.what)
+        eq = self.get_equipment_by_id(request.equipment_id)
         eq.reserve_count += 1
         if isinstance(eq, Union[Equipments, Equipments]):
             self.update_equipment(eq)
         self.__session.add(db_request)
         self.__session.commit()
 
-    def get_all_requests(self):
+    def add_admin_request(self, request: req.Request):
+        self.__session.add(
+            AdminRequests(
+                equipment_id=request.equipment_id,
+                count=request.count,
+                purpose=request.purpose,
+                sender_tg_id=request.sender_tg_id,
+                sender_id=request.sender_id,
+                taken=request.taken
+            )
+        )
+        self.__session.commit()
+
+    def get_all_users_requests(self):
         return self.__session.query(UserRequests).all()
 
-    def get_solved_requests(self):
+    def get_solved_users_requests(self) -> List[Type[UserRequests]]:
         self.__session.commit()
         return self.__session.query(UserRequests).filter(UserRequests.solved.is_(True)).all()
 
-    def get_unsolved_requests(self):
+    def get_solved_unannounced_users_request(self) -> List[Type[UserRequests]]:
+        self.__session.commit()
+        return self.__session.query(UserRequests).filter(
+            UserRequests.solved.is_(True),
+            UserRequests.notified.is_(False)
+        ).all()
+
+    def get_unsolved_users_requests(self):
         self.__session.commit()
         return self.__session.query(UserRequests).filter(UserRequests.solved.is_(False)).all()
 
-    def get_first_unsolved_request(self):
+    def get_first_unsolved_users_request(self):
         return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
                                                          (UserRequests.solved.is_(None))).first()
 
@@ -594,18 +649,18 @@ class DataBase:
         self.__session.commit()
         return self.__session.query(LastRequest).filter(LastRequest.tg_id == tg_id).first()
 
-    def update_request(self, request: UserRequests):
-        self.__session.query(UserRequests).filter(UserRequests.sender_tg_id == request.sender_tg_id,
-                                                  UserRequests.title == request.title,
-                                                  UserRequests.solved is False).update(
+    def update_user_request(self, request: Union[Type[UserRequests]]):
+        self.__session.query(UserRequests).filter(UserRequests.id == request.id).update(
             {
-                "solved": True,
+                "solved": request.solved,
                 "approved": request.approved,
-                "approved_id": request.approved_id
+                "approved_id": request.approved_id,
+                "notified": request.notified,
+                "taken": request.taken
             }, synchronize_session=False)
         self.__session.commit()
 
-    def del_request(self, req_id: int):
+    def del_user_request(self, req_id: int):
         self.__session.query(UserRequests).filter(UserRequests.id == req_id).delete()
         self.__session.commit()
 
