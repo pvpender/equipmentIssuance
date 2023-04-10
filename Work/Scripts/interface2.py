@@ -1645,11 +1645,14 @@ class MainWindow(QMainWindow):
                 groups=[]
                 for i in self.__addUsTableContents:
                     groups.append(self.__allGroups[i])
-                ac=Access(groups)
+                ac = Access(groups)
                 us = CommonUser(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), ac)
                 self.__user_list.append_user(us)
             if self.usradioButton_Admin.isChecked():
-                ac = AdminAccess([], add_users, change_users, add_equipment, change_equipment, get_request)
+                groups = []
+                for i in self.__addUsTableContents:
+                    groups.append(self.__allGroups[i])
+                ac = AdminAccess(groups, add_users, change_users, add_equipment, change_equipment, get_request)
                 adm = Admin(int(self.usIdCardLineEdit.text(), 16), str(self.usnameOrEmailLineEdit.text()), ac)
                 self.__user_list.append_user(adm)
             self.heightSpinBox.setValue(-1)
@@ -1811,8 +1814,8 @@ class MainWindow(QMainWindow):
             for i in self.__usTableContents:
                 if i[1] == self.ussearchByEmailOrNameLineEdit.text():
                     found2.append(i)
-        if self.ussearchByGroupNameLineEdit.text()!='':
-            for i in self.__user_list.get_user_by_group(self.__allGroups[self.ussearchByGroupNameLineEdit.text()]):
+        if self.ussearchByGroupIdSpinBox.text() != "0":
+            for i in self.__user_list.get_user_by_group(self.__allGroups.get(self.ussearchByGroupIdSpinBox.text())):
                 found4.append([
                     str(hex(i.pass_number)),
                     i.mail,

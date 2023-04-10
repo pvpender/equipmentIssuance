@@ -458,7 +458,9 @@ class DataBase:
         exists = list(map(
             list,
             zip(*self.__session.query(AdminGroups.group_id).filter(AdminGroups.admin_id == admin.base_id).all())
-        ))[0]
+        ))
+        if exists:
+            exists = exists[0]
         for i in admin.access.groups:
             if i not in exists:
                 self.__session.add(AdminGroups(admin_id=admin.base_id, group_id=i))
