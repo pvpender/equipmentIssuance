@@ -39,14 +39,14 @@ class EquipmentCollection:
 
     def get_equipment_by_coordinates(self, x: int, y: int):
         mas = [i for i in self.__objects.values() if i.x == x and i.y == y]
-        return mas
+        return mas if mas else None
 
     def get_equipment_list(self) -> list:
         return list(self.__objects.values())
 
     def add_equipment(self, equipment: Equipment):
         self.__db.add_equipment(equipment)
-        equipment.id = self.__db.get_equipment_by_title(equipment.title)
+        equipment.id = self.__db.get_equipment_by_title(equipment.title).id
         self.__objects.update({equipment.title: equipment})
         self.__count += 1
 

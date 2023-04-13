@@ -1636,7 +1636,7 @@ class MainWindow(QMainWindow):
             add_equipment = False
             change_equipment = False
             get_request = False
-        if code_error == -1 and self.__user_list.get_user_by_id(int(self.usIdCardLineEdit.text(), 16)) is not None:
+        if code_error == -1 and self.__user_list.get_user_by_pass(int(self.usIdCardLineEdit.text(), 16)) is not None:
             code_error = 7
         if code_error == -1 and self.__user_list.get_user_by_mail(self.usnameOrEmailLineEdit.text()) is not None:
             code_error = 8
@@ -1700,9 +1700,9 @@ class MainWindow(QMainWindow):
     def changeUs(self):
         code_error = -1
 
-        if (self.__user_list.get_user_by_id(
+        if (self.__user_list.get_user_by_pass(
                 int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and \
-                self.__user_list.get_user_by_id(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).mail != self.__usFoundTableContents[self.__usnum][
+                self.__user_list.get_user_by_pass(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).mail != self.__usFoundTableContents[self.__usnum][
             1]:
             code_error = 7
         elif(self.__user_list.get_user_by_mail(
@@ -1711,7 +1711,7 @@ class MainWindow(QMainWindow):
                 int(self.__usFoundTableContents[self.__usnum][0], 16)):
             code_error = 8
         if code_error == -1:
-            user_to_change = self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16))
+            user_to_change = self.__user_list.get_user_by_pass(int(self.__usFoundTableContents[self.__usnum][0], 16))
             user_to_change.pass_number = int(self.ussearchByNameOrEmailLineEdit.text(), 16)
             user_to_change.mail = self.ussearchByEmailOrNameLineEdit.text()
             user_to_change.access.groups.clear()
@@ -1761,8 +1761,8 @@ class MainWindow(QMainWindow):
         self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
         self.ussearchByEmailOrNameLineEdit.setText(self.__usFoundTableContents[self.__usnum][1])
         self.__currUsGroupsTableContents.clear()
-        self.__usFoundGroups=self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups
-        for i in self.__user_list.get_user_by_id(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups:
+        self.__usFoundGroups=self.__user_list.get_user_by_pass(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups
+        for i in self.__user_list.get_user_by_pass(int(self.__usFoundTableContents[self.__usnum][0], 16)).access.groups:
             self.__currUsGroupsTableContents.append(self.__db.get_group_by_id(i).group_name)
         data_frame = pd.DataFrame(self.__currUsGroupsTableContents, columns=["Номер группы"],
                                   index=[i for i in range(len(self.__currUsGroupsTableContents))])
@@ -1775,11 +1775,11 @@ class MainWindow(QMainWindow):
         self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
         self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[self.__eqnum][1])
         if self.__eqFoundTableContents[self.__eqnum][5] != '--':
-            self.searchByHeightSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][6]))
+            self.searchByHeightSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
         else:
             self.searchByHeightSpinBox.setValue(-1)
         if self.__eqFoundTableContents[self.__eqnum][4] != '--':
-            self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
+            self.searchByPosFromLeftSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][4]))
         else:
             self.searchByPosFromLeftSpinBox.setValue(-1)
         self.eqsearchByNumberSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][2]))

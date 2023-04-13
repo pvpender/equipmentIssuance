@@ -31,13 +31,13 @@ class UserGroups(Base):
     user: Mapped["Users"] = relationship()
 
 
-class AdminGroups(Base):
+"""class AdminGroups(Base):
     __tablename__ = "admin_groups"
     id: Mapped[int] = mapped_column(primary_key=True)
     admin_id: Mapped[int] = mapped_column(ForeignKey("admins.id", ondelete='CASCADE'))
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id", ondelete='CASCADE'))
     group: Mapped["Groups"] = relationship()
-    admin: Mapped["Admins"] = relationship()
+    admin: Mapped["Admins"] = relationship()"""
 
 
 class EquipmentGroups(Base):
@@ -68,28 +68,37 @@ class Users(Base):
     user_groups: Mapped[List["UserGroups"]] = relationship(back_populates="user", cascade="save-update, delete")
 
 
-class Admins(Base):
+"""class Admins(Base):
     __tablename__ = "admins"
     id: Mapped[int] = mapped_column(primary_key=True)
     pass_number: Mapped[int] = mapped_column(BigInteger)
     mail: Mapped[str] = mapped_column(Text)
     access_id: Mapped[int] = mapped_column(ForeignKey("admin_accesses.id"))
     access: Mapped["AdminAccesses"] = relationship(back_populates="admins")
-    admin_groups: Mapped[List["AdminGroups"]] = relationship(back_populates="admin")
+    admin_groups: Mapped[List["AdminGroups"]] = relationship(back_populates="admin")"""
 
 
-class UserLogins(Base):
-    __tablename__ = "user_logins"
+class Admins(Base):
+    __tablename__ = "admins"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True,
+                                         autoincrement=False)
+    access_id: Mapped[int] = mapped_column(ForeignKey("admin_accesses.id"))
+    access: Mapped["AdminAccesses"] = relationship(back_populates="admins")
+    user: Mapped["Users"] = relationship()
+
+
+class Logins(Base):
+    __tablename__ = "logins"
     id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
     login: Mapped[str] = mapped_column(Text)
     password: Mapped[str] = mapped_column(Text)
 
 
-class AdminLogins(Base):
+"""class AdminLogins(Base):
     __tablename__ = "admin_logins"
     id: Mapped[int] = mapped_column(ForeignKey("admins.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
     login: Mapped[str] = mapped_column(Text)
-    password: Mapped[str] = mapped_column(Text)
+    password: Mapped[str] = mapped_column(Text)"""
 
 
 class Equipments(Base):
@@ -104,18 +113,18 @@ class Equipments(Base):
     equipment_groups: Mapped[List["EquipmentGroups"]] = relationship(back_populates="equipment")
 
 
-class TelegramUserLogins(Base):
-    __tablename__ = "telegram_user_logins"
+class TelegramLogins(Base):
+    __tablename__ = "telegram_logins"
     id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
     tg_id: Mapped[int] = mapped_column(BigInteger)
     user: Mapped[List["Users"]] = relationship()
 
 
-class TelegramAdminLogins(Base):
+"""class TelegramAdminLogins(Base):
     __tablename__ = "telegram_admin_logins"
     id: Mapped[int] = mapped_column(ForeignKey("admins.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
     tg_id: Mapped[int] = mapped_column(BigInteger)
-    admin: Mapped[List["Admins"]] = relationship()
+    admin: Mapped[List["Admins"]] = relationship()"""
 
 
 class LastRequest(Base):
@@ -140,7 +149,7 @@ class UserRequests(Base):
     taken: Mapped[bool] = mapped_column(default=False)
 
 
-class AdminRequests(Base):
+"""class AdminRequests(Base):
     __tablename__ = "admin_requests"
     id: Mapped[int] = mapped_column(primary_key=True)
     equipment_id: Mapped[int]
@@ -148,8 +157,7 @@ class AdminRequests(Base):
     purpose: Mapped[str] = mapped_column(Text)
     sender_tg_id: Mapped[int] = mapped_column(BigInteger)
     sender_id: Mapped[int]
-    taken: Mapped[bool] = mapped_column(default=False)
-
+    taken: Mapped[bool] = mapped_column(default=False)"""
 
 """class Actions(Base):    # trash
     __tablename__ = "actions"
@@ -174,7 +182,7 @@ class UsersBackUp(Base):
     mail: Mapped[str] = mapped_column(Text)
 
 
-class AdminsBackUp(Base):
+"""class AdminsBackUp(Base):
     __tablename__ = "admins_backup"
     id: Mapped[int] = mapped_column(primary_key=True)
     user: Mapped[int]
@@ -183,6 +191,16 @@ class AdminsBackUp(Base):
     id_in_table: Mapped[int]
     pass_number: Mapped[int] = mapped_column(BigInteger)
     mail: Mapped[str] = mapped_column(Text)
+    access_id: Mapped[int]"""
+
+
+class AdminBackUp(Base):
+    __tablename__ = "admins_backup"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user: Mapped[int]
+    action: Mapped[str] = mapped_column(Text)
+    action_time: Mapped[datetime.datetime] = mapped_column(DateTime)
+    id_in_table: Mapped[int]
     access_id: Mapped[int]
 
 
@@ -221,13 +239,14 @@ def restart_if_except(function):
     :param function:
     :return:
     """
+
     def check(*args, **kwargs):
         self = args[0]
         try:
             return function(*args, **kwargs)
         except OperationalError:
             self.session.rollback()
-            return function(*args, **kwargs)    
+            return function(*args, **kwargs)
 
     return check
 
@@ -238,6 +257,7 @@ def for_all_methods(decorator):
     :param decorator:
     :return:
     """
+
     def decorate(cls):
         print(cls.__dict__)
         for attr in cls.__dict__:
@@ -251,6 +271,7 @@ def for_all_methods(decorator):
 @for_all_methods(restart_if_except)
 class DataBase:
     """Class for working with database"""
+
     def __init__(self, engine: Engine):
         self.__engine = engine
         self.__session = Session(engine)
@@ -275,6 +296,7 @@ class DataBase:
 
         return check
         """
+
     def add_group(self, group_name: str):
         """
         Add new group to base
@@ -304,7 +326,7 @@ class DataBase:
     def del_user_group(self, user_id, groups: list):
         self.__session.query(UserGroups).filter(UserGroups.group_id.in_(groups), UserGroups.user_id == user_id).delete()
 
-    def add_admin_group(self, admin_id: int, group_id: int):
+    """def add_admin_group(self, admin_id: int, group_id: int):
         self.__session.add(AdminGroups(admin_id=admin_id, group_id=group_id))
         self.__session.commit()
 
@@ -312,7 +334,7 @@ class DataBase:
         self.__session.query(AdminGroups).filter(
             AdminGroups.group_id.in_(groups),
             AdminGroups.admin_id == admin_id).delete()
-        self.__session.commit()
+        self.__session.commit()"""
 
     def add_equipment_group(self, equipment_id: int, group_id: int):
         self.__session.add(EquipmentGroups(equipment_id=equipment_id, group_id=group_id))
@@ -327,7 +349,8 @@ class DataBase:
 
     def change_user(self, login: str, password: str):
         self.__engine.dispose()
-        self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
+        # self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
+        self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
         self.__session.close()
         self.__session = Session(self.__engine)
 
@@ -385,8 +408,8 @@ class DataBase:
         return self.__session.query(Users).all()
 
     def add_admin(self, admin: Admin):
-        exist = self.__session.query(Admins.id).filter(Admins.mail == admin.mail,
-                                                       Admins.pass_number == admin.pass_number).first()
+        exist = self.__session.query(Users.id).filter(Users.mail == admin.mail,
+                                                      Users.pass_number == admin.pass_number).first()
         if exist:
             raise ValueError("This admin already exists!")
         access = admin.access
@@ -414,7 +437,16 @@ class DataBase:
                 AdminAccesses.can_add_inventory == access.can_add_inventory,
                 AdminAccesses.can_get_request == access.can_get_request,
             ).one()
+        self.add_user(CommonUser(admin.pass_number, admin.mail, Access(admin.access.groups)))
+        user_id = self.__session.query(Users.id).filter(Users.mail == admin.mail,
+                                                        Users.pass_number == admin.pass_number).one()
         db_admin = Admins(
+            user_id=user_id[0],
+            access_id=access_id[0]
+        )
+        self.__session.add(db_admin)
+        self.__session.commit()
+        """db_admin = Admins(
             pass_number=admin.pass_number,
             mail=admin.mail,
             access_id=access_id[0]
@@ -423,7 +455,7 @@ class DataBase:
         self.__session.commit()
         admin_id = self.get_admin_by_mail(admin.mail).id
         for i in admin.access.groups:
-            self.add_admin_group(admin_id, i)
+            self.add_admin_group(admin_id, i)"""
 
     def update_admin(self, old_id: int, old_mail: str, admin: Admin):
         access = admin.access
@@ -451,36 +483,39 @@ class DataBase:
                 AdminAccesses.can_add_inventory == access.can_add_inventory,
                 AdminAccesses.can_get_request == access.can_get_request,
             ).one()
-        self.__session.query(AdminGroups).filter(
-            AdminGroups.admin_id == admin.base_id,
-            AdminGroups.group_id.notin_(admin.access.groups)
+        self.__session.query(UserGroups).filter(
+            UserGroups.user_id == admin.base_id,
+            UserGroups.group_id.notin_(admin.access.groups)
         ).delete()
         exists = list(map(
             list,
-            zip(*self.__session.query(AdminGroups.group_id).filter(AdminGroups.admin_id == admin.base_id).all())
+            zip(*self.__session.query(UserGroups.group_id).filter(UserGroups.user_id == admin.base_id).all())
         ))
         if exists:
             exists = exists[0]
         for i in admin.access.groups:
             if i not in exists:
-                self.__session.add(AdminGroups(admin_id=admin.base_id, group_id=i))
-        self.__session.query(Admins).filter(Admins.mail == old_mail, Admins.pass_number == old_id).update(
-            {"pass_number": admin.pass_number, "mail": admin.mail, "access_id": access_id[0]},
+                self.__session.add(UserGroups(user_id=admin.base_id, group_id=i))
+        self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
+            {"pass_number": admin.pass_number, "mail": admin.mail},
             synchronize_session=False
+        )
+        self.__session.query(Admins).filter(Admins.user_id == admin.base_id).update(
+            {"access_id": access_id[0]}
         )
         self.__session.commit()
 
     def delete_admin(self, admin: Admin):
-        self.__session.query(Admins).filter(Admins.mail == admin.mail, Admins.pass_number == admin.pass_number).delete()
+        self.__session.query(Users).filter(Users.id == admin.base_id).delete()
         self.__session.commit()
 
     def get_admin_by_id(self, pass_number: int):
         self.__session.commit()
-        return self.__session.query(Admins).filter(Admins.pass_number == pass_number).first()
+        return self.__session.query(Admins).join(Users).filter(Users.pass_number == pass_number).first()
 
     def get_admin_by_mail(self, mail: str) -> Union[Admins, None]:
         self.__session.commit()
-        return self.__session.query(Admins).filter(Admins.mail == mail).first()
+        return self.__session.query(Admins).join(Users).filter(Users.mail == mail).first()
 
     def get_all_admins(self):
         self.__session.commit()
@@ -518,7 +553,9 @@ class DataBase:
             ).delete()
             exist_groups = list(map(list, zip(*self.__session.query(EquipmentGroups.group_id).filter(
                 EquipmentGroups.equipment_id == equipment.id
-            ).all())))[0]
+            ).all())))
+            if exist_groups:
+                exist_groups = exist_groups[0]
             for i in equipment.groups:
                 if i not in exist_groups:
                     self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
@@ -555,29 +592,24 @@ class DataBase:
         else:
             return None
 
-    def get_equipment_by_id(self, eq_id: int):
+    def get_tg_user(self, tg_id) -> Union[TelegramLogins, None]:
         self.__session.commit()
-        return self.__session.query(Equipments).filter(Equipments.id == eq_id).first()
+        return self.__session.query(TelegramLogins).filter(TelegramLogins.tg_id == tg_id).first()
 
-    def get_tg_user(self, tg_id) -> Union[TelegramUserLogins, None]:
+    """def get_tg_admin(self, tg_id) -> Union[TelegramAdminLogins, None]:
         self.__session.commit()
-        return self.__session.query(TelegramUserLogins).filter(TelegramUserLogins.tg_id == tg_id).first()
-
-    def get_tg_admin(self, tg_id) -> Union[TelegramAdminLogins, None]:
-        self.__session.commit()
-        return self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).first()
+        return self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).first()"""
 
     def add_tg_user(self, tg_id: int, user_id: int):
-        self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).delete()
         if self.get_tg_user(tg_id):
-            self.__session.query(TelegramUserLogins).filter(TelegramUserLogins.tg_id == tg_id).update(
+            self.__session.query(TelegramLogins).filter(TelegramLogins.tg_id == tg_id).update(
                 {"id": user_id}
             )
         else:
-            self.__session.add(TelegramUserLogins(id=user_id, tg_id=tg_id))
+            self.__session.add(TelegramLogins(id=user_id, tg_id=tg_id))
         self.__session.commit()
 
-    def add_tg_admin(self, tg_id, admin_id):
+    """def add_tg_admin(self, tg_id, admin_id):
         self.__session.query(TelegramUserLogins).filter(TelegramUserLogins.tg_id == tg_id).delete()
         if self.get_tg_admin(tg_id):
             self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).update(
@@ -585,7 +617,7 @@ class DataBase:
             )
         else:
             self.__session.add(TelegramAdminLogins(id=admin_id, tg_id=tg_id))
-        self.__session.commit()
+        self.__session.commit()"""
 
     def add_user_request(self, request: req.Request):
         db_request = UserRequests(
@@ -603,7 +635,7 @@ class DataBase:
         self.__session.add(db_request)
         self.__session.commit()
 
-    def add_admin_request(self, request: req.Request):
+    """def add_admin_request(self, request: req.Request):
         self.__session.add(
             AdminRequests(
                 equipment_id=request.equipment_id,
@@ -614,7 +646,7 @@ class DataBase:
                 taken=request.taken
             )
         )
-        self.__session.commit()
+        self.__session.commit()"""
 
     def get_all_users_requests(self):
         return self.__session.query(UserRequests).all()
@@ -684,6 +716,7 @@ class DataBase:
 
     def get_all_actions(self):
         return self.__session.query(Actions).all()"""
+
 
 """    def get_action_by_passes(self, pass_numbers: list):
         return self.__session.query(Actions).filter(Actions.user_id.in_(pass_numbers)).all()

@@ -22,7 +22,8 @@ dp = Dispatcher(bot, storage=storage)
 registry = DialogRegistry(dp)
 scheduler = AsyncIOScheduler()
 # engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
-engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
+#engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
+engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 1
 sqlalchemy.pool_timeout = 20
@@ -37,7 +38,7 @@ class LoginFilter(BoundFilter):
         self.is_login = is_login
 
     async def check(self, message: Message):
-        if db.get_tg_user(message.from_user.id) or db.get_tg_admin(message.from_user.id):
+        if db.get_tg_user(message.from_user.id):
             return True
         else:
             return False
@@ -60,14 +61,9 @@ class LogSG(StatesGroup):
 async def on_input(msg: Message, dialog: Dialog, manager: DialogManager):
     manager.current_context().dialog_data["mail"] = msg.text
     usr = db.get_user_by_mail(msg.text)
-    adm = db.get_admin_by_mail(msg.text)
     if usr:
         await msg.answer("Успех!")
         db.add_tg_user(msg.from_user.id, usr.id)
-        await manager.done()
-    elif adm:
-        await msg.answer("Успех!")
-        db.add_tg_admin(msg.from_user.id, adm.id)
         await manager.done()
     else:
         await msg.answer("Нет пользователя с такой почтой! Пожалуйста, повторите ввод")
@@ -104,12 +100,8 @@ async def get_data(**kwargs):
 
 async def ans(c: CallbackQuery, button: Button, manager: DialogManager, button_id):
     user = db.get_tg_user(c.from_user.id)
-    admin = db.get_tg_admin(c.from_user.id)
     eq = db.get_equipment_by_id(button_id)
-    if user:
-        mas = [j.group_id for j in user.user.user_groups]
-    else:
-        mas = [j.group_id for j in admin.admin.admin_groups]
+    mas = [j.group_id for j in user.user.user_groups]
     manager.data["title"] = eq.title
     manager.data["description"] = eq.description
     if not any(x in [j.group_id for j in eq.equipment_groups] for x in mas):
@@ -145,7 +137,7 @@ async def switch_to_confirm(msg: Message, dialog: Dialog, manager: DialogManager
 async def send_request(c: CallbackQuery, button: Button, manager: DialogManager):
     r = db.get_last_request(c.from_user.id)
     usr = db.get_tg_user(c.from_user.id)
-    adm = db.get_tg_admin(c.from_user.id)
+    adm = db.get_admin_by_id(usr.user.pass_number)
     if adm:
         db.add_admin_request(req.Request(c.from_user.id, adm.admin.id, db.get_equipment_by_title(r.title).id, 1,
                                          c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
