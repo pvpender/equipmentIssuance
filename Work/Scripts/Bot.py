@@ -29,6 +29,7 @@ sqlalchemy.pool_recycle = 1
 sqlalchemy.pool_timeout = 20
 # session = Session(engine)
 db = DataBase(engine)
+db = DataBase(engine)
 
 
 class LoginFilter(BoundFilter):
@@ -237,7 +238,7 @@ async def send_notification(dp: Dispatcher):
     for i in mas:
         try:
             if i.approved is False:
-                db.del_request(i.id)
+                db.del_user_request(i.id)
                 await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title}")
             else:
                 await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title} принят! Вы можете забрать "

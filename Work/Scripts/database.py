@@ -378,7 +378,9 @@ class DataBase:
             UserGroups.group_id.notin_(user.access.groups)
         ).delete()
         exists = list(map(list, zip(*self.__session.query(UserGroups.group_id).filter(
-            UserGroups.user_id == user.base_id).all())))[0]
+            UserGroups.user_id == user.base_id).all())))
+        if exists:
+            exists = exists[0]
         for i in user.access.groups:
             if i not in exists:
                 self.__session.add(UserGroups(user_id=user.base_id, group_id=i))
