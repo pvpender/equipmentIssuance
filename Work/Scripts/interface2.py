@@ -1477,8 +1477,6 @@ class MainWindow(QMainWindow):
             self.eqSearchAllGrTableView.clearSpans()
             new_table=[]
             for i in self.__allGroups.keys():
-                print(i.find(self.eqChangeGroupByName.text()))
-                print(i)
                 if i.find(self.eqChangeGroupByName.text()) >= 0 or i==self.eqChangeGroupByName.text():
                     new_table.append(i)
             data_frame = pd.DataFrame(new_table,
@@ -1496,8 +1494,6 @@ class MainWindow(QMainWindow):
             self.usSearchAllGrTableView.clearSpans()
             new_table=[]
             for i in self.__allGroups.keys():
-                print(i.find(self.usChangeGroupByName.text()))
-                print(i)
                 if i.find(self.usChangeGroupByName.text()) >= 0 or i==self.usChangeGroupByName.text():
                     new_table.append(i)
             data_frame = pd.DataFrame(new_table,
@@ -1515,8 +1511,6 @@ class MainWindow(QMainWindow):
             self.eqAddAllGrTableView.clearSpans()
             new_table=[]
             for i in self.__allGroups.keys():
-                print(i.find(self.eqAddGroupByName.text()))
-                print(i)
                 if i.find(self.eqAddGroupByName.text()) >= 0 or i==self.eqAddGroupByName.text():
                     new_table.append(i)
             data_frame = pd.DataFrame(new_table,
@@ -1534,8 +1528,6 @@ class MainWindow(QMainWindow):
             self.usAddAllGrTableView.clearSpans()
             new_table=[]
             for i in self.__allGroups.keys():
-                print(i.find(self.usAddGroupByName.text()))
-                print(i)
                 if i.find(self.usAddGroupByName.text()) >= 0 or i==self.usAddGroupByName.text():
                     new_table.append(i)
             data_frame = pd.DataFrame(new_table,
@@ -2038,9 +2030,8 @@ class MainWindow(QMainWindow):
             except ValueError:
                 show_message("Ошибка", "ID должен быть числом")
         if self.ussearchByEmailOrNameLineEdit.text() != "":
-            name = self.ussearchByEmailOrNameLineEdit.text()
             for i in self.__usTableContents:
-                if i[1] == self.ussearchByEmailOrNameLineEdit.text():
+                if i[1] == self.ussearchByEmailOrNameLineEdit.text() or i[1].find(self.ussearchByEmailOrNameLineEdit.text())>=0:
                     found2.append(i)
         if self.ussearchByGroupLineEdit.text() != "" and self.ussearchByGroupLineEdit.text() in self.__allGroups.keys():
             for i in self.__user_list.get_user_by_group(self.__allGroups.get(self.ussearchByGroupLineEdit.text())):
@@ -2103,14 +2094,10 @@ class MainWindow(QMainWindow):
         if self.eqsearchByEmailOrNameLineEdit.text() != "":
             name = self.eqsearchByEmailOrNameLineEdit.text()
             for i in self.__eqTableContents:
-                if i[1] == name:
+                if i[1] == name or i[1].find(name)>=0:
                     found2.append(i)
                     break
         if self.eqsearchByGroupLineEdit.text() != "" and self.eqsearchByGroupLineEdit.text() in self.__allGroups.keys():
-            print(self.__allGroups)
-            print(self.__allGroups[self.eqsearchByGroupLineEdit.text()])
-            print(self.__equipment_list.get_equipment_by_group(
-                int(self.__allGroups[self.eqsearchByGroupLineEdit.text()])))
             for i in self.__equipment_list.get_equipment_by_group(
                     self.__allGroups[self.eqsearchByGroupLineEdit.text()]):
                 x = ""
