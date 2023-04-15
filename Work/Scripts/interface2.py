@@ -1107,9 +1107,9 @@ class MainWindow(QMainWindow):
         self.eqsearchByIdLabel_19 = QtWidgets.QLabel(parent=self.viewInvOrUserBox_2)
         self.eqsearchByIdLabel_19.setGeometry(QtCore.QRect(10, 90, 111, 21))
         self.eqsearchByIdLabel_19.setObjectName("eqsearchByIdLabel_19")
-        self.ussearchByGroupLineEdit_2 = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox_2)
-        self.ussearchByGroupLineEdit_2.setGeometry(QtCore.QRect(120, 90, 181, 22))
-        self.ussearchByGroupLineEdit_2.setObjectName("ussearchByGroupLineEdit_2")
+        self.ussearchByGroupLineEdit = QtWidgets.QLineEdit(parent=self.viewInvOrUserBox_2)
+        self.ussearchByGroupLineEdit.setGeometry(QtCore.QRect(120, 90, 181, 22))
+        self.ussearchByGroupLineEdit.setObjectName("ussearchByGroupLineEdit")
         self.tabWidget.addTab(self.tab_4, "")
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
@@ -2042,8 +2042,8 @@ class MainWindow(QMainWindow):
             for i in self.__usTableContents:
                 if i[1] == self.ussearchByEmailOrNameLineEdit.text():
                     found2.append(i)
-        if self.usChangeGroupByName.text() != "" and self.usChangeGroupByName.text() in self.__allGroups.keys():
-            for i in self.__user_list.get_user_by_group(self.__allGroups.get(self.usChangeGroupByName.text())):
+        if self.ussearchByGroupLineEdit.text() != "" and self.ussearchByGroupLineEdit.text() in self.__allGroups.keys():
+            for i in self.__user_list.get_user_by_group(self.__allGroups.get(self.ussearchByGroupLineEdit.text())):
                 found4.append([
                     str(hex(i.pass_number)),
                     i.mail,
