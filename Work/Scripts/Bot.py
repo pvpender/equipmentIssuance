@@ -102,16 +102,15 @@ async def get_data(**kwargs):
 async def ans(c: CallbackQuery, button: Button, manager: DialogManager, button_id):
     user = db.get_tg_user(c.from_user.id)
     eq = db.get_equipment_by_id(button_id)
-    mas = [j.group_id for j in user.user.user_groups]
     manager.data["title"] = eq.title
     manager.data["description"] = eq.description
-    if not any(x in [j.group_id for j in eq.equipment_groups] for x in mas):
+    """if not any(x in [j.group_id for j in eq.equipment_groups] for x in mas):
         manager.data["possible"] = "Вы не можете запросить это оборудование."
         manager.data["extend"] = False
-    else:
-        manager.data["possible"] = "Вы можете запросить это оборудование"
-        manager.data["extend"] = True
-        db.add_last_request(c.from_user.id, eq.title)
+    else:"""
+    manager.data["possible"] = "Вы можете запросить это оборудование"
+    manager.data["extend"] = True
+    db.add_last_request(c.from_user.id, eq.title)
     await manager.dialog().switch_to(MySG.preview)
 
 
@@ -139,11 +138,20 @@ async def send_request(c: CallbackQuery, button: Button, manager: DialogManager)
     r = db.get_last_request(c.from_user.id)
     usr = db.get_tg_user(c.from_user.id)
     adm = db.get_admin_by_id(usr.user.pass_number)
+    eq = db.get_equipment_by_title(r.title)
+    mas = [j.group_id for j in usr.user.user_groups]
     if adm:
         db.add_admin_request(req.Request(c.from_user.id, adm.admin.id, db.get_equipment_by_title(r.title).id, 1,
                                          c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
         await c.message.edit_text(f"Оборудование {r.title} заказано!\nНа правах администратора система вам автоматически"
                                   f"одобрила запрос! Вы можете забрать оборудование уже сейчас!")
+        await manager.done()
+    elif any(x in [j.group_id for j in eq.equipment_groups] for x in mas):
+        db.add_admin_request(req.Request(c.from_user.id, usr.user.id, db.get_equipment_by_title(r.title).id, 1,
+                                         c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
+        await c.message.edit_text(f"Оборудование {r.title} заказано!\nТак как вы принадлежите к одной из групп с "
+                                  f"доступом - система вам автоматически одобрила запрос! "
+                                  f"Вы можете забрать оборудование уже сейчас!")
         await manager.done()
     else:
         request = req.Request(c.from_user.id, usr.user.id, db.get_equipment_by_title(r.title).id,
