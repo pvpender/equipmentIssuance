@@ -637,18 +637,23 @@ class DataBase:
         self.__session.add(db_request)
         self.__session.commit()
 
-    """def add_admin_request(self, request: req.Request):
-        self.__session.add(
-            AdminRequests(
-                equipment_id=request.equipment_id,
-                count=request.count,
-                purpose=request.purpose,
-                sender_tg_id=request.sender_tg_id,
-                sender_id=request.sender_id,
-                taken=request.taken
-            )
+    def add_admin_request(self, request: req.Request):
+        db_request = UserRequests(
+            sender_tg_id=request.sender_tg_id,
+            sender_id=request.sender_id,
+            equipment_id=request.equipment_id,
+            count=request.count,
+            purpose=request.purpose,
+            solved=True,
+            approved=True,
+            notified=True
         )
-        self.__session.commit()"""
+        eq = self.get_equipment_by_id(request.equipment_id)
+        eq.reserve_count += 1
+        if isinstance(eq, Union[Equipments, Equipments]):
+            self.update_equipment(eq)
+        self.__session.add(db_request)
+        self.__session.commit()
 
     def get_all_users_requests(self):
         return self.__session.query(UserRequests).all()
