@@ -1661,6 +1661,8 @@ class MainWindow(QMainWindow):
 
     def refresh_users_table(self):
         self.usChangeSearchGroupsGroupBox.hide()
+        self.listLabel_19.hide()
+        self.listLabel_4.setText("Все пользователи")
         self.uschangerGroupBox.hide()
         self.__usFoundTableContents = []
         self.usTableView.clearSpans()
@@ -1992,6 +1994,7 @@ class MainWindow(QMainWindow):
     def setEqInfo(self):
         self.eqTableView.selectRow(self.__eqnum)
         self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
+        self.eqsearchByEmailOrNameLineEdit_2.setText(self.__equipment_list.get_equipment_by_id(int(self.__eqFoundTableContents[self.__eqnum][0])).description)
         self.eqsearchByEmailOrNameLineEdit.setText(self.__eqFoundTableContents[self.__eqnum][1])
         if self.__eqFoundTableContents[self.__eqnum][5] != '--':
             self.searchByHeightSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][5]))
@@ -2073,6 +2076,8 @@ class MainWindow(QMainWindow):
                 self.usSearchAllGrTableView.show()
                 self.usSearchGrToSelected.show()
                 self.usChangeSearchGroupsGroupBox.show()
+                self.listLabel_19.show()
+                self.listLabel_4.setText("Группы пользователя")
         else:
             show_message("Проблема", "Ничего не найдено")
 
