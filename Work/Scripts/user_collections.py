@@ -79,7 +79,8 @@ class UserCollection:
         del self.__objects[pass_number]
         self.__objects.update({user.pass_number: user})
 
-    def del_user(self, pass_number: str):
+    def del_user(self, pass_number: int):
+        print(self.__objects)
         if isinstance(self.__objects[pass_number], CommonUser):
             self.__db.delete_user(self.__objects[pass_number])
         else:
