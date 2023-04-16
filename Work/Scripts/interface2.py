@@ -128,12 +128,14 @@ class MainWindow(QMainWindow):
         self.__currEqGroupsTableContents = []
         self.__addUsTableContents = []
         self.__addEqTableContents = []
+        self.__currGroupsTableContents = []
         self.__allGroups = {}
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_users_requests()
         self.__reqnum = 0
         self.__eqnum = -1
         self.__usnum = -1
+        self.__grnum = -1
         # self.eqTableView.setGeometry(QtCore.QRect(600, 40, 581, 721))
         # self.usTableView.setGeometry(QtCore.QRect(620, 30, 701, 721))
         # self.__sidePanel = QFrame(self)
@@ -569,7 +571,7 @@ class MainWindow(QMainWindow):
                                            "}")
         self.grAddPushButton.setObjectName("grAddPushButton")
         self.grTableView = QtWidgets.QTableView(parent=self.tab_16)
-        self.grTableView.setGeometry(QtCore.QRect(440, 40, 661, 661))
+        self.grTableView.setGeometry(QtCore.QRect(490, 40, 611, 561))
         self.grTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.grTableView.setObjectName("grTableView")
         self.grSearchPushButton = QtWidgets.QPushButton(parent=self.tab_16)
@@ -592,7 +594,7 @@ class MainWindow(QMainWindow):
                                               "}")
         self.grSearchPushButton.setObjectName("grSearchPushButton")
         self.listLabel_13 = QtWidgets.QLabel(parent=self.tab_16)
-        self.listLabel_13.setGeometry(QtCore.QRect(440, 10, 161, 20))
+        self.listLabel_13.setGeometry(QtCore.QRect(490, 10, 161, 20))
         self.listLabel_13.setObjectName("listLabel_13")
         self.grRefreshPushButton = QtWidgets.QPushButton(parent=self.tab_16)
         self.grRefreshPushButton.setGeometry(QtCore.QRect(20, 220, 401, 41))
@@ -632,6 +634,47 @@ class MainWindow(QMainWindow):
                                               " transition: 0.9s; \n"
                                               "}")
         self.grDeletePushButton.setObjectName("grDeletePushButton")
+        self.grPrevPushButton = QtWidgets.QPushButton(parent=self.tab_16)
+        self.grPrevPushButton.setGeometry(QtCore.QRect(450, 70, 31, 51))
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        self.grPrevPushButton.setFont(font)
+        self.grPrevPushButton.setStyleSheet("QPushButton{\n"
+                                            " background-color: #081f2d; \n"
+                                            " border-radius: 8px; \n"
+                                            " border: 2px solid #081F2D; \n"
+                                            " color: white; \n"
+                                            " font-size: 15px;  \n"
+                                            " cursor: pointer; \n"
+                                            " transition: 0.3s; \n"
+                                            " }\n"
+                                            " \n"
+                                            "QPushButton:hover{ \n"
+                                            " background-color: white; \n"
+                                            " color: #081F2D; \n"
+                                            " border-color: #081F2D;\n"
+                                            " transition: 0.9s; \n"
+                                            "}")
+        self.grPrevPushButton.setObjectName("grPrevPushButton")
+        self.grNextPushButton = QtWidgets.QPushButton(parent=self.tab_16)
+        self.grNextPushButton.setGeometry(QtCore.QRect(450, 140, 31, 51))
+        self.grNextPushButton.setStyleSheet("QPushButton{\n"
+                                            " background-color: #081f2d; \n"
+                                            " border-radius: 8px; \n"
+                                            " border: 2px solid #081F2D; \n"
+                                            " color: white; \n"
+                                            " font-size: 15px;  \n"
+                                            " cursor: pointer; \n"
+                                            " transition: 0.3s; \n"
+                                            " }\n"
+                                            " \n"
+                                            "QPushButton:hover{ \n"
+                                            " background-color: white; \n"
+                                            " color: #081F2D; \n"
+                                            " border-color: #081F2D;\n"
+                                            " transition: 0.9s; \n"
+                                            "}")
+        self.grNextPushButton.setObjectName("grNextPushButton")
         self.tabWidget.addTab(self.tab_16, "")
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
@@ -1485,6 +1528,10 @@ class MainWindow(QMainWindow):
         self.listLabel_13.setText(_translate("MainWindow", "Все группы"))
         self.grRefreshPushButton.setText(_translate("MainWindow", "Вернуть полный список"))
         self.grDeletePushButton.setText(_translate("MainWindow", "Удалить группу"))
+        self.grPrevPushButton.setText(_translate("MainWindow", "▲\n"
+                                                               "||"))
+        self.grNextPushButton.setText(_translate("MainWindow", "||\n"
+                                                               "▼"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_16), _translate("MainWindow", "Добавление групп"))
         self.searchByIdLabel_2.setText(_translate("MainWindow", "ID карты пропуска"))
         self.searchByEmailOrNameLabel_2.setText(_translate("MainWindow", "Email"))
@@ -1572,8 +1619,6 @@ class MainWindow(QMainWindow):
         self.eqchangerprevPushButton.clicked.connect(self.previousEq)
         self.uschangernextPushButton.clicked.connect(self.nextUs)
         self.uschangerprevPushButton.clicked.connect(self.previousUs)
-        # self.uscommitchangesPushButton.clicked.connect(self.testForButton)
-        # self.uscommitchangesPushButton.doubleClicked.connect(self.testForDCButton)
         self.uscommitchangesPushButton.clicked.connect(self.changeUs)
         self.eqcommitchangesPushButton.clicked.connect(self.changeEq)
         self.eqGrToSelected.clicked.connect(self.selected_to_eq_groups)
@@ -1598,7 +1643,6 @@ class MainWindow(QMainWindow):
         self.eqsearchByReservedSpinBox.setMinimum(-1)
         self.eqsearchByNumberSpinBox.setValue(-1)
         self.eqsearchByReservedSpinBox.setValue(-1)
-        # self.searchPushButton.clicked.connect(self.searchUsOrEq)
         self.heightSpinBox.setMinimum(-1)
         self.posFromLeftSpinBox.setMinimum(-1)
         self.reqsearchByCount.setMinimum(-1)
@@ -1630,7 +1674,58 @@ class MainWindow(QMainWindow):
         self.usAddRefreshGroupButton.clicked.connect(self.refresh_groups_in_us_add_groups)
         self.eqAddSearchGroupButton.clicked.connect(self.search_groups_in_eq_add_groups)
         self.eqAddRefreshGroupButton.clicked.connect(self.refresh_groups_in_eq_add_groups)
+        self.grRefreshPushButton.clicked.connect(self.refresh_only_groups_table)
+        self.grSearchPushButton.clicked.connect(self.search_groups_in_groups)
+        self.grPrevPushButton.clicked.connect(self.prevGr)
+        self.grNextPushButton.clicked.connect(self.nextGr)
+        self.grDeletePushButton.hide()
+        self.grNextPushButton.hide()
+        self.grPrevPushButton.hide()
+        self.usChangeDeleteGroupsButton.hide()
+        self.eqChangeDeleteGroupsButton.hide()
         self.show()
+    def search_groups_in_groups(self):
+        if self.grAddLineEdit.text()!='':
+            self.__currGroupsTableContents = []
+            for i in self.__allGroups.keys():
+                if i.find(self.grAddLineEdit.text())>=0:
+                    self.__currGroupsTableContents.append(i)
+            if len(self.__currGroupsTableContents)>0:
+                self.grTableView.clearSpans()
+                data_frame = pd.DataFrame(self.__currGroupsTableContents,
+                                          columns=["Название группы"],
+                                          index=[i for i in range(len(self.__currGroupsTableContents))])
+                model = TableModel(data_frame)
+                self.grTableView.setModel(model)
+                self.grAddLineEdit.setText("")
+                self.__grnum=0
+                self.grDeletePushButton.show()
+                self.grAddPushButton.setText("Принять изменения")
+                self.set_gr_info()
+            else:
+                show_message('Проблема','Ничего не найдено')
+                self.__grnum=-1
+    def set_gr_info(self):
+        if self.__grnum!=-1:
+            self.grTableView.selectRow(self.__grnum)
+            if self.__grnum >= 0 and self.__grnum <= len(self.__currGroupsTableContents) -1:
+                self.grAddLineEdit.setText(self.__currGroupsTableContents[self.__grnum])
+            if self.__grnum == 0:
+                self.grPrevPushButton.hide()
+            else:
+                self.grPrevPushButton.show()
+            if self.__grnum == len(self.__currGroupsTableContents) -1:
+                self.grNextPushButton.hide()
+            else:
+                self.grNextPushButton.show()
+    def prevGr(self):
+        if self.__grnum>0:
+            self.__grnum = self.__grnum - 1
+            self.set_gr_info()
+    def nextGr(self):
+            if self.__grnum<= len(self.__currGroupsTableContents)-1:
+                self.__grnum = self.__grnum + 1
+                self.set_gr_info()
 
     def search_groups_in_eq_search_groups(self):
         if self.eqChangeGroupByName.text() != '':
@@ -1817,8 +1912,11 @@ class MainWindow(QMainWindow):
         self.listLabel_3.hide()
         self.listLabel_20.hide()
         self.eqTableView.setGeometry(QtCore.QRect(420, 40, 1201, 721))
-        self.usChangeSearchGroupsGroupBox.hide()
+        self.eqChangeSearchGroupsGroupBox.hide()
         self.eqsearchByEmailOrNameLineEdit_2.setText("")
+        self.eqsearchByGroupLineEdit.setText("")
+        self.eqChangeDelPushButton.hide()
+        self.eqChangeDeleteGroupsButton.hide()
 
     def refresh_users_table(self):
         self.usChangeSearchGroupsGroupBox.hide()
@@ -1847,6 +1945,10 @@ class MainWindow(QMainWindow):
         self.usTableView.setGeometry(QtCore.QRect(470, 30, 1101, 721))
         self.ussearchByNameOrEmailLineEdit.setText("")
         self.ussearchByEmailOrNameLineEdit.setText("")
+        self.ussearchByGroupLineEdit.setText("")
+        self.usChangeDelPushButton.hide()
+        self.usChangeDeleteGroupsButton.hide()
+
     def refresh_gr_view_table(self):
         self.grTableView.clearSpans()
         self.eqAddAllGrTableView.clearSpans()
@@ -1868,7 +1970,18 @@ class MainWindow(QMainWindow):
         self.usAddAllGrTableView.setModel(model)
         self.usSearchAllGrTableView.setModel(model)
         self.eqSearchAllGrTableView.setModel(model)
-
+    def refresh_only_groups_table(self):
+        self.grTableView.clearSpans()
+        data_frame = pd.DataFrame(self.__allGroups.keys(),
+                                  columns=["Название группы"],
+                                  index=[i for i in range(len(self.__allGroups.keys()))])
+        model = TableModel(data_frame)
+        self.grTableView.setModel(model)
+        self.grDeletePushButton.hide()
+        self.grNextPushButton.hide()
+        self.grPrevPushButton.hide()
+        self.grAddPushButton.setText("Добавить")
+        self.__grnum=-1
     def refresh_selected_us_groups(self):
         self.usAddSelectedGrTableView.clearSpans()
         data_frame = pd.DataFrame(self.__addUsTableContents,
@@ -1900,7 +2013,6 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__currUsGroupsTableContents))])
         model = TableModel(data_frame)
         self.usGroupsTableView.setModel(model)
-
     def refresh_requests_table(self):
         # self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
@@ -1926,7 +2038,6 @@ class MainWindow(QMainWindow):
         self.tableView2.setModel(model)
         self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         self.get_request()
-
     def add_equipment(self):
         code_error = -1
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
@@ -1974,7 +2085,6 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "Оборудование с таким названием уже есть в базе")
             elif code_error == 9:
                 show_message("Ошибка добавления", "Ячейка занята")
-
     def add_user(self):
         code_error = -1
         add_users = False
@@ -2053,7 +2163,6 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка добавления", "пользователь с такой картой уже добавлен")
             elif code_error == 8:
                 show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
-
     def add_group(self):
         code_error = -1
         if self.grAddLineEdit.text() == '':
@@ -2062,15 +2171,12 @@ class MainWindow(QMainWindow):
             code_error = 4
         if code_error == -1:
             self.__db.add_group(self.grAddLineEdit.text())
+            self.grAddLineEdit.setText("")
             self.refresh_gr_view_table()
         elif code_error == 2:
             show_message("Ошибка добавления", "Введите название группы")
         elif code_error == 4:
             show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
-
-    # def search_gr(self):
-    # indexes = self.grTableView.selectionModel().selectedRows()
-    # for i in indexes:
     def changeUs(self):
         code_error = -1
 
@@ -2105,7 +2211,6 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка изменения", "этот ID уже занят")
             elif code_error == 8:
                 show_message("Ошибка изменения", "Другой пользователь с таким email уже добавлен")
-
     def changeEq(self):
         code_error = -1
         if (self.__equipment_list.get_equipment_by_title(
@@ -2138,8 +2243,20 @@ class MainWindow(QMainWindow):
                 show_message("Ошибка изменения", "Не отмечены права для получения")
             elif code_error == 8:
                 show_message("Ошибка изменения", "Уже существует оборудование с таким названием")
-
     def setUsInfo(self):
+        if self.__usnum==0:
+            self.uschangerprevPushButton.hide()
+            self.uschangernextPushButton.show()
+
+        elif self.__usnum==len(self.__usFoundTableContents) - 1:
+            self.uschangernextPushButton.hide()
+            self.uschangerprevPushButton.show()
+        elif len(self.__usFoundTableContents)==0:
+            self.uschangerprevPushButton.hide()
+            self.uschangernextPushButton.hide()
+        else:
+            self.uschangerprevPushButton.show()
+            self.uschangernextPushButton.show()
         self.usTableView.selectRow(self.__usnum)
         self.ussearchByNameOrEmailLineEdit.setText(self.__usFoundTableContents[self.__usnum][0])
         self.ussearchByEmailOrNameLineEdit.setText(self.__usFoundTableContents[self.__usnum][1])
@@ -2154,8 +2271,20 @@ class MainWindow(QMainWindow):
         self.usGroupsTableView.setModel(model)
         if len(self.__usFoundGroups) > 0:
             self.usSearchDelFromSelectedGr.show()
-
     def setEqInfo(self):
+        if self.__eqnum==0:
+            self.eqchangerprevPushButton.hide()
+            self.eqchangernextPushButton.show()
+
+        elif self.__eqnum==len(self.__eqFoundTableContents) - 1:
+            self.eqchangernextPushButton.hide()
+            self.eqchangerprevPushButton.show()
+        elif len(self.__eqFoundTableContents)==0:
+            self.eqchangerprevPushButton.hide()
+            self.eqchangernextPushButton.hide()
+        else:
+            self.eqchangerprevPushButton.show()
+            self.eqchangernextPushButton.show()
         self.eqTableView.selectRow(self.__eqnum)
         self.eqsearchByIdSpinBox.setValue(int(self.__eqFoundTableContents[self.__eqnum][0]))
         self.eqsearchByEmailOrNameLineEdit_2.setText(self.__equipment_list.get_equipment_by_id(int(self.__eqFoundTableContents[self.__eqnum][0])).description)
@@ -2181,7 +2310,6 @@ class MainWindow(QMainWindow):
         self.eqGroupsTableView.setModel(model)
         if len(self.__eqFoundGroups) > 0:
             self.eqSearchDelFromSelectedGr.show()
-
     def search_users(self):
         found = []
         found2 = []
@@ -2242,9 +2370,10 @@ class MainWindow(QMainWindow):
                 self.usChangeSearchGroupsGroupBox.show()
                 self.listLabel_19.show()
                 self.listLabel_4.setText("Группы пользователя")
+                self.usChangeDelPushButton.show()
+                self.eqChangeDeleteGroupsButton.show()
         else:
             show_message("Проблема", "Ничего не найдено")
-
     def searchEq(self):
         found = []
         found2 = []
@@ -2375,16 +2504,17 @@ class MainWindow(QMainWindow):
             self.setEqInfo()
             if self.__admin_access.can_change_inventory:
                 self.eqchangerGroupBox.show()
-            self.eqTableView.setGeometry(QtCore.QRect(840, 40, 781, 721))
-            self.eqSearchAllGrTableView.show()
-            self.eqGroupsTableView.show()
-            self.eqSearchGrToSelected.show()
-            self.listLabel_3.show()
-            self.listLabel_20.show()
-            self.eqChangeSearchGroupsGroupBox.show()
+                self.eqTableView.setGeometry(QtCore.QRect(840, 40, 781, 721))
+                self.eqSearchAllGrTableView.show()
+                self.eqGroupsTableView.show()
+                self.eqSearchGrToSelected.show()
+                self.listLabel_3.show()
+                self.listLabel_20.show()
+                self.eqChangeSearchGroupsGroupBox.show()
+                self.eqChangeDelPushButton.show()
+                self.eqChangeDeleteGroupsButton.show()
         else:
             show_message("Проблема", "Ничего не найдено")
-
     def search_request(self):
         found = []
         found2 = []
@@ -2468,35 +2598,30 @@ class MainWindow(QMainWindow):
             self.tableView2.setModel(model)
         else:
             show_message("Проблема", "Ничего не найдено")
-
     def previousEq(self):
         if self.__eqnum > 0:
             self.__eqnum = self.__eqnum - 1
             self.setEqInfo()
         else:
             show_message("Ошибка", "Это первый элемент в списке")
-
     def nextEq(self):
         if self.__eqnum < len(self.__eqFoundTableContents) - 1:
             self.__eqnum = self.__eqnum + 1
             self.setEqInfo()
         else:
             show_message("Ошибка", "Элемент последний в списке")
-
     def previousUs(self):
         if self.__usnum > 0:
             self.__usnum = self.__usnum - 1
             self.setUsInfo()
         else:
             show_message("Ошибка", "Это первый элемент в списке")
-
     def nextUs(self):
         if self.__usnum < len(self.__usFoundTableContents) - 1:
             self.__usnum = self.__usnum + 1
             self.setUsInfo()
         else:
             show_message("Ошибка", "Элемент последний в списке")
-
     def get_request(self):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__user_list.get_user_by_id(
@@ -2509,27 +2634,22 @@ class MainWindow(QMainWindow):
         else:
             self.__reqnum -= 1
             show_message("Сообщение", "Запросов нет")
-
     def previous_request(self):
         if self.__reqnum > 0:
             self.__reqnum = self.__reqnum - 1
             self.get_request()
         else:
             show_message("Ошибка", "Запрос уже первый в списке")
-
     def next_request(self):
         if self.__reqnum < len(self.__reqs):
             self.__reqnum = self.__reqnum + 1
             self.get_request()
         else:
             show_message("Ошибка", "Запрос последний в списке")
-
     def reject_request(self):
         self.decide_request(False)
-
     def approve_request(self):
         self.decide_request(True)
-
     def decide_request(self, decision):
         if len(self.__reqs) != 0:
             self.__reqs[self.__reqnum].solved = True
@@ -2542,7 +2662,6 @@ class MainWindow(QMainWindow):
             self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         else:
             show_message("Ошибка", "Запросов нет")
-
     class TableModel(QtCore.QAbstractTableModel):
         def __init__(self, data):
             super(TableModel, self).__init__()
