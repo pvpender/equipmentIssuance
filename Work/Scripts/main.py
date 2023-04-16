@@ -18,7 +18,8 @@ import datetime
 
 #engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 #engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base",  pool_recycle=18000, pool_timeout=10,
+                                      pool_size=10, connect_args={'connect_timeout': 2})
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
@@ -45,6 +46,8 @@ mas = user_list.get_user_list()
 #print(db.get_inv_from_act_as_df(["test", "тестик"]))
 
 equipment_list = EquipmentCollection(db)
+
+print(user_list.get_user_by_id(1))
 
 app = QApplication([])
 

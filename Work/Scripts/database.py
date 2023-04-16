@@ -137,11 +137,11 @@ class LastRequest(Base):
 class UserRequests(Base):
     __tablename__ = "user_requests"
     id: Mapped[int] = mapped_column(primary_key=True)
-    equipment_id: Mapped[int]
+    equipment_id: Mapped[int] = mapped_column(ForeignKey("equipments.id", ondelete='CASCADE'))
     count: Mapped[int] = mapped_column(default=1)
     purpose: Mapped[str] = mapped_column(Text)
     sender_tg_id: Mapped[int] = mapped_column(BigInteger)
-    sender_id: Mapped[int]
+    sender_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete='CASCADE'))
     solved: Mapped[bool] = mapped_column(default=False)
     approved: Mapped[bool] = mapped_column(nullable=True)
     approved_id: Mapped[int] = mapped_column(nullable=True)
@@ -357,7 +357,8 @@ class DataBase:
     def change_user(self, login: str, password: str):
         self.__engine.dispose()
         # self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-        self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+        self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base", pool_recycle=18000, pool_timeout=10,
+                                      pool_size=10, connect_args={'connect_timeout': 2})
         self.__session.close()
         self.__session = Session(self.__engine)
 
