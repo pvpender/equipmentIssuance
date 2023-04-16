@@ -1729,7 +1729,8 @@ class MainWindow(QMainWindow):
                 self.set_gr_info()
     #def changeGroup(self):
     def del_user(self):
-        self.__user_list.del_user(str(self.__user_list.get_user_by_mail(self.__currUsGroupsTableContents[self.__usnum][1]).pass_number))
+        print(str(self.__user_list.get_user_by_mail(self.__usFoundTableContents[self.__usnum][1]).pass_number))
+        self.__user_list.del_user(str(self.__user_list.get_user_by_mail(self.__usFoundTableContents[self.__usnum][1]).pass_number))
         self.__currUsGroupsTableContents.pop(self.__usnum)
         if len(self.__currUsGroupsTableContents)>0:
             self.usTableView.clearSpans()
