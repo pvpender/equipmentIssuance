@@ -1736,10 +1736,11 @@ class MainWindow(QMainWindow):
             data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта"],
                                       index=[i for i in range(len(self.__usTableContents))])
             model = TableModel(data_frame)
+            self.setUsInfo()
             self.usTableView.setModel(model)
         else:
             self.refresh_users_table()
-            show_message("Пользователь удален")
+            show_message("успех","Пользователь удален")
     def search_groups_in_eq_search_groups(self):
         if self.eqChangeGroupByName.text() != '':
             self.eqSearchAllGrTableView.clearSpans()
