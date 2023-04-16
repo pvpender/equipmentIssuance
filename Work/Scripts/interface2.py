@@ -1770,7 +1770,6 @@ class MainWindow(QMainWindow):
             self.grTableView.selectRow(self.__grnum)
             self.grTableView.setModel(model)
         else:
-            self.refresh_gr_view_table()
             show_message("успех","Группа удалена")
         self.eqGroupsTableView.clearSpans()
         self.usGroupsTableView.clearSpans()
@@ -1806,7 +1805,8 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__addUsTableContents))])
         model = TableModel(data_frame)
         self.usAddSelectedGrTableView.setModel(model)
-        del self.__allGroups[self.__currGroupsTableContents[self.__grnum]]
+        del self.__allGroups[to_delete]
+        self.refresh_gr_view_table()
     def change_group(self):
         if self.grAddLineEdit.text()!='':
             if self.grAddLineEdit.text() in self.__allGroups.keys() and self.grAddLineEdit.text()!=self.__currGroupsTableContents[self.__grnum]:
