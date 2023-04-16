@@ -1730,12 +1730,12 @@ class MainWindow(QMainWindow):
     #def changeGroup(self):
     def del_user(self):
         print(str(self.__user_list.get_user_by_mail(self.__usFoundTableContents[self.__usnum][1]).pass_number))
-        self.__user_list.del_user(str(self.__user_list.get_user_by_mail(self.__usFoundTableContents[self.__usnum][1]).pass_number))
-        self.__currUsGroupsTableContents.pop(self.__usnum)
-        if len(self.__currUsGroupsTableContents)>0:
+        self.__user_list.del_user(int(str(self.__user_list.get_user_by_mail(self.__usFoundTableContents[self.__usnum][1]).pass_number),16))
+        self.__usFoundTableContents.pop(self.__usnum)
+        if len(self.__usFoundTableContents)>0:
             self.usTableView.clearSpans()
-            data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта"],
-                                      index=[i for i in range(len(self.__usTableContents))])
+            data_frame = pd.DataFrame(self.__usFoundTableContents, columns=["ID карты", "Почта"],
+                                      index=[i for i in range(len(self.__usFoundTableContents))])
             model = TableModel(data_frame)
             self.setUsInfo()
             self.usTableView.setModel(model)
