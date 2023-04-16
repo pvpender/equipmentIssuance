@@ -244,7 +244,8 @@ def restart_if_except(function):
         self = args[0]
         try:
             return function(*args, **kwargs)
-        except OperationalError:
+        except OperationalError as oe:
+            print(oe)
             self.session.rollback()
             return function(*args, **kwargs)
 
@@ -304,6 +305,12 @@ class DataBase:
         :return: None
         """
         self.__session.add(Groups(group_name=group_name))
+        self.__session.commit()
+
+    def rename_group(self, group_id: int, new_name: str):
+        self.__session.query(Groups).filter(Groups.id == group_id).update(
+            {"group_name": new_name}
+        )
         self.__session.commit()
 
     def del_group(self, group_id: int):
