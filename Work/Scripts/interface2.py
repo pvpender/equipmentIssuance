@@ -1683,6 +1683,7 @@ class MainWindow(QMainWindow):
         self.grPrevPushButton.hide()
         self.usChangeDeleteGroupsButton.hide()
         self.eqChangeDeleteGroupsButton.hide()
+        self.usChangeDelPushButton.clicked.connect(self.del_user)
         self.show()
     def search_groups_in_groups(self):
         if self.grAddLineEdit.text()!='':
@@ -1726,7 +1727,19 @@ class MainWindow(QMainWindow):
             if self.__grnum<= len(self.__currGroupsTableContents)-1:
                 self.__grnum = self.__grnum + 1
                 self.set_gr_info()
-
+    #def changeGroup(self):
+    def del_user(self):
+        self.__user_list.del_user(str(self.__user_list.get_user_by_mail(self.__currUsGroupsTableContents[self.__usnum][1]).pass_number))
+        self.__currUsGroupsTableContents.pop(self.__usnum)
+        if len(self.__currUsGroupsTableContents)>0:
+            self.usTableView.clearSpans()
+            data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта"],
+                                      index=[i for i in range(len(self.__usTableContents))])
+            model = TableModel(data_frame)
+            self.usTableView.setModel(model)
+        else:
+            self.refresh_users_table()
+            show_message("Пользователь удален")
     def search_groups_in_eq_search_groups(self):
         if self.eqChangeGroupByName.text() != '':
             self.eqSearchAllGrTableView.clearSpans()
@@ -2164,19 +2177,22 @@ class MainWindow(QMainWindow):
             elif code_error == 8:
                 show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
     def add_group(self):
-        code_error = -1
-        if self.grAddLineEdit.text() == '':
-            code_error = 2
-        elif self.__db.get_group_by_name(self.grAddLineEdit.text()) != None:
-            code_error = 4
-        if code_error == -1:
-            self.__db.add_group(self.grAddLineEdit.text())
-            self.grAddLineEdit.setText("")
-            self.refresh_gr_view_table()
-        elif code_error == 2:
-            show_message("Ошибка добавления", "Введите название группы")
-        elif code_error == 4:
-            show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
+        if self.__grnum!=-1:
+            code_error = -1
+            if self.grAddLineEdit.text() == '':
+                code_error = 2
+            elif self.__db.get_group_by_name(self.grAddLineEdit.text()) != None:
+                code_error = 4
+            if code_error == -1:
+                self.__db.add_group(self.grAddLineEdit.text())
+                self.grAddLineEdit.setText("")
+                self.refresh_gr_view_table()
+            elif code_error == 2:
+                show_message("Ошибка добавления", "Введите название группы")
+            elif code_error == 4:
+                show_message("Ошибка добавления", "Группа с таким названием уже есть в базе")
+        else:
+            self.changeGroup()
     def changeUs(self):
         code_error = -1
 
