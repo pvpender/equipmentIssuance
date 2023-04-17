@@ -10,6 +10,7 @@ from users import *
 from equipment import *
 from sqlalchemy.exc import OperationalError
 import request as req
+import time
 
 
 class Base(DeclarativeBase):
@@ -242,6 +243,9 @@ def restart_if_except(function):
 
     def check(*args, **kwargs):
         self = args[0]
+        if (time.time() - self.last_db_access_time) > 200:
+            self.session = Session(create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base"))
+        self.last_db_access_time = time.time()
         try:
             return function(*args, **kwargs)
         except OperationalError as oe:
@@ -262,7 +266,7 @@ def for_all_methods(decorator):
     def decorate(cls):
         print(cls.__dict__)
         for attr in cls.__dict__:
-            if callable(getattr(cls, attr)):
+            if callable(getattr(cls, attr)) and attr != '__init__':
                 setattr(cls, attr, decorator(getattr(cls, attr)))
         return cls
 
@@ -276,6 +280,15 @@ class DataBase:
     def __init__(self, engine: Engine):
         self.__engine = engine
         self.__session = Session(engine)
+        self.__last_db_access_time = time.time()
+
+    @property
+    def last_db_access_time(self) -> float:
+        return self.__last_db_access_time
+
+    @last_db_access_time.setter
+    def last_db_access_time(self, new_time: float):
+        self.__last_db_access_time = new_time
 
     @property
     def session(self) -> Session:
@@ -284,6 +297,10 @@ class DataBase:
         :return: session
         """
         return self.__session
+
+    @session.setter
+    def session(self, new_session: Session):
+        self.__session = new_session
 
     """@staticmethod
     def __restart_if_except(function):
@@ -355,11 +372,11 @@ class DataBase:
         self.__session.commit()
 
     def change_user(self, login: str, password: str):
+        self.__session.close_all()
         self.__engine.dispose()
         # self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-        self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base", pool_recycle=18000, pool_timeout=10,
-                                      pool_size=10, connect_args={'connect_timeout': 2})
-        self.__session.close()
+        self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+        #self.__session.close()
         self.__session = Session(self.__engine)
 
     def add_user(self, user: CommonUser):

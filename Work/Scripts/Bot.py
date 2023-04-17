@@ -248,7 +248,7 @@ async def send_notification(dp: Dispatcher):
         try:
             if i.approved is False:
                 db.del_user_request(i.id)
-                await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title}")
+                await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title} отклонён!")
             else:
                 await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title} принят! Вы можете забрать "
                                                           f"своё оборудование уже сейчас!")

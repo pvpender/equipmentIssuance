@@ -18,8 +18,7 @@ import datetime
 
 #engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 #engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base",  pool_recycle=18000, pool_timeout=10,
-                                      pool_size=10, connect_args={'connect_timeout': 2})
+engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
@@ -51,6 +50,10 @@ print(user_list.get_user_by_id(1))
 
 """
 Веди переменную последнего обращения к базе в декораторе делай проверку, если что-то не так - rollback сессии
+
+Роллбэк не сработает, зато можно создавать новую сессию (эта всё равно уже нерабочая) тогда избежим большую задержку
+
+
 """
 
 
