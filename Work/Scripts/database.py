@@ -247,6 +247,7 @@ def restart_if_except(function):
             self.session = Session(create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base"))
         self.last_db_access_time = time.time()
         try:
+            self.session.commit()
             return function(*args, **kwargs)
         except OperationalError as oe:
             print(oe)
