@@ -11,6 +11,16 @@ from equipment import *
 from sqlalchemy.exc import OperationalError
 import request as req
 import time
+import threading
+
+
+def fix_died_connection(a: Session):
+    try:
+        a.close()
+    except OperationalError:
+        a.rollback()
+        a.close()
+    return
 
 
 class Base(DeclarativeBase):
@@ -244,6 +254,8 @@ def restart_if_except(function):
     def check(*args, **kwargs):
         self = args[0]
         if (time.time() - self.last_db_access_time) > 200:
+            t = threading.Thread(target=fix_died_connection, args=(self.session,))
+            t.start()
             self.session = Session(create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base"))
         self.last_db_access_time = time.time()
         try:
@@ -377,7 +389,7 @@ class DataBase:
         self.__engine.dispose()
         # self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
         self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
-        #self.__session.close()
+        # self.__session.close()
         self.__session = Session(self.__engine)
 
     def add_user(self, user: CommonUser):
