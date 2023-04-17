@@ -49,6 +49,11 @@ equipment_list = EquipmentCollection(db)
 
 print(user_list.get_user_by_id(1))
 
+"""
+Веди переменную последнего обращения к базе в декораторе делай проверку, если что-то не так - rollback сессии
+"""
+
+
 app = QApplication([])
 
 
