@@ -2373,8 +2373,8 @@ class MainWindow(QMainWindow):
             eq_to_change.groups.clear()
             for i in self.__currEqGroupsTableContents:
                 eq_to_change.groups.append(self.__allGroups[i])
-            eq_to_change.x = int(self.searchByHeightSpinBox.text())
-            eq_to_change.y = int(self.searchByPosFromLeftSpinBox.text())
+            eq_to_change.x = int(self.searchByPosFromLeftSpinBox.text())
+            eq_to_change.y = int(self.searchByHeightSpinBox.text())
             self.__equipment_list.change_equipment(eq_to_change)
         else:
             if code_error == 1:
