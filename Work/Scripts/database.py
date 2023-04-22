@@ -1,9 +1,8 @@
 import datetime
 from enum import Enum
-from typing import List, Union
-import pandas as pd
+from typing import List
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer, BigInteger
+from sqlalchemy import BigInteger
 from sqlalchemy import Text, DateTime, Engine, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, relationship, Mapped, mapped_column
 from users import *
@@ -127,7 +126,7 @@ class Equipments(Base):
 class TelegramLogins(Base):
     __tablename__ = "telegram_logins"
     id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete='CASCADE'), primary_key=True, autoincrement=False)
-    tg_id: Mapped[int] = mapped_column(BigInteger)
+    tg_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
     user: Mapped[List["Users"]] = relationship()
 
 
@@ -140,9 +139,14 @@ class TelegramLogins(Base):
 
 class LastRequest(Base):
     __tablename__ = "last_message"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    tg_id: Mapped[int] = mapped_column(BigInteger)
+    tg_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
     title: Mapped[str] = mapped_column(Text)
+
+
+class LastLogin(Base):
+    __tablename__ = "last_login"
+    tg_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
+    login: Mapped[str] = mapped_column(Text)
 
 
 class UserRequests(Base):
@@ -315,19 +319,6 @@ class DataBase:
     def session(self, new_session: Session):
         self.__session = new_session
 
-    """@staticmethod
-    def __restart_if_except(function):
-        def check(*args, **kwargs):
-            self = args[0]
-            try:
-                return function(*args, **kwargs)
-            except OperationalError:
-                self.__session.rollback()
-                return function(*args, **kwargs)
-
-        return check
-        """
-
     def add_group(self, group_name: str):
         """
         Add new group to base
@@ -362,16 +353,6 @@ class DataBase:
 
     def del_user_group(self, user_id, groups: list):
         self.__session.query(UserGroups).filter(UserGroups.group_id.in_(groups), UserGroups.user_id == user_id).delete()
-
-    """def add_admin_group(self, admin_id: int, group_id: int):
-        self.__session.add(AdminGroups(admin_id=admin_id, group_id=group_id))
-        self.__session.commit()
-
-    def del_admin_group(self, admin_id: int, groups: list):
-        self.__session.query(AdminGroups).filter(
-            AdminGroups.group_id.in_(groups),
-            AdminGroups.admin_id == admin_id).delete()
-        self.__session.commit()"""
 
     def add_equipment_group(self, equipment_id: int, group_id: int):
         self.__session.add(EquipmentGroups(equipment_id=equipment_id, group_id=group_id))
@@ -436,16 +417,19 @@ class DataBase:
         self.__session.commit()
 
     def get_user_by_id(self, pass_number: int):
-        self.__session.commit()
         return self.__session.query(Users).filter(Users.pass_number == pass_number).first()
 
     def get_user_by_mail(self, mail: str) -> Union[Users, None]:
-        self.__session.commit()
         return self.__session.query(Users).filter(Users.mail == mail).first()
 
     def get_all_users(self) -> List[Type[Users]]:
-        self.__session.commit()
         return self.__session.query(Users).all()
+
+    def add_user_login(self, user_id, login: str, password: str):
+        self.__session.add(Logins(id=user_id, login=login, password=password))
+
+    def get_user_login(self, login: str) -> Logins | None:
+        return self.__session.query(Logins).filter(Logins.login == login).first()
 
     def add_admin(self, admin: Admin):
         exist = self.__session.query(Users.id).filter(Users.mail == admin.mail,
@@ -486,16 +470,6 @@ class DataBase:
         )
         self.__session.add(db_admin)
         self.__session.commit()
-        """db_admin = Admins(
-            pass_number=admin.pass_number,
-            mail=admin.mail,
-            access_id=access_id[0]
-        )
-        self.__session.add(db_admin)
-        self.__session.commit()
-        admin_id = self.get_admin_by_mail(admin.mail).id
-        for i in admin.access.groups:
-            self.add_admin_group(admin_id, i)"""
 
     def update_admin(self, old_id: int, old_mail: str, admin: Admin):
         access = admin.access
@@ -550,15 +524,12 @@ class DataBase:
         self.__session.commit()
 
     def get_admin_by_id(self, pass_number: int):
-        self.__session.commit()
         return self.__session.query(Admins).join(Users).filter(Users.pass_number == pass_number).first()
 
     def get_admin_by_mail(self, mail: str) -> Union[Admins, None]:
-        self.__session.commit()
         return self.__session.query(Admins).join(Users).filter(Users.mail == mail).first()
 
     def get_all_admins(self):
-        self.__session.commit()
         return self.__session.query(Admins).all()
 
     def add_equipment(self, equipment: Equipment):
@@ -611,34 +582,25 @@ class DataBase:
         self.__session.commit()
 
     def get_equipment_by_id(self, eq_id: int):
-        self.__session.commit()
         return self.__session.query(Equipments).filter(Equipments.id == eq_id).first()
 
     def get_equipment_by_title(self, title: str) -> Union[Equipments, None]:
-        self.__session.commit()
         return self.__session.query(Equipments).filter(Equipments.title == title).first()
 
     def get_equipments_by_group(self, group_id: int) -> list:
         return self.__session.query(EquipmentGroups).filter(EquipmentGroups.group_id == group_id).all()
 
     def get_all_equipment(self):
-        self.__session.commit()
         return self.__session.query(Equipments).all()
 
     def get_equipment_by_coordinates(self, x: int, y: int):
-        self.__session.commit()
         if x != -1 and y != -1:
             return self.__session.query(Equipments).filter(Equipments.x == x, Equipments.y == y).first()
         else:
             return None
 
     def get_tg_user(self, tg_id) -> Union[TelegramLogins, None]:
-        self.__session.commit()
         return self.__session.query(TelegramLogins).filter(TelegramLogins.tg_id == tg_id).first()
-
-    """def get_tg_admin(self, tg_id) -> Union[TelegramAdminLogins, None]:
-        self.__session.commit()
-        return self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).first()"""
 
     def add_tg_user(self, tg_id: int, user_id: int):
         if self.get_tg_user(tg_id):
@@ -648,16 +610,6 @@ class DataBase:
         else:
             self.__session.add(TelegramLogins(id=user_id, tg_id=tg_id))
         self.__session.commit()
-
-    """def add_tg_admin(self, tg_id, admin_id):
-        self.__session.query(TelegramUserLogins).filter(TelegramUserLogins.tg_id == tg_id).delete()
-        if self.get_tg_admin(tg_id):
-            self.__session.query(TelegramAdminLogins).filter(TelegramAdminLogins.tg_id == tg_id).update(
-                {"id": admin_id}
-            )
-        else:
-            self.__session.add(TelegramAdminLogins(id=admin_id, tg_id=tg_id))
-        self.__session.commit()"""
 
     def add_user_request(self, request: req.Request):
         db_request = UserRequests(
@@ -697,18 +649,15 @@ class DataBase:
         return self.__session.query(UserRequests).all()
 
     def get_solved_users_requests(self) -> List[Type[UserRequests]]:
-        self.__session.commit()
         return self.__session.query(UserRequests).filter(UserRequests.solved.is_(True)).all()
 
     def get_solved_unannounced_users_request(self) -> List[Type[UserRequests]]:
-        self.__session.commit()
         return self.__session.query(UserRequests).filter(
             UserRequests.solved.is_(True),
             UserRequests.notified.is_(False)
         ).all()
 
     def get_unsolved_users_requests(self):
-        self.__session.commit()
         return self.__session.query(UserRequests).filter(UserRequests.solved.is_(False)).all()
 
     def get_first_unsolved_users_request(self):
@@ -725,8 +674,18 @@ class DataBase:
         self.__session.commit()
 
     def get_last_request(self, tg_id):
-        self.__session.commit()
         return self.__session.query(LastRequest).filter(LastRequest.tg_id == tg_id).first()
+
+    def add_last_login(self, tg_id: int, login: str):
+        self.__session.query(LastLogin).filter(LastLogin.tg_id == tg_id).delete()
+        self.__session.add(LastLogin(
+            tg_id=tg_id,
+            login=login
+        ))
+        self.__session.commit()
+
+    def get_last_login(self, tg_id) -> Type[LastLogin]:
+        return self.__session.query(LastLogin).filter(LastLogin.tg_id == tg_id).first()
 
     def update_user_request(self, request: Union[Type[UserRequests]]):
         self.__session.query(UserRequests).filter(UserRequests.id == request.id).update(
@@ -742,40 +701,3 @@ class DataBase:
     def del_user_request(self, req_id: int):
         self.__session.query(UserRequests).filter(UserRequests.id == req_id).delete()
         self.__session.commit()
-
-    """def add_action(self, user_mail_or_id: str | int, action: ActionTypes, what: WhatTypes, what_id: str | int):
-        if isinstance(user_mail_or_id, str):
-            user = self.get_user_by_mail(user_mail_or_id)
-            user = self.get_admin_by_mail(user_mail_or_id) if not user else user
-            user_mail_or_id = user[0].id
-        new_action = Actions(
-            user_id=user_mail_or_id,
-            action=action,
-            what=what,
-            what_id=what_id,
-            action_time=datetime.datetime.now()
-        )
-        self.__session.add(new_action)
-        self.__session.commit()
-    
-
-    def get_all_actions(self):
-        return self.__session.query(Actions).all()"""
-
-
-"""    def get_action_by_passes(self, pass_numbers: list):
-        return self.__session.query(Actions).filter(Actions.user_id.in_(pass_numbers)).all()
-
-    def get_action_by_passes_as_df(self, pass_numbers: list):
-        df = pd.read_sql(self.__session.query(Actions).filter(Actions.user_id.in_(pass_numbers)).statement,
-                         self.__session.connection())
-
-        return df
-
-   def get_inv_from_act_as_df(self, inventories_names: list):
-        df = pd.read_sql(
-            self.__session.query(Actions).filter(Actions.what_id.in_(inventories_names)).statement,
-            self.__session.connection()
-        )
-        return df
-"""

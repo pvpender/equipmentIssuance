@@ -1,7 +1,5 @@
 import operator
-
 import aiogram.utils.exceptions
-import sqlalchemy
 from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import BoundFilter
@@ -12,8 +10,6 @@ from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, ScrollingGroup, Select
 from aiogram_dialog.widgets.text import Const, Format
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-import request as req
 from database import *
 
 storage = MemoryStorage()
@@ -22,15 +18,10 @@ dp = Dispatcher(bot, storage=storage)
 registry = DialogRegistry(dp)
 scheduler = AsyncIOScheduler()
 # engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
-#engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base", pool_recycle=18000, pool_timeout=10,
-                                      pool_size=10, connect_args={'connect_timeout': 2})
+# engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
+engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
 Base.metadata.create_all(engine)
-#sqlalchemy.pool_recycle = 1
-#sqlalchemy.pool_timeout = 20
-# session = Session(engine)
 db = DataBase(engine)
-
 
 
 class LoginFilter(BoundFilter):
@@ -58,37 +49,48 @@ class MySG(StatesGroup):
 
 class LogSG(StatesGroup):
     mail = State()
+    setting_password = State()
+    password = State()
 
 
-async def on_input(msg: Message, dialog: Dialog, manager: DialogManager):
-    manager.current_context().dialog_data["mail"] = msg.text
+async def on_input(msg: Message, curr_dialog: Dialog, manager: DialogManager):
+    # manager.current_context().dialog_data["mail"] = msg.text
     usr = db.get_user_by_mail(msg.text)
     if usr:
-        await msg.answer("Успех!")
-        db.add_tg_user(msg.from_user.id, usr.id)
-        await manager.done()
+        manager.data["login"] = msg.text
+        db.add_last_login(msg.from_user.id, usr.mail)
+        if db.get_user_login(usr.mail):
+            await manager.dialog().switch_to(LogSG.password)
+        else:
+            await manager.dialog().switch_to(LogSG.setting_password)
     else:
         await msg.answer("Нет пользователя с такой почтой! Пожалуйста, повторите ввод")
 
 
-# async def hello(c: CallbackQuery, button: Button, manager: DialogManager):
-#     await manager.dialog().switch_to(MySG.sec)
-#     await c.message.delete()
-#     await c.message.answer(button.widget_id)
+async def setting_password(msg: Message, curr_dialog: Dialog, manager: DialogManager):
+    password = msg.text
+    usr = db.get_user_by_mail(db.get_last_login(msg.from_user.id).login)
+    db.add_user_login(usr.id, usr.mail, password)
+    db.add_tg_user(msg.from_user.id, usr.id)
+    await msg.answer("Успех!")
+    await manager.done()
+
+
+async def input_password(msg: Message, curr_dialog: Dialog, manager: DialogManager):
+    password = msg.text
+    user_login = db.get_user_login(db.get_last_login(msg.from_user.id).login)
+    if password == user_login.password:
+        db.add_tg_user(msg.from_user.id, user_login.id)
+        await msg.answer("Успех!")
+        await manager.done()
+    else:
+        await msg.answer("Неверный пароль!")
+        await manager.dialog().switch_to(LogSG.mail)
 
 
 async def end(c: CallbackQuery, button: Button, manager: DialogManager):
     await c.message.edit_text("Выбор отменён")
     await manager.done()
-
-
-# def test_buttons_creator(database: DataBase):
-#     buttons = []
-#     mas = database.get_all_equipment()
-#     for i in mas:
-#         if (i.count - i.reserve_count) > 0:
-#             buttons.append(Button(Const(i.title), id=str(i.id), on_click=hello))
-#     return buttons
 
 
 async def get_data(**kwargs):
@@ -101,7 +103,6 @@ async def get_data(**kwargs):
 
 
 async def ans(c: CallbackQuery, button: Button, manager: DialogManager, button_id):
-    user = db.get_tg_user(c.from_user.id)
     eq = db.get_equipment_by_id(button_id)
     manager.data["title"] = eq.title
     manager.data["description"] = eq.description
@@ -118,7 +119,6 @@ async def ans(c: CallbackQuery, button: Button, manager: DialogManager, button_i
 async def get_equipment_user_data(dialog_manager: DialogManager, **kwargs):
     return {
         "title": dialog_manager.data.get("title"),
-        "purpose": dialog_manager.data.get("purpose"),
         "description": dialog_manager.data.get("description"),
         "possible": dialog_manager.data.get("possible"),
         "extend": dialog_manager.data.get("extend"),
@@ -126,11 +126,15 @@ async def get_equipment_user_data(dialog_manager: DialogManager, **kwargs):
     }
 
 
+async def get_login_user_data(dialog_manager: DialogManager, **kwargs):
+    return {"login": dialog_manager.data.get("login")}
+
+
 async def switch_to_choice(c: CallbackQuery, button: Button, manager: DialogManager):
     await manager.dialog().switch_to(MySG.main)
 
 
-async def switch_to_confirm(msg: Message, dialog: Dialog, manager: DialogManager):
+async def switch_to_confirm(msg: Message, curr_dialog: Dialog, manager: DialogManager):
     manager.data["input"] = msg.text
     await manager.dialog().switch_to(MySG.confirm)
 
@@ -143,23 +147,26 @@ async def send_request(c: CallbackQuery, button: Button, manager: DialogManager)
     mas = [j.group_id for j in usr.user.user_groups]
     if adm:
         db.add_admin_request(req.Request(c.from_user.id, adm.admin.id, db.get_equipment_by_title(r.title).id, 1,
-                                         c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
-        await c.message.edit_text(f"Оборудование {r.title} заказано!\nНа правах администратора система вам автоматически"
-                                  f"одобрила запрос! Вы можете забрать оборудование уже сейчас!")
+                                         c.message.text[
+                                         c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
+        await c.message.edit_text(
+            f"Оборудование *{r.title}* заказано!\nНа правах администратора система вам автоматически"
+            f"одобрила запрос! Вы можете забрать оборудование уже сейчас!", parse_mode='Markdown')
         await manager.done()
     elif any(x in [j.group_id for j in eq.equipment_groups] for x in mas):
         db.add_admin_request(req.Request(c.from_user.id, usr.user.id, db.get_equipment_by_title(r.title).id, 1,
-                                         c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
-        await c.message.edit_text(f"Оборудование {r.title} заказано!\nТак как вы принадлежите к одной из групп с "
+                                         c.message.text[
+                                         c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
+        await c.message.edit_text(f"Оборудование *{r.title}* заказано!\nТак как вы принадлежите к одной из групп с "
                                   f"доступом - система вам автоматически одобрила запрос! "
-                                  f"Вы можете забрать оборудование уже сейчас!")
+                                  f"Вы можете забрать оборудование уже сейчас!", parse_mode='Markdown')
         await manager.done()
     else:
         request = req.Request(c.from_user.id, usr.user.id, db.get_equipment_by_title(r.title).id,
                               1, c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")])
         db.add_user_request(request)
-        await c.message.edit_text(f"Оборудование {r.title} заказано!\nКак только администратор ответит на ваш запрос "
-                                  f"- вы получите уведомление")
+        await c.message.edit_text(f"Оборудование *{r.title}* заказано!\nКак только администратор ответит на ваш запрос "
+                                  f"- вы получите уведомление", parse_mode='Markdown')
         await manager.done()
 
 
@@ -204,7 +211,7 @@ purpose_window = Window(
     state=MySG.purpose
 )
 
-confirm_input = Window(
+confirm_input_window = Window(
     Format("Вы ввели:\n{input}\nПродолжить?"),
     Button(Const("Отправить"), id="yes", on_click=send_request),
     Button(Const("Повторить ввод"), id="retry", on_click=switch_to_input),
@@ -219,8 +226,22 @@ greetings_window = Window(
     state=LogSG.mail,
 )
 
-dialog = Dialog(main_window, preview_window, purpose_window, confirm_input)
-log_menu = Dialog(greetings_window)
+setting_password_window = Window(
+    Format("Вы впервые вошли под {login}, пожалуйста, установите пароль"),
+    MessageInput(setting_password),
+    getter=get_login_user_data,
+    state=LogSG.setting_password
+)
+
+input_password_window = Window(
+    Format("Введите пароль для {login}"),
+    MessageInput(input_password),
+    getter=get_login_user_data,
+    state=LogSG.password
+)
+
+dialog = Dialog(main_window, preview_window, purpose_window, confirm_input_window)
+log_menu = Dialog(greetings_window, setting_password_window, input_password_window)
 
 
 @dp.message_handler(commands=["start"])
@@ -247,11 +268,17 @@ async def send_notification(dp: Dispatcher):
     for i in mas:
         try:
             if i.approved is False:
+                await dp.bot.send_message(i.sender_tg_id,
+                                          f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* отклонён!",
+                                          parse_mode='Markdown')
+                eq = db.get_equipment_by_id(i.equipment_id)
+                eq.reserve_count -= i.count
+                db.update_equipment(eq)
                 db.del_user_request(i.id)
-                await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title} отклонён!")
             else:
-                await dp.bot.send_message(i.sender_tg_id, f"Ваш запрос на выдачу {db.get_equipment_by_id(i.equipment_id).title} принят! Вы можете забрать "
-                                                          f"своё оборудование уже сейчас!")
+                await dp.bot.send_message(i.sender_tg_id,
+                                          f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* принят! Вы можете забрать "
+                                          f"своё оборудование уже сейчас!", parse_mode='Markdown')
                 i.notified = True
                 db.update_user_request(i)
         except aiogram.utils.exceptions.ChatNotFound:

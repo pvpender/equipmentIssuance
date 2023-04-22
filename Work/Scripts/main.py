@@ -1,19 +1,10 @@
-from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtWidgets import QApplication
 from interface2 import LogWindow
-from users import *
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
 from equipment_collections import EquipmentCollection
 from user_collections import *
 from database import *
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from database import *
 import sqlalchemy
-import cryptography
-import pymysql
 
-import datetime
 
 
 #engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
