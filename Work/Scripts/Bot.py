@@ -146,7 +146,7 @@ async def send_request(c: CallbackQuery, button: Button, manager: DialogManager)
     eq = db.get_equipment_by_title(r.title)
     mas = [j.group_id for j in usr.user.user_groups]
     if adm:
-        db.add_admin_request(req.Request(c.from_user.id, adm.admin.id, db.get_equipment_by_title(r.title).id, 1,
+        db.add_admin_request(req.Request(c.from_user.id, adm.user.id, db.get_equipment_by_title(r.title).id, 1,
                                          c.message.text[
                                          c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
         await c.message.edit_text(
