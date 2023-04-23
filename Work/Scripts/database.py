@@ -465,10 +465,12 @@ class DataBase:
         self.__session.commit()
 
     def get_admin_by_id(self, pass_number: int):
-        return self.__session.query(Admins).first()
+        us_id = self.get_user_by_id(pass_number).id
+        return self.__session.query(Admins).filter(Admins.user_id == us_id).first()
 
     def get_admin_by_mail(self, mail: str) -> Union[Admins, None]:
-        return self.__session.query(Admins).first()
+        us_id = self.get_user_by_mail(mail).id
+        return self.__session.query(Admins).filter(Admins.user_id == us_id).first()
 
     def get_all_admins(self):
         return self.__session.query(Admins).all()
