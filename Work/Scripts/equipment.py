@@ -78,4 +78,3 @@ class Equipment:
     @y.setter
     def y(self, new_y: int):
         self.__y = new_y
-

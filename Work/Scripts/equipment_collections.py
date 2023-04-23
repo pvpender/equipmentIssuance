@@ -1,8 +1,3 @@
-from typing import Any
-
-from sqlalchemy.orm import InstrumentedAttribute
-
-from Work.Scripts.equipment import Equipment
 from equipment import Equipment
 from database import DataBase
 
