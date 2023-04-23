@@ -13,6 +13,8 @@ engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_
 Base.metadata.create_all(engine)
 sqlalchemy.pool_recycle = 10
 sqlalchemy.pool_timeout = 20
+
+
 #session = Session(engine)
 db = DataBase(engine)
 

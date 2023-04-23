@@ -62,12 +62,12 @@ class UserCollection:
 
     def get_user_by_mail(self, user_mail: str) -> CommonUser | Admin:
         for i in self.__objects.values():
-            if i.mail == user_mail:
+            if i.mail.lower() == user_mail.lower():
                 return i
 
     def check_user_by_mail(self, user_mail: str) -> bool:
         for i in self.__objects.values():
-            if i.mail == user_mail:
+            if i.mail.lower() == user_mail.lower():
                 return True
         return False
 
@@ -112,7 +112,9 @@ class UserCollection:
         mas = [i for i in self.__objects.values() if group_id in i.access.groups]
         return mas
 
-    """def get_user_by_rights(self, rights: int) -> CommonUser | Admin:
-        for i in self.__objects:
-            if self.__objects[i].access.power == rights:
-                return self.__objects[i]"""
+    def del_group_from_users(self, group_id: int):
+        for i in self.__objects.values():
+            if group_id in i.access.groups:
+                i.access.groups.remove(group_id)
+    def refresh_collection(self):
+        self.__init__(self.__db)

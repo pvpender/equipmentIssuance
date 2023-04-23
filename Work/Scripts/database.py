@@ -1,16 +1,24 @@
 import datetime
 from enum import Enum
 from typing import List
-from sqlalchemy import ForeignKey
+from PyQt6.QtWidgets import QMessageBox
+from sqlalchemy import ForeignKey, exc
 from sqlalchemy import BigInteger
 from sqlalchemy import Text, DateTime, Engine, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, relationship, Mapped, mapped_column
 from users import *
 from equipment import *
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 import request as req
 import time
 import threading
+
+
+def show_message(title: str, info: str):
+    msg_box = QMessageBox()
+    msg_box.setText(info)
+    msg_box.setWindowTitle(title)
+    msg_box.exec()
 
 
 def fix_died_connection(a: Session):
@@ -388,7 +396,10 @@ class DataBase:
         self.__session.commit()
         user_id = self.get_user_by_mail(user.mail).id
         for i in user.access.groups:
-            self.add_user_group(user_id, i)
+            try:
+                self.add_user_group(user_id, i)
+            except IntegrityError:
+                pass
         self.__session.commit()
 
     def update_user(self, old_id: int, old_mail: str, user: CommonUser):
@@ -400,13 +411,17 @@ class DataBase:
             UserGroups.user_id == user.base_id).all())))
         if exists:
             exists = exists[0]
-        for i in user.access.groups:
-            if i not in exists:
-                self.__session.add(UserGroups(user_id=user.base_id, group_id=i))
-        self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
-            {"pass_number": user.pass_number, "mail": user.mail}, synchronize_session=False
-        )
-        self.__session.commit()
+        try:
+            for i in user.access.groups:
+                if i not in exists:
+                    self.__session.add(UserGroups(user_id=user.base_id, group_id=i))
+            self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
+                {"pass_number": user.pass_number, "mail": user.mail}, synchronize_session=False
+            )
+            self.__session.commit()
+        except IntegrityError:
+            show_message("Ошибка синхронизации", "Обновите пользователей и оборудование!")
+            self.__session.rollback()
 
     def delete_user(self, user: CommonUser):
         try:
@@ -428,7 +443,7 @@ class DataBase:
     def add_user_login(self, user_id, login: str, password: str):
         self.__session.add(Logins(id=user_id, login=login, password=password))
 
-    def get_user_login(self, login: str) -> Logins | None:
+    def get_user_login(self, login: str) -> Union[Logins, None]:
         return self.__session.query(Logins).filter(Logins.login == login).first()
 
     def add_admin(self, admin: Admin):
@@ -507,17 +522,22 @@ class DataBase:
         ))
         if exists:
             exists = exists[0]
-        for i in admin.access.groups:
-            if i not in exists:
-                self.__session.add(UserGroups(user_id=admin.base_id, group_id=i))
-        self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
-            {"pass_number": admin.pass_number, "mail": admin.mail},
-            synchronize_session=False
-        )
-        self.__session.query(Admins).filter(Admins.user_id == admin.base_id).update(
-            {"access_id": access_id[0]}
-        )
-        self.__session.commit()
+        try:
+            for i in admin.access.groups:
+                    if i not in exists:
+                        self.__session.add(UserGroups(user_id=admin.base_id, group_id=i))
+            else:
+                self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
+                    {"pass_number": admin.pass_number, "mail": admin.mail},
+                    synchronize_session=False
+                )
+                self.__session.query(Admins).filter(Admins.user_id == admin.base_id).update(
+                    {"access_id": access_id[0]}
+                )
+                self.__session.commit()
+        except IntegrityError:
+            show_message("Ошибка синхронизации", "Обновите группы и пользователей")
+            self.__session.rollback()
 
     def delete_admin(self, admin: Admin):
         self.__session.query(Users).filter(Users.id == admin.base_id).delete()
@@ -548,7 +568,10 @@ class DataBase:
         self.__session.commit()
         equipment_id = self.get_equipment_by_title(equipment.title).id
         for i in equipment.groups:
-            self.add_equipment_group(equipment_id=equipment_id, group_id=i)
+            try:
+                self.add_equipment_group(equipment_id=equipment_id, group_id=i)
+            except IntegrityError:
+                pass
 
     def update_equipment(self, equipment: Union[Equipment, Equipments]):
         if not (equipment.x and equipment.y):
@@ -570,12 +593,16 @@ class DataBase:
             for i in equipment.groups:
                 if i not in exist_groups:
                     self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
-        self.__session.query(Equipments).filter(Equipments.id == equipment.id).update(
-            {"title": equipment.title, "description": equipment.description,
-             "count": equipment.count, "reserve_count": equipment.reserve_count,
-             "x": equipment.x, "y": equipment.y}, synchronize_session=False
-        )
-        self.__session.commit()
+        try:
+            self.__session.query(Equipments).filter(Equipments.id == equipment.id).update(
+                {"title": equipment.title, "description": equipment.description,
+                 "count": equipment.count, "reserve_count": equipment.reserve_count,
+                 "x": equipment.x, "y": equipment.y}, synchronize_session=False
+            )
+            self.__session.commit()
+        except IntegrityError:
+            show_message("Ошибка синхронизации", "Обновите группы и оборудование")
+            self.__session.rollback()
 
     def delete_equipment(self, equipment: Equipment):
         self.__session.query(Equipments).filter(Equipments.title == equipment.title).delete()
@@ -657,10 +684,10 @@ class DataBase:
             UserRequests.notified.is_(False)
         ).all()
 
-    def get_unsolved_users_requests(self):
+    def get_unsolved_users_requests(self) -> Union[List[Type[UserRequests]]]:
         return self.__session.query(UserRequests).filter(UserRequests.solved.is_(False)).all()
 
-    def get_first_unsolved_users_request(self):
+    def get_first_unsolved_users_request(self) -> Union[Type[UserRequests], None]:
         return self.__session.query(UserRequests).filter((UserRequests.solved is False) or
                                                          (UserRequests.solved.is_(None))).first()
 
@@ -673,7 +700,7 @@ class DataBase:
         self.__session.add(last_request)
         self.__session.commit()
 
-    def get_last_request(self, tg_id):
+    def get_last_request(self, tg_id) -> Union[UserRequests, None]:
         return self.__session.query(LastRequest).filter(LastRequest.tg_id == tg_id).first()
 
     def add_last_login(self, tg_id: int, login: str):
@@ -686,6 +713,9 @@ class DataBase:
 
     def get_last_login(self, tg_id) -> Type[LastLogin]:
         return self.__session.query(LastLogin).filter(LastLogin.tg_id == tg_id).first()
+
+    def get_user_request(self, request_id: int) -> Union[UserRequests, None]:
+        return self.__session.query(UserRequests).filter(UserRequests.id == request_id).first()
 
     def update_user_request(self, request: Union[Type[UserRequests]]):
         self.__session.query(UserRequests).filter(UserRequests.id == request.id).update(

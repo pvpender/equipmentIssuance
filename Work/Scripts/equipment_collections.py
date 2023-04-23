@@ -29,7 +29,7 @@ class EquipmentCollection:
 
     def get_equipment_by_title(self, title: str) -> Equipment:
         for i in self.__objects.values():
-            if i.title == title:
+            if i.title.lower() == title.lower():
                 return i
 
     def get_equipment_by_coordinates(self, x: int, y: int):
@@ -71,4 +71,10 @@ class EquipmentCollection:
         mas = [i for i in self.__objects.values() if group_id in i.groups]
         return mas
 
+    def del_group_from_equipment(self, group_id: int):
+        for i in self.__objects.values():
+            if group_id in i.groups:
+                i.groups.remove(group_id)
 
+    def refresh_collection(self):
+        self.__init__(self.__db)

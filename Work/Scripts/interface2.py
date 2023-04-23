@@ -1640,7 +1640,9 @@ class MainWindow(QMainWindow):
         self.searchByHeightSpinBox.setMinimum(-1)
         self.searchByPosFromLeftSpinBox.setMinimum(-1)
         self.eqsearchByNumberSpinBox.setMinimum(-1)
+        self.eqsearchByNumberSpinBox.setMaximum(10000)
         self.eqsearchByReservedSpinBox.setMinimum(-1)
+        self.eqsearchByReservedSpinBox.setMaximum(10000)
         self.eqsearchByNumberSpinBox.setValue(-1)
         self.eqsearchByReservedSpinBox.setValue(-1)
         self.heightSpinBox.setMinimum(-1)
@@ -1674,7 +1676,7 @@ class MainWindow(QMainWindow):
         self.usAddRefreshGroupButton.clicked.connect(self.refresh_groups_in_us_add_groups)
         self.eqAddSearchGroupButton.clicked.connect(self.search_groups_in_eq_add_groups)
         self.eqAddRefreshGroupButton.clicked.connect(self.refresh_groups_in_eq_add_groups)
-        self.grRefreshPushButton.clicked.connect(self.refresh_only_groups_table)
+        self.grRefreshPushButton.clicked.connect(self.refresh_gr_view_table)
         self.grSearchPushButton.clicked.connect(self.search_groups_in_groups)
         self.grPrevPushButton.clicked.connect(self.prevGr)
         self.grNextPushButton.clicked.connect(self.nextGr)
@@ -1765,8 +1767,14 @@ class MainWindow(QMainWindow):
             self.refresh_equipment_table()
             show_message("успех","Оборудование удалено")
     def del_group(self):
+        self.grAddLineEdit.clear()
+        self.grDeletePushButton.hide()
+        self.grNextPushButton.hide()
+        self.grPrevPushButton.hide()
+        self.__user_list.del_group_from_users(self.__allGroups[self.__currGroupsTableContents[self.__grnum]])
+        self.__equipment_list.del_group_from_equipment(self.__allGroups[self.__currGroupsTableContents[self.__grnum]])
         self.__db.del_group(self.__allGroups[self.__currGroupsTableContents[self.__grnum]])
-        to_delete=self.__currGroupsTableContents[self.__grnum]
+        to_delete = self.__currGroupsTableContents[self.__grnum]
         self.__currGroupsTableContents.pop(self.__grnum)
         if len(self.__currGroupsTableContents)>0:
             self.grTableView.clearSpans()
@@ -1774,10 +1782,12 @@ class MainWindow(QMainWindow):
                                       index=[i for i in range(len(self.__currGroupsTableContents))])
             model = TableModel(data_frame)
             self.set_gr_info()
+            self.__grnum = max(self.__grnum - 1, 0)
             self.grTableView.selectRow(self.__grnum)
             self.grTableView.setModel(model)
         else:
-            show_message("успех","Группа удалена")
+            self.__grnum = max(self.__grnum - 1, 0)
+            show_message("Успех", "Группа удалена")
         self.eqGroupsTableView.clearSpans()
         self.usGroupsTableView.clearSpans()
         self.eqAddSelectedGrTableView.clearSpans()
@@ -1813,9 +1823,10 @@ class MainWindow(QMainWindow):
         model = TableModel(data_frame)
         self.usAddSelectedGrTableView.setModel(model)
         del self.__allGroups[to_delete]
+
         self.refresh_gr_view_table()
     def change_group(self):
-        if self.grAddLineEdit.text()!='':
+        if self.grAddLineEdit.text()!='' and len(self.__currGroupsTableContents)>0:
             if self.grAddLineEdit.text() in self.__allGroups.keys() and self.grAddLineEdit.text()!=self.__currGroupsTableContents[self.__grnum]:
                 show_message("Ошибка","группа с таким названием уже существует")
             elif self.grAddLineEdit.text()==self.__currGroupsTableContents[self.__grnum]:
@@ -2016,6 +2027,7 @@ class MainWindow(QMainWindow):
         self.__addUsTableContents=[]
         self.refresh_selected_us_groups()
     def refresh_equipment_table(self):
+        self.__equipment_list.refresh_collection()
         self.eqchangerGroupBox.hide()
         self.__eqFoundTableContents = []
         self.eqsearchByIdSpinBox.setValue(-1)
@@ -2066,13 +2078,13 @@ class MainWindow(QMainWindow):
         self.eqChangeDeleteGroupsButton.hide()
 
     def refresh_users_table(self):
+        self.__user_list.refresh_collection()
         self.usChangeSearchGroupsGroupBox.hide()
         self.listLabel_19.hide()
         self.listLabel_4.setText("Все пользователи")
         self.uschangerGroupBox.hide()
         self.__usFoundTableContents = []
         self.usTableView.clearSpans()
-        ref = AdminAccess
         self.__usTableContents.clear()
         for i in self.__user_list.get_user_list():
             self.__usTableContents.append([
@@ -2097,6 +2109,7 @@ class MainWindow(QMainWindow):
         self.usChangeDeleteGroupsButton.hide()
 
     def refresh_gr_view_table(self):
+        self.__allGroups.clear()
         self.grTableView.clearSpans()
         self.eqAddAllGrTableView.clearSpans()
         self.usAddAllGrTableView.clearSpans()
@@ -2117,6 +2130,7 @@ class MainWindow(QMainWindow):
         self.usAddAllGrTableView.setModel(model)
         self.usSearchAllGrTableView.setModel(model)
         self.eqSearchAllGrTableView.setModel(model)
+
     def refresh_only_groups_table(self):
         self.grTableView.clearSpans()
         data_frame = pd.DataFrame(self.__allGroups.keys(),
@@ -2124,6 +2138,7 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__allGroups.keys()))])
         model = TableModel(data_frame)
         self.grTableView.setModel(model)
+        self.grAddLineEdit.clear()
         self.grDeletePushButton.hide()
         self.grNextPushButton.hide()
         self.grPrevPushButton.hide()
@@ -2183,8 +2198,8 @@ class MainWindow(QMainWindow):
             self.usSearchDelFromSelectedGr.show()
             self.usSearchDelFromSelectedGr.show()
     def refresh_requests_table(self):
-        # self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
+        self.textBrowser.clear()
         self.__reqs = self.__db.get_unsolved_users_requests()
         if (len(self.__reqs)) == 0:
             print("0 requests")
@@ -2255,6 +2270,7 @@ class MainWindow(QMainWindow):
             elif code_error == 9:
                 show_message("Ошибка добавления", "Ячейка занята")
     def add_user(self):
+        self.__user_list.refresh_collection()
         code_error = -1
         add_users = False
         change_users = False
@@ -2351,7 +2367,6 @@ class MainWindow(QMainWindow):
             self.change_group()
     def changeUs(self):
         code_error = -1
-
         if (self.__user_list.get_user_by_pass(
                 int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and \
                 self.__user_list.get_user_by_pass(int(self.ussearchByNameOrEmailLineEdit.text(), 16)).mail != \
@@ -2373,6 +2388,7 @@ class MainWindow(QMainWindow):
             self.__user_list.change_user(int(self.__usFoundTableContents[self.__usnum][0], 16),
                                          self.__usFoundTableContents[self.__usnum][1],
                                          user_to_change)
+            self.__user_list.refresh_collection()
             self.refresh_users_table()
         else:
             if code_error == 1:
@@ -2403,6 +2419,8 @@ class MainWindow(QMainWindow):
                 eq_to_change.reserve_count = self.eqsearchByReservedSpinBox.value()
             else:
                 eq_to_change.reserve_count = 0
+            eq_to_change.x = int(self.searchByPosFromLeftSpinBox.text())
+            eq_to_change.y = int(self.searchByHeightSpinBox.text())
             eq_to_change.description=self.eqsearchByEmailOrNameLineEdit_2.text()
             eq_to_change.groups.clear()
             for i in self.__currEqGroupsTableContents:
@@ -2591,7 +2609,7 @@ class MainWindow(QMainWindow):
                     y])
         if self.searchByHeightSpinBox.value() != -1:
             for i in self.__eqTableContents:
-                if i[6] == str(self.searchByHeightSpinBox.value()):
+                if i[4] == str(self.searchByHeightSpinBox.value()):
                     found4.append(i)
         if self.searchByPosFromLeftSpinBox.value() != -1:
             for i in self.__eqTableContents:
@@ -2826,14 +2844,19 @@ class MainWindow(QMainWindow):
         self.decide_request(True)
     def decide_request(self, decision):
         if len(self.__reqs) != 0:
-            self.__reqs[self.__reqnum].solved = True
-            self.__reqs[self.__reqnum].approved = decision
-            self.__reqs[self.__reqnum].approved_id = self.__current_user.base_id
-            self.__db.update_user_request(self.__reqs[self.__reqnum])
-            self.__reqs.remove(self.__reqs[self.__reqnum])
-            self.tableView2.model().removeRow(self.__reqnum)
-            self.tableView2.update()
-            self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
+            if self.__db.get_user_request(self.__reqs[self.__reqnum].id).solved is False:
+                self.__reqs[self.__reqnum].solved = True
+                self.__reqs[self.__reqnum].approved = decision
+                self.__reqs[self.__reqnum].approved_id = self.__current_user.base_id
+                self.__db.update_user_request(self.__reqs[self.__reqnum])
+                self.__reqs.remove(self.__reqs[self.__reqnum])
+                self.tableView2.model().removeRow(self.__reqnum)
+                self.tableView2.update()
+                self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
+            else:
+                show_message("Ошибка синхронизации", "Запрос уже обработан!")
+                self.refresh_requests_table()
+                self.__reqnum = 0 if len(self.__reqs) <= (self.__reqnum - 1) else self.__reqnum - 1
         else:
             show_message("Ошибка", "Запросов нет")
     class TableModel(QtCore.QAbstractTableModel):
