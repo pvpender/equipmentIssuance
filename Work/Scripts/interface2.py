@@ -1686,7 +1686,10 @@ class MainWindow(QMainWindow):
         self.usChangeDelPushButton.clicked.connect(self.del_user)
         self.grDeletePushButton.clicked.connect(self.del_group)
         self.eqChangeDelPushButton.clicked.connect(self.del_equipment)
-
+        self.usAddDeleteGroupsButton.clicked.connect(self.del_all_from_us_selected_groups)
+        self.eqAddDeleteGroupsButton.clicked.connect(self.del_all_from_eq_selected_groups)
+        self.usChangeDeleteGroupsButton.clicked.connect(self.del_all_from_us_search_selected_groups)
+        self.eqChangeDeleteGroupsButton.clicked.connect(self.del_all_from_eq_search_selected_groups)
         self.show()
     def search_groups_in_groups(self):
         if self.grAddLineEdit.text()!='':
@@ -1730,7 +1733,6 @@ class MainWindow(QMainWindow):
             if self.__grnum<= len(self.__currGroupsTableContents)-1:
                 self.__grnum = self.__grnum + 1
                 self.set_gr_info()
-    #def changeGroup(self):
     def del_user(self):
         self.__user_list.del_user(int(self.__usFoundTableContents[self.__usnum][0],16))
         self.__usFoundTableContents.pop(self.__usnum)
@@ -1967,6 +1969,25 @@ class MainWindow(QMainWindow):
             self.refresh_selected_eq_groups()
             self.eqDelFromSelectedGr.show()
 
+    def del_all_from_eq_search_selected_groups(self):
+        self.__currEqGroupsTableContents=[]
+        self.refresh_selected_eq_search_groups()
+        self.eqSearchDelFromSelectedGr.hide()
+    def del_all_from_us_search_selected_groups(self):
+        self.__currUsGroupsTableContents=[]
+        self.refresh_selected_us_search_groups()
+        self.usSearchDelFromSelectedGr.hide()
+
+    def del_all_from_eq_selected_groups(self):
+        self.__addEqTableContents=[]
+        self.refresh_selected_eq_groups()
+        self.eqDelFromSelectedGr.hide()
+
+    def del_all_from_us_selected_groups(self):
+        self.__addUsTableContents=[]
+        self.refresh_selected_us_groups()
+        self.usDelFromSelectedGr.hide()
+
     def del_from_eq_search_selected_groups(self):
         indexes = self.eqGroupsTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
@@ -2124,6 +2145,10 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__addUsTableContents))])
         model = TableModel(data_frame)
         self.usAddSelectedGrTableView.setModel(model)
+        if len(self.__addUsTableContents)==0:
+            self.usAddDeleteGroupsButton.hide()
+        else:
+            self.usAddDeleteGroupsButton.show()
 
     def refresh_selected_eq_groups(self):
         self.eqAddSelectedGrTableView.clearSpans()
@@ -2132,6 +2157,10 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__addEqTableContents))])
         model = TableModel(data_frame)
         self.eqAddSelectedGrTableView.setModel(model)
+        if len(self.__addEqTableContents)==0:
+            self.eqAddDeleteGroupsButton.hide()
+        else:
+            self.eqAddDeleteGroupsButton.show()
 
     def refresh_selected_eq_search_groups(self):
         self.eqGroupsTableView.clearSpans()
@@ -2140,6 +2169,10 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__currEqGroupsTableContents))])
         model = TableModel(data_frame)
         self.eqGroupsTableView.setModel(model)
+        if len(self.__currEqGroupsTableContents)==0:
+            self.eqChangeDeleteGroupsButton.hide()
+        else:
+            self.eqChangeDeleteGroupsButton.show()
 
     def refresh_selected_us_search_groups(self):
         self.usGroupsTableView.clearSpans()
@@ -2148,6 +2181,10 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(self.__currUsGroupsTableContents))])
         model = TableModel(data_frame)
         self.usGroupsTableView.setModel(model)
+        if len(self.__currUsGroupsTableContents)==0:
+            self.usChangeDeleteGroupsButton.hide()
+        else:
+            self.usChangeDeleteGroupsButton.show()
     def refresh_requests_table(self):
         # self.__reqs = self.__db.get_unsolved_requests()
         self.tableView2.clearSpans()
