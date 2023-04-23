@@ -472,6 +472,33 @@ class DataBase:
 
     def get_all_admins(self):
         return self.__session.query(Admins).all()
+    
+    def update_equipment(self, equipment: Union[Equipment, Equipments]):
+        if not (equipment.x and equipment.y):
+            exist = self.__session.query(Equipments).filter(
+                Equipments.x == equipment.x, Equipments.y == equipment.y
+            ).first()
+            if exist:
+                raise ValueError("This cell is occupied!")
+        if isinstance(equipment, Equipment):
+            self.__session.query(EquipmentGroups).filter(
+                EquipmentGroups.equipment_id == equipment.id,
+                EquipmentGroups.group_id.notin_(equipment.groups)
+            ).delete()
+            exist_groups = list(map(list, zip(*self.__session.query(EquipmentGroups.group_id).filter(
+                EquipmentGroups.equipment_id == equipment.id
+            ).all())))
+            if exist_groups:
+                exist_groups = exist_groups[0]
+            for i in equipment.groups:
+                if i not in exist_groups:
+                    self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
+        self.__session.query(Equipments).filter(Equipments.id == equipment.id).update(
+            {"title": equipment.title, "description": equipment.description,
+             "count": equipment.count, "reserve_count": equipment.reserve_count,
+             "x": equipment.x, "y": equipment.y}, synchronize_session=False
+        )
+        self.__session.commit()
 
     def add_equipment(self, equipment: Equipment):
         exist = self.__session.query(Equipments.id).filter(Equipments.title == equipment.title).first()
