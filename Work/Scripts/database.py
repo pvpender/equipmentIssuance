@@ -1,7 +1,6 @@
 import datetime
 from enum import Enum
 from typing import List
-from PyQt6.QtWidgets import QMessageBox
 from sqlalchemy import ForeignKey
 from sqlalchemy import BigInteger
 from sqlalchemy import Text, DateTime, Engine, create_engine
@@ -13,12 +12,6 @@ import request as req
 import time
 import threading
 
-
-def show_message(title: str, info: str):
-    msg_box = QMessageBox()
-    msg_box.setText(info)
-    msg_box.setWindowTitle(title)
-    msg_box.exec()
 
 
 def fix_died_connection(a: Session):
@@ -402,26 +395,6 @@ class DataBase:
                 pass
         self.__session.commit()
 
-    def update_user(self, old_id: int, old_mail: str, user: CommonUser):
-        self.__session.query(UserGroups).filter(
-            UserGroups.user_id == user.base_id,
-            UserGroups.group_id.notin_(user.access.groups)
-        ).delete()
-        exists = list(map(list, zip(*self.__session.query(UserGroups.group_id).filter(
-            UserGroups.user_id == user.base_id).all())))
-        if exists:
-            exists = exists[0]
-        try:
-            for i in user.access.groups:
-                if i not in exists:
-                    self.__session.add(UserGroups(user_id=user.base_id, group_id=i))
-            self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
-                {"pass_number": user.pass_number, "mail": user.mail}, synchronize_session=False
-            )
-            self.__session.commit()
-        except IntegrityError:
-            show_message("Ошибка синхронизации", "Обновите пользователей и оборудование!")
-            self.__session.rollback()
 
     def delete_user(self, user: CommonUser):
         try:
@@ -486,58 +459,6 @@ class DataBase:
         self.__session.add(db_admin)
         self.__session.commit()
 
-    def update_admin(self, old_id: int, old_mail: str, admin: Admin):
-        access = admin.access
-        access_id = self.__session.query(AdminAccesses.id).filter(
-            AdminAccesses.can_add_users == access.can_add_users,
-            AdminAccesses.can_change_users == access.can_change_users,
-            AdminAccesses.can_change_inventory == access.can_change_inventory,
-            AdminAccesses.can_add_inventory == access.can_add_inventory,
-            AdminAccesses.can_get_request == access.can_get_request,
-        ).first()
-        if not access_id:
-            db_access = AdminAccesses(
-                can_add_users=access.can_add_users,
-                can_change_users=access.can_change_users,
-                can_add_inventory=access.can_add_inventory,
-                can_change_inventory=access.can_change_inventory,
-                can_get_request=access.can_get_request,
-            )
-            self.__session.add(db_access)
-            self.__session.commit()
-            access_id = self.__session.query(AdminAccesses.id).filter(
-                AdminAccesses.can_add_users == access.can_add_users,
-                AdminAccesses.can_change_users == access.can_change_users,
-                AdminAccesses.can_change_users == access.can_change_users,
-                AdminAccesses.can_add_inventory == access.can_add_inventory,
-                AdminAccesses.can_get_request == access.can_get_request,
-            ).one()
-        self.__session.query(UserGroups).filter(
-            UserGroups.user_id == admin.base_id,
-            UserGroups.group_id.notin_(admin.access.groups)
-        ).delete()
-        exists = list(map(
-            list,
-            zip(*self.__session.query(UserGroups.group_id).filter(UserGroups.user_id == admin.base_id).all())
-        ))
-        if exists:
-            exists = exists[0]
-        try:
-            for i in admin.access.groups:
-                    if i not in exists:
-                        self.__session.add(UserGroups(user_id=admin.base_id, group_id=i))
-            else:
-                self.__session.query(Users).filter(Users.mail == old_mail, Users.pass_number == old_id).update(
-                    {"pass_number": admin.pass_number, "mail": admin.mail},
-                    synchronize_session=False
-                )
-                self.__session.query(Admins).filter(Admins.user_id == admin.base_id).update(
-                    {"access_id": access_id[0]}
-                )
-                self.__session.commit()
-        except IntegrityError:
-            show_message("Ошибка синхронизации", "Обновите группы и пользователей")
-            self.__session.rollback()
 
     def delete_admin(self, admin: Admin):
         self.__session.query(Users).filter(Users.id == admin.base_id).delete()
@@ -573,36 +494,6 @@ class DataBase:
             except IntegrityError:
                 pass
 
-    def update_equipment(self, equipment: Union[Equipment, Equipments]):
-        if not (equipment.x and equipment.y):
-            exist = self.__session.query(Equipments).filter(
-                Equipments.x == equipment.x, Equipments.y == equipment.y
-            ).first()
-            if exist:
-                raise ValueError("This cell is occupied!")
-        if isinstance(equipment, Equipment):
-            self.__session.query(EquipmentGroups).filter(
-                EquipmentGroups.equipment_id == equipment.id,
-                EquipmentGroups.group_id.notin_(equipment.groups)
-            ).delete()
-            exist_groups = list(map(list, zip(*self.__session.query(EquipmentGroups.group_id).filter(
-                EquipmentGroups.equipment_id == equipment.id
-            ).all())))
-            if exist_groups:
-                exist_groups = exist_groups[0]
-            for i in equipment.groups:
-                if i not in exist_groups:
-                    self.__session.add(EquipmentGroups(equipment_id=equipment.id, group_id=i))
-        try:
-            self.__session.query(Equipments).filter(Equipments.id == equipment.id).update(
-                {"title": equipment.title, "description": equipment.description,
-                 "count": equipment.count, "reserve_count": equipment.reserve_count,
-                 "x": equipment.x, "y": equipment.y}, synchronize_session=False
-            )
-            self.__session.commit()
-        except IntegrityError:
-            show_message("Ошибка синхронизации", "Обновите группы и оборудование")
-            self.__session.rollback()
 
     def delete_equipment(self, equipment: Equipment):
         self.__session.query(Equipments).filter(Equipments.title == equipment.title).delete()
