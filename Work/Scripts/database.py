@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from typing import List
 from PyQt6.QtWidgets import QMessageBox
-from sqlalchemy import ForeignKey, exc
+from sqlalchemy import ForeignKey
 from sqlalchemy import BigInteger
 from sqlalchemy import Text, DateTime, Engine, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, relationship, Mapped, mapped_column

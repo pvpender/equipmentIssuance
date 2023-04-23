@@ -1,12 +1,10 @@
-from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFrame, QMessageBox, QHeaderView
+from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer, pyqtSlot
 from PyQt6 import QtCore, QtGui, QtWidgets
 from equipment_collections import EquipmentCollection
-from Work.Scripts.interface import TableModel
+from interface import TableModel
 from user_collections import *
-from equipment import *
 from database import *
-from accesses import *
 from users import *
 from accesses import *
 import pandas as pd
