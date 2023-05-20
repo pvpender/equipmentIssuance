@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import BoundFilter
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram_dialog import Window, Dialog, DialogRegistry, DialogManager, StartMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, ScrollingGroup, Select
@@ -82,6 +82,12 @@ async def input_password(msg: Message, curr_dialog: Dialog, manager: DialogManag
     if password == user_login.password:
         db.add_tg_user(msg.from_user.id, user_login.id)
         await msg.answer("Успех!")
+        inline_keyboard = InlineKeyboardMarkup(row_width=1)
+        inline_keyboard.add(*[
+                InlineKeyboardButton(text="Войти как новый пользователь", callback_data="login"),
+                InlineKeyboardButton(text="Запросить оборудование", callback_data="get_equipment")
+             ])
+        await msg.answer("Вот что вы можете сделать:", reply_markup=inline_keyboard)
         await manager.done()
     else:
         await msg.answer("Неверный пароль!")
@@ -113,7 +119,7 @@ async def ans(c: CallbackQuery, button: Button, manager: DialogManager, button_i
     manager.data["possible"] = "Вы можете запросить это оборудование"
     manager.data["extend"] = True
     db.add_last_request(c.from_user.id, eq.title)
-    await manager.dialog().switch_to(MySG.preview)
+    await manager.dialog().switch_to(MySG.purpose)
 
 
 async def get_equipment_user_data(dialog_manager: DialogManager, **kwargs):
@@ -204,6 +210,7 @@ preview_window = Window(
 )
 
 purpose_window = Window(
+    Format("Оборудование: {title}\nОписание: {description}\n{possible}"),
     Const("Последний шаг: введите для какой цели вы запрашиваете оборудование"),
     MessageInput(switch_to_confirm),
     Button(Const("Отмена"), id="cancel", on_click=switch_to_choice),
@@ -254,12 +261,18 @@ async def start(msg: Message, dialog_manager: DialogManager):
 
 
 @dp.message_handler(commands=["login"])
+@dp.callback_query_handler(text="login")
 async def login(msg: Message, dialog_manager: DialogManager):
+    if isinstance(msg, CallbackQuery):
+        await msg.answer()
     await dialog_manager.start(LogSG.mail, mode=StartMode.RESET_STACK)
 
 
 @dp.message_handler(is_login=True, commands=["get_equipment"])
+@dp.callback_query_handler(text="get_equipment")
 async def get_equipment(msg: Message, dialog_manager: DialogManager):
+    if isinstance(msg, CallbackQuery):
+        await msg.answer()
     await dialog_manager.start(MySG.main, mode=StartMode.RESET_STACK)
 
 
