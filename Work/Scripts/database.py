@@ -544,10 +544,12 @@ class DataBase:
         self.__session.commit()
 
     def get_admin_by_id(self, pass_number: int):
-        return self.__session.query(Admins).first()
+        us_id = self.get_user_by_id(pass_number).id
+        return self.__session.query(Admins).filter(Admins.user_id == us_id).first()
 
     def get_admin_by_mail(self, mail: str) -> Union[Admins, None]:
-        return self.__session.query(Admins).first()
+        us_id = self.get_user_by_mail(mail).id
+        return self.__session.query(Admins).filter(Admins.user_id == us_id).first()
 
     def get_all_admins(self):
         return self.__session.query(Admins).all()
@@ -700,7 +702,7 @@ class DataBase:
         self.__session.add(last_request)
         self.__session.commit()
 
-    def get_last_request(self, tg_id) -> Union[UserRequests, None]:
+    def get_last_request(self, tg_id) -> Union[LastRequest, None]:
         return self.__session.query(LastRequest).filter(LastRequest.tg_id == tg_id).first()
 
     def add_last_login(self, tg_id: int, login: str):
