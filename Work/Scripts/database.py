@@ -278,8 +278,6 @@ def for_all_methods(decorator):
 
     return decorate
 
-
-@for_all_methods(restart_if_except)
 class DataBase:
     """Class for working with database"""
 
