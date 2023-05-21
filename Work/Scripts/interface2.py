@@ -31,6 +31,7 @@ class QDoublePushButton(QPushButton):
 
 
 class LogWindow(QMainWindow):
+    """Class of login window. App starts with it window"""
     loggedSignal = QtCore.pyqtSignal()
 
     def __init__(self, user_list: UserCollection, equipment_list: EquipmentCollection, db: DataBase):
@@ -81,6 +82,12 @@ class LogWindow(QMainWindow):
         self.show()
 
     def login(self):
+        """
+        Login function (calls on pushing button)
+
+        Returns:
+
+        """
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
         #     if isinstance(user, Admin) and user.password == self.__password_field.text():
         if isinstance(user, Admin):
@@ -93,6 +100,16 @@ class LogWindow(QMainWindow):
 
 
 def show_message(title: str, info: str):
+    """
+    Function to showing message
+
+    Args:
+        title (str): Title
+        info (str): Info(body)
+
+    Returns:
+
+    """
     msg_box = QMessageBox()
     msg_box.setText(info)
     msg_box.setWindowTitle(title)
@@ -100,6 +117,9 @@ def show_message(title: str, info: str):
 
 
 class MainWindow(QMainWindow):
+    """
+    Class of main window
+    """
     def __init__(self,
                  user_list: UserCollection,
                  equipment_list: EquipmentCollection,
@@ -1695,8 +1715,13 @@ class MainWindow(QMainWindow):
         self.refresh_selected_us_search_groups()
         self.refresh_selected_eq_search_groups()
         self.show()
+
     def search_groups_in_groups(self):
-        if self.grAddLineEdit.text()!='':
+        """
+        Method calls when user want to findsome group
+
+        """
+        if self.grAddLineEdit.text() != '':
             self.__currGroupsTableContents = []
             for i in self.__allGroups.keys():
                 if i.find(self.grAddLineEdit.text())>=0:
@@ -1717,9 +1742,12 @@ class MainWindow(QMainWindow):
                 show_message('Проблема','Ничего не найдено')
                 self.__grnum=-2
     def set_gr_info(self):
-        if self.__grnum!=-1:
+        """
+        Method for drawing groups in table
+        """
+        if self.__grnum != -1:
             self.grTableView.selectRow(self.__grnum)
-            if self.__grnum >= 0 and self.__grnum <= len(self.__currGroupsTableContents) -1:
+            if 0 <= self.__grnum <= len(self.__currGroupsTableContents) -1:
                 self.grAddLineEdit.setText(self.__currGroupsTableContents[self.__grnum])
             if self.__grnum == 0:
                 self.grPrevPushButton.hide()
@@ -1730,15 +1758,24 @@ class MainWindow(QMainWindow):
             else:
                 self.grNextPushButton.show()
     def prevGr(self):
+        """
+        Select prev group
+        """
         if self.__grnum>0:
             self.__grnum = self.__grnum - 1
             self.set_gr_info()
     def nextGr(self):
-            if self.__grnum<= len(self.__currGroupsTableContents)-1:
-                self.__grnum = self.__grnum + 1
-                self.set_gr_info()
+        """
+        Select nex group
+        """
+        if self.__grnum<= len(self.__currGroupsTableContents)-1:
+            self.__grnum = self.__grnum + 1
+            self.set_gr_info()
     #def changeGroup(self):
     def del_user(self):
+        """
+        Method calls when trying to delete user
+        """
         self.__user_list.del_user(int(self.__usFoundTableContents[self.__usnum][0],16))
         self.__usFoundTableContents.pop(self.__usnum)
         if len(self.__usFoundTableContents)>0:
@@ -1752,6 +1789,11 @@ class MainWindow(QMainWindow):
             self.refresh_users_table()
             show_message("успех","Пользователь удален")
     def del_equipment(self):
+        """
+
+        Method calls when trying to delete equipment
+
+        """
         self.__equipment_list.del_equipment(int(self.__eqFoundTableContents[self.__eqnum][0]))
         self.__eqFoundTableContents.pop(self.__eqnum)
         if len(self.__eqFoundTableContents)>0:
@@ -1765,6 +1807,11 @@ class MainWindow(QMainWindow):
             self.refresh_equipment_table()
             show_message("успех","Оборудование удалено")
     def del_group(self):
+        """
+
+        Method calls where trying to delete group
+
+        """
         self.grAddLineEdit.clear()
         self.grDeletePushButton.hide()
         self.grNextPushButton.hide()
@@ -1824,6 +1871,11 @@ class MainWindow(QMainWindow):
 
         self.refresh_gr_view_table()
     def change_group(self):
+        """
+
+        For changing group
+
+        """
         if self.grAddLineEdit.text()!='' and len(self.__currGroupsTableContents)>0:
             if self.grAddLineEdit.text() in self.__allGroups.keys() and self.grAddLineEdit.text()!=self.__currGroupsTableContents[self.__grnum]:
                 show_message("Ошибка","группа с таким названием уже существует")
@@ -1879,6 +1931,11 @@ class MainWindow(QMainWindow):
                 self.refresh_gr_view_table()
 
     def search_groups_in_eq_search_groups(self):
+        """
+
+        For searching groups in equipment groups
+
+        """
         if self.eqChangeGroupByName.text() != '':
             self.eqSearchAllGrTableView.clearSpans()
             new_table=[]
@@ -1891,11 +1948,21 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.eqSearchAllGrTableView.setModel(model)
     def refresh_groups_in_eq_search_groups(self):
+        """
+
+        For refreshing groups in equipment groups window
+
+        """
         self.eqSearchAllGrTableView.clearSpans()
         data_frame = pd.DataFrame(sorted(self.__allGroups),columns=["Название группы"],index=[i for i in range(len(sorted(self.__allGroups)))])
         model = TableModel(data_frame)
         self.eqSearchAllGrTableView.setModel(model)
     def search_groups_in_us_search_groups(self):
+        """
+
+        For searching groups in users groups
+
+        """
         if self.usChangeGroupByName.text() != '':
             self.usSearchAllGrTableView.clearSpans()
             new_table=[]
@@ -1908,11 +1975,21 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.usSearchAllGrTableView.setModel(model)
     def refresh_groups_in_us_search_groups(self):
+        """
+
+        For refreshing groups in users groups table
+
+        """
         self.usSearchAllGrTableView.clearSpans()
         data_frame = pd.DataFrame(sorted(self.__allGroups),columns=["Название группы"],index=[i for i in range(len(sorted(self.__allGroups)))])
         model = TableModel(data_frame)
         self.usSearchAllGrTableView.setModel(model)
     def search_groups_in_eq_add_groups(self):
+        """
+
+        For searching groups in equipment group adding table
+
+        """
         if self.eqAddGroupByName.text() != '':
             self.eqAddAllGrTableView.clearSpans()
             new_table=[]
@@ -1925,11 +2002,21 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.eqAddAllGrTableView.setModel(model)
     def refresh_groups_in_eq_add_groups(self):
+        """
+
+        For refreshing groups in equipment group adding table
+
+        """
         self.eqAddAllGrTableView.clearSpans()
         data_frame = pd.DataFrame(sorted(self.__allGroups),columns=["Название группы"],index=[i for i in range(len(sorted(self.__allGroups)))])
         model = TableModel(data_frame)
         self.eqAddAllGrTableView.setModel(model)
     def search_groups_in_us_add_groups(self):
+        """
+
+        For searching groups in user group adding table
+
+        """
         if self.usAddGroupByName.text() != '':
             self.usAddAllGrTableView.clearSpans()
             new_table=[]
@@ -1942,12 +2029,18 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.usAddAllGrTableView.setModel(model)
     def refresh_groups_in_us_add_groups(self):
+        """
+
+        For refreshing groups in user group adding table
+
+        """
         self.usAddAllGrTableView.clearSpans()
         data_frame = pd.DataFrame(sorted(self.__allGroups),columns=["Название группы"],index=[i for i in range(len(sorted(self.__allGroups)))])
         model = TableModel(data_frame)
         self.usAddAllGrTableView.setModel(model)
 
     def selected_to_us_groups(self):
+        """To adding selected group to user groups"""
         indexes = self.usAddAllGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in indexes:
@@ -1957,6 +2050,7 @@ class MainWindow(QMainWindow):
             self.usDelFromSelectedGr.show()
 
     def selected_to_eq_search_groups(self):
+        """To adding selected group to equipment groups"""
         indexes = self.eqSearchAllGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in indexes:
@@ -1966,6 +2060,7 @@ class MainWindow(QMainWindow):
             self.eqSearchDelFromSelectedGr.show()
 
     def selected_to_us_search_groups(self):
+        """For adding selected groups to user search groups"""
         indexes = self.usSearchAllGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in indexes:
@@ -1975,6 +2070,7 @@ class MainWindow(QMainWindow):
             self.usSearchDelFromSelectedGr.show()
 
     def selected_to_eq_groups(self):
+        """For adding selected groups to equipment groups"""
         indexes = self.eqAddAllGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in indexes:
@@ -1984,15 +2080,18 @@ class MainWindow(QMainWindow):
             self.eqDelFromSelectedGr.show()
 
     def del_from_eq_search_selected_groups(self):
+        """For deleting selected gsearch roups from equipment"""
         indexes = self.eqGroupsTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in reversed(indexes):
                 self.__currEqGroupsTableContents.remove(i.data(0))
         self.refresh_selected_eq_search_groups()
     def del_all_from_eq_search_selected_groups(self):
+        """For deleting all selected search groups from equipment"""
         self.__currEqGroupsTableContents=[]
         self.refresh_selected_eq_search_groups()
     def del_from_us_search_selected_groups(self):
+        """For deleting selected search groups from user"""
         indexes = self.usGroupsTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in reversed(indexes):
@@ -2001,19 +2100,23 @@ class MainWindow(QMainWindow):
         if len(self.__currUsGroupsTableContents) == 0:
             self.usSearchDelFromSelectedGr.hide()
     def del_all_from_us_search_selected_groups(self):
+        """For deleting all selected search groups from user"""
         self.__currUsGroupsTableContents=[]
         self.refresh_selected_us_search_groups()
     def del_from_eq_selected_groups(self):
+        """For deleting selected groups from user"""
         indexes = self.eqAddSelectedGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in reversed(indexes):
                 self.__addEqTableContents.remove(i.data(0))
         self.refresh_selected_eq_groups()
     def del_all_from_eq_selected_groups(self):
+        """For all deleting selected groups from equipment"""
         self.__addEqTableContents=[]
         self.refresh_selected_eq_groups()
 
     def del_from_us_selected_groups(self):
+        """For deleting selected groups from user"""
         indexes = self.usAddSelectedGrTableView.selectionModel().selectedRows()
         if len(indexes) > 0:
             for i in reversed(indexes):
@@ -2022,9 +2125,11 @@ class MainWindow(QMainWindow):
         if len(self.__addUsTableContents) == 0:
             self.usDelFromSelectedGr.hide()
     def del_all_from_us_selected_groups(self):
+        """For deleting all from selected groups"""
         self.__addUsTableContents=[]
         self.refresh_selected_us_groups()
     def refresh_equipment_table(self):
+        """For refreshing equipment table"""
         self.__equipment_list.refresh_collection()
         self.eqchangerGroupBox.hide()
         self.__eqFoundTableContents = []
@@ -2076,6 +2181,7 @@ class MainWindow(QMainWindow):
         self.eqChangeDeleteGroupsButton.hide()
 
     def refresh_users_table(self):
+        """For refreshing users table"""
         self.__user_list.refresh_collection()
         self.usChangeSearchGroupsGroupBox.hide()
         self.listLabel_19.hide()
@@ -2107,6 +2213,7 @@ class MainWindow(QMainWindow):
         self.usChangeDeleteGroupsButton.hide()
 
     def refresh_gr_view_table(self):
+        """For refreshing group view table"""
         self.__allGroups.clear()
         self.grTableView.clearSpans()
         self.eqAddAllGrTableView.clearSpans()
@@ -2130,6 +2237,7 @@ class MainWindow(QMainWindow):
         self.eqSearchAllGrTableView.setModel(model)
 
     def refresh_only_groups_table(self):
+        """For refreshing only groups table"""
         self.grTableView.clearSpans()
         data_frame = pd.DataFrame(self.__allGroups.keys(),
                                   columns=["Название группы"],
@@ -2143,6 +2251,7 @@ class MainWindow(QMainWindow):
         self.grAddPushButton.setText("Добавить")
         self.__grnum=-2
     def refresh_selected_us_groups(self):
+        """For refreshing selected user groups table"""
         self.usAddSelectedGrTableView.clearSpans()
         data_frame = pd.DataFrame(self.__addUsTableContents,
                                   columns=["Название групп"],
@@ -2157,6 +2266,7 @@ class MainWindow(QMainWindow):
             self.usAddDeleteGroupsButton.show()
 
     def refresh_selected_eq_groups(self):
+        """For refreshing selected equipment groups table"""
         self.eqAddSelectedGrTableView.clearSpans()
         data_frame = pd.DataFrame(self.__addEqTableContents,
                                   columns=["Название групп"],
@@ -2170,6 +2280,7 @@ class MainWindow(QMainWindow):
             self.eqDelFromSelectedGr.show()
             self.eqAddDeleteGroupsButton.show()
     def refresh_selected_eq_search_groups(self):
+        """For refreshing selected equipment search groups table"""
         self.eqGroupsTableView.clearSpans()
         data_frame = pd.DataFrame(self.__currEqGroupsTableContents,
                                   columns=["Название групп"],
@@ -2183,6 +2294,7 @@ class MainWindow(QMainWindow):
             self.eqSearchDelFromSelectedGr.show()
             self.eqChangeDeleteGroupsButton.show()
     def refresh_selected_us_search_groups(self):
+        """For refreshing selected user search groups table"""
         self.usGroupsTableView.clearSpans()
         data_frame = pd.DataFrame(self.__currUsGroupsTableContents,
                                   columns=["Название групп"],
@@ -2196,6 +2308,7 @@ class MainWindow(QMainWindow):
             self.usSearchDelFromSelectedGr.show()
             self.usSearchDelFromSelectedGr.show()
     def refresh_requests_table(self):
+        """For refreshing requests table"""
         self.tableView2.clearSpans()
         self.textBrowser.clear()
         self.__reqs = self.__db.get_unsolved_users_requests()
@@ -2221,6 +2334,7 @@ class MainWindow(QMainWindow):
         self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         self.get_request()
     def add_equipment(self):
+        """For adding equipment"""
         code_error = -1
         if code_error == -1 and self.eqNameOrEmailLineEdit.text() == "":
             code_error = 1
@@ -2268,6 +2382,7 @@ class MainWindow(QMainWindow):
             elif code_error == 9:
                 show_message("Ошибка добавления", "Ячейка занята")
     def add_user(self):
+        """For adding user"""
         self.__user_list.refresh_collection()
         code_error = -1
         add_users = False
@@ -2347,6 +2462,7 @@ class MainWindow(QMainWindow):
             elif code_error == 8:
                 show_message("Ошибка добавления", "Пользователь с таким email уже добавлен")
     def add_group(self):
+        """For adding groups"""
         if self.__grnum==-2:
             code_error = -1
             if self.grAddLineEdit.text() == '':
@@ -2364,6 +2480,7 @@ class MainWindow(QMainWindow):
         else:
             self.change_group()
     def changeUs(self):
+        """For changing user"""
         code_error = -1
         if (self.__user_list.get_user_by_pass(
                 int(self.ussearchByNameOrEmailLineEdit.text(), 16)) is not None) and \
@@ -2398,6 +2515,7 @@ class MainWindow(QMainWindow):
             elif code_error == 8:
                 show_message("Ошибка изменения", "Другой пользователь с таким email уже добавлен")
     def changeEq(self):
+        """For changing equipment"""
         code_error = -1
         if (self.__equipment_list.get_equipment_by_title(
                 self.eqsearchByEmailOrNameLineEdit.text()) is not None) and self.__equipment_list.get_equipment_by_title(
@@ -2432,6 +2550,7 @@ class MainWindow(QMainWindow):
             elif code_error == 8:
                 show_message("Ошибка изменения", "Уже существует оборудование с таким названием")
     def setUsInfo(self):
+        """For setting user info"""
         if self.__usnum==0:
             self.uschangerprevPushButton.hide()
             self.uschangernextPushButton.show()
@@ -2461,6 +2580,7 @@ class MainWindow(QMainWindow):
         if len(self.__usFoundGroups) > 0:
             self.usSearchDelFromSelectedGr.show()
     def setEqInfo(self):
+        """For setting equipment info"""
         if self.__eqnum==0:
             self.eqchangerprevPushButton.hide()
             self.eqchangernextPushButton.show()
@@ -2501,6 +2621,7 @@ class MainWindow(QMainWindow):
         if len(self.__eqFoundGroups) > 0:
             self.eqSearchDelFromSelectedGr.show()
     def search_users(self):
+        """For searching users"""
         found = []
         found2 = []
         found3 = []
@@ -2565,6 +2686,7 @@ class MainWindow(QMainWindow):
         else:
             show_message("Проблема", "Ничего не найдено")
     def searchEq(self):
+        """For searching equipment"""
         found = []
         found2 = []
         found3 = []
@@ -2706,6 +2828,7 @@ class MainWindow(QMainWindow):
         else:
             show_message("Проблема", "Ничего не найдено")
     def search_request(self):
+        """For searching request"""
         found = []
         found2 = []
         found3 = []
@@ -2789,30 +2912,39 @@ class MainWindow(QMainWindow):
         else:
             show_message("Проблема", "Ничего не найдено")
     def previousEq(self):
+        """Show previous equipment"""
         if self.__eqnum > 0:
             self.__eqnum = self.__eqnum - 1
             self.setEqInfo()
         else:
             show_message("Ошибка", "Это первый элемент в списке")
     def nextEq(self):
+        """Show nex equipment"""
         if self.__eqnum < len(self.__eqFoundTableContents) - 1:
             self.__eqnum = self.__eqnum + 1
             self.setEqInfo()
         else:
             show_message("Ошибка", "Элемент последний в списке")
     def previousUs(self):
+        """Show previous user"""
         if self.__usnum > 0:
             self.__usnum = self.__usnum - 1
             self.setUsInfo()
         else:
             show_message("Ошибка", "Это первый элемент в списке")
     def nextUs(self):
+        """
+        Show next user
+        """
         if self.__usnum < len(self.__usFoundTableContents) - 1:
             self.__usnum = self.__usnum + 1
             self.setUsInfo()
         else:
             show_message("Ошибка", "Элемент последний в списке")
     def get_request(self):
+        """
+        Draw all requests
+        """
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__user_list.get_user_by_id(
                 self.__reqs[self.__reqnum].sender_id).mail) + "\n ID запросившего: " + str(
@@ -2825,22 +2957,43 @@ class MainWindow(QMainWindow):
             self.__reqnum -= 1
             show_message("Сообщение", "Запросов нет")
     def previous_request(self):
+        """
+        Show previous request
+        """
         if self.__reqnum > 0:
             self.__reqnum = self.__reqnum - 1
             self.get_request()
         else:
             show_message("Ошибка", "Запрос уже первый в списке")
     def next_request(self):
+        """
+        Show nex request
+        """
         if self.__reqnum < len(self.__reqs):
             self.__reqnum = self.__reqnum + 1
             self.get_request()
         else:
             show_message("Ошибка", "Запрос последний в списке")
     def reject_request(self):
+        """
+        Rejecting request
+        """
         self.decide_request(False)
     def approve_request(self):
+        """
+        Approving request
+        """
         self.decide_request(True)
-    def decide_request(self, decision):
+    def decide_request(self, decision: bool):
+        """
+        Method for deciding requests
+
+        Args:
+            decision (bool): Decision (true if approve, false if reject)
+
+        Returns:
+
+        """
         if len(self.__reqs) != 0:
             if self.__db.get_user_request(self.__reqs[self.__reqnum].id).solved is False:
                 self.__reqs[self.__reqnum].solved = True
@@ -2858,22 +3011,58 @@ class MainWindow(QMainWindow):
         else:
             show_message("Ошибка", "Запросов нет")
     class TableModel(QtCore.QAbstractTableModel):
+        """Table model for showing data"""
         def __init__(self, data):
             super(TableModel, self).__init__()
             self._data = data
 
-        def data(self, index, role):
+        def data(self, index: QtCore.QModelIndex, role: Qt.ItemDataRole) -> str:
+            """
+
+            Args:
+                index: index
+                role: role
+
+            Returns:
+                Data as str
+            """
             if role == Qt.ItemDataRole.DisplayRole:
                 value = self._data.iloc[index.row(), index.column()]
                 return str(value)
 
-        def rowCount(self, index):
+        def rowCount(self, index: QtCore.QModelIndex) -> int:
+            """
+
+            Args:
+                index: index
+
+            Returns:
+                Row count
+            """
             return self._data.shape[0]
 
         def columnCount(self, parent: QtCore.QModelIndex) -> int:
+            """
+
+            Args:
+                parent:
+
+            Returns:
+                Column count
+            """
             return self._data.shape[1]
 
         def headerData(self, section: int, orientation, role: int):
+            """
+
+            Args:
+                section:
+                orientation:
+                role:
+
+            Returns:
+                Data from headers
+            """
             # section is the index of the column/row.
             if role == Qt.ItemDataRole.DisplayRole:
                 if orientation == Qt.Orientation.Horizontal:
@@ -2885,10 +3074,29 @@ class MainWindow(QMainWindow):
                     return str(self._data.index[section])
 
         def removeRow(self, row: int, parent=None):
+            """
+
+            Args:
+                row:
+                parent:
+
+            Returns:
+                For removing row
+            """
             self._data.drop(row, inplace=True)
             self._data.reset_index(drop=True, inplace=True)
 
         def setData(self, index: QtCore.QModelIndex, value, role: int = ...) -> bool:
+            """
+
+            Args:
+                index:
+                value:
+                role:
+
+            Returns:
+                Setting data to cell
+            """
             if role == Qt.ItemDataRole.EditRole:
                 self._data.iloc[index.row(), index.column()] = value
                 return True
