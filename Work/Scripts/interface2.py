@@ -1781,6 +1781,7 @@ class MainWindow(QMainWindow):
             self.set_gr_info()
 
     # def changeGroup(self):
+
     def del_user(self):
         """
         Method calls when trying to delete user
