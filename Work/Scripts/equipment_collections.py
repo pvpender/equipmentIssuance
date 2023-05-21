@@ -137,7 +137,7 @@ class EquipmentCollection:
         Returns:
 
         """
-        self.__db.del_equipment_group(equipment_id, groups)
+        self.__db.del_equipment_groups(equipment_id, groups)
         for i in groups:
             try:
                 self.__objects[equipment_id].groups.remove(i)

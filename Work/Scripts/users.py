@@ -6,6 +6,7 @@ from accesses import *
 
 class User(ABC):
 
+    """User abstract class"""
     def __init__(self, pass_number: int, mail: str, base_id=None):
         self.__pass_number = pass_number
         self.__mail = mail
@@ -13,10 +14,20 @@ class User(ABC):
 
     @property
     def pass_number(self) -> int:
+        """
+
+        Returns:
+            User pass number in decimal
+        """
         return self.__pass_number
 
     @property
     def mail(self) -> str:
+        """
+
+        Returns:
+            User email|login
+        """
         return self.__mail
 
     @pass_number.setter
@@ -29,6 +40,11 @@ class User(ABC):
 
     @property
     def base_id(self) -> Union[None, int]:
+        """
+
+        Returns:
+            Id from database if exists else None
+        """
         return self.__base_id
 
     @base_id.setter
@@ -44,13 +60,18 @@ class User(ABC):
 
 
 class Admin(User):
-
+    """Admin class"""
     def __init__(self, pass_nuber, mail, access: AdminAccess, base_id=None):
         super().__init__(pass_nuber, mail, base_id)
         self.__access = access
 
     @property
     def access(self) -> AdminAccess:
+        """
+
+        Returns:
+            Admin acesses
+        """
         return self.__access
 
     @access.setter
@@ -62,12 +83,18 @@ class Admin(User):
 
 
 class CommonUser(User):
+    """Common user class"""
     def __init__(self, pass_number: int, mail: str, access: Access, base_id=None):
         super().__init__(pass_number, mail, base_id)
         self.__access = access
 
     @property
     def access(self) -> Access:
+        """
+
+        Returns:
+            User access
+        """
         return self.__access
 
     @access.setter
