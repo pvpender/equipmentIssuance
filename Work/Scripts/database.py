@@ -160,6 +160,7 @@ class UserRequests(Base):
     approved_id: Mapped[int] = mapped_column(nullable=True)
     notified: Mapped[bool] = mapped_column(default=False)
     taken: Mapped[bool] = mapped_column(default=False)
+    equipment: Mapped["Equipments"] = relationship()
 
 
 class UsersBackUp(Base):
@@ -196,6 +197,14 @@ class EquipmentBackUp(Base):
     reserve_count: Mapped[int]
     x: Mapped[int]
     y: Mapped[int]
+
+
+class NotificationMessages(Base):
+    __tablename__ = "notification_messages"
+    tg_chat_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    request_id: Mapped[int] = mapped_column(ForeignKey("user_requests.id", ondelete='CASCADE'), primary_key=True)
+    message_id: Mapped[int] = mapped_column(BigInteger)
+    request: Mapped["UserRequests"] = relationship()
 
 
 class ActionTypes(Enum):
@@ -518,7 +527,16 @@ class DataBase:
             self.__session.query(Users).filter_by(mail=user.mail, pass_number=user.pass_number).delete()
         self.__session.commit()
 
-    def get_user_by_id(self, pass_number: int) -> Users | None:
+    def get_user_by_id(self, user_id: int) -> Users | None:
+        """
+        Args:
+            user_id (int): User id
+        Returns:
+            User or None
+        """
+        return self.__session.query(Users).filter(Users.id == user_id).first()
+
+    def get_user_by_pass(self, pass_number: int) -> Users | None:
         """
 
         Args:
@@ -704,7 +722,7 @@ class DataBase:
         Returns:
             Admin or None
         """
-        us_id = self.get_user_by_id(pass_number).id
+        us_id = self.get_user_by_pass(pass_number).id
         return self.__session.query(Admins).filter(Admins.user_id == us_id).first()
 
     def get_admin_by_mail(self, mail: str) -> Union[Admins, None]:
@@ -1056,6 +1074,16 @@ class DataBase:
         """
         return self.__session.query(UserRequests).filter(UserRequests.id == request_id).first()
 
+    def get_user_requests(self, user_id: int) -> List[Type[UserRequests]]:
+        """
+
+        Args:
+            user_id (int): User id from database
+
+        Returns:
+            List of all user requests
+        """
+        return self.__session.query(UserRequests).filter(UserRequests.sender_id == user_id).all()
     def update_user_request(self, request: Union[Type[UserRequests]]):
         """
 
@@ -1086,3 +1114,95 @@ class DataBase:
         """
         self.__session.query(UserRequests).filter(UserRequests.id == req_id).delete()
         self.__session.commit()
+
+    def get_all_tg_admins(self) -> List[Type[TelegramLogins]]:
+        """
+
+        Returns:
+            All telegram admins with possibilities to getting requests
+        """
+        return self.__session.query(TelegramLogins).join(
+            Admins,
+            TelegramLogins.id == Admins.user_id
+        ).join(
+            AdminAccesses,
+            AdminAccesses.id == Admins.access_id
+        ).filter(AdminAccesses.can_get_request.is_(True)).all()
+
+    def add_tg_message(self, tg_chat_id: int, request_id: int, message_id: int):
+        """
+
+        Args:
+            tg_chat_id (int): Telegram chat/user id
+            request_id (int): Request id
+            message_id (int): Message id
+
+        Returns:
+
+        """
+        self.__session.add(NotificationMessages(tg_chat_id=tg_chat_id, request_id=request_id, message_id=message_id))
+        self.__session.commit()
+
+    def del_tg_message(self, tg_message: NotificationMessages):
+        """
+
+        Args:
+            tg_message (NotificationMessages): Object of NotificationMessages
+
+        Returns:
+
+        """
+        self.__session.query(NotificationMessages).filter(
+            NotificationMessages.tg_chat_id == tg_message.tg_chat_id,
+            NotificationMessages.request_id == tg_message.request_id,
+            NotificationMessages.message_id == tg_message.message_id
+        ).delete()
+        self.__session.commit()
+
+    def del_tg_message_by_request(self, request_id: int):
+        """
+
+        Args:
+            request_id (int): Request id
+
+        Returns:
+
+        """
+        self.__session.query(NotificationMessages).filter(
+            NotificationMessages.request_id == request_id,
+        ).delete()
+        self.__session.commit()
+
+    def get_useless_tg_messages(self) -> List[Type[NotificationMessages]]:
+        """
+
+        Returns:
+            List of message which should be deleted
+        """
+        return self.__session.query(NotificationMessages).join(
+            UserRequests,
+            NotificationMessages.request_id == UserRequests.id
+        ).filter(UserRequests.solved.is_(True)).all()
+
+    def get_message_by_chat_and_message_id(self, tg_chat_id: int, message_id: int) -> Type[NotificationMessages]:
+        """
+
+        Args:
+            tg_chat_id (int): Tg char/user id
+            message_id (int): Tg message id
+
+        Returns:
+
+        """
+        return self.__session.query(NotificationMessages).filter(
+            NotificationMessages.tg_chat_id == tg_chat_id,
+            NotificationMessages.message_id == message_id
+        ).first()
+
+    def get_all_adm_notified_requests(self) -> List[NotificationMessages.request_id]:
+        """
+
+        Returns:
+            ID's of requests that already has notified
+        """
+        return self.__session.query(NotificationMessages.request_id).group_by(NotificationMessages.request_id).all()

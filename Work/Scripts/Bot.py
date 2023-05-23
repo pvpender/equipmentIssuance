@@ -85,7 +85,8 @@ async def input_password(msg: Message, curr_dialog: Dialog, manager: DialogManag
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
         inline_keyboard.add(*[
                 InlineKeyboardButton(text="Войти как новый пользователь", callback_data="login"),
-                InlineKeyboardButton(text="Запросить оборудование", callback_data="get_equipment")
+                InlineKeyboardButton(text="Запросить оборудование", callback_data="get_equipment"),
+                InlineKeyboardButton(text="Посмотреть список ваших запросов", callback_data="my_requests")
              ])
         await msg.answer("Вот что вы можете сделать:", reply_markup=inline_keyboard)
         await manager.done()
@@ -268,12 +269,78 @@ async def login(msg: Message, dialog_manager: DialogManager):
     await dialog_manager.start(LogSG.mail, mode=StartMode.RESET_STACK)
 
 
+@dp.message_handler(commands=['my_requests'])
+@dp.callback_query_handler(text="my_requests")
+async def my_equip(msg: Union[Message, CallbackQuery]):
+    user_id = db.get_tg_user(msg.from_user.id).id
+    mas = db.get_user_requests(user_id)
+    answer = "*Ваши запросы*\n*Полученные:*\n"
+    for i in mas:
+        if i.taken:
+            answer += f"__{i.equipment.title}__\n"
+    answer += "*Ожидающие получения:*\n"
+    for i in mas:
+        if i.approved is True and not i.taken:
+            answer += f"__{i.equipment.title}__\n"
+    answer += "*Ожидающие решения администратора:*\n"
+    for i in mas:
+        if not i.solved:
+            answer += f"__{i.equipment.title}__"
+    if isinstance(msg, CallbackQuery):
+        await msg.answer()
+        await bot.send_message(msg.message.chat.id, answer, parse_mode='Markdown')
+    else:
+        await msg.answer(answer, parse_mode='Markdown')
+
+
 @dp.message_handler(is_login=True, commands=["get_equipment"])
 @dp.callback_query_handler(text="get_equipment")
 async def get_equipment(msg: Message, dialog_manager: DialogManager):
     if isinstance(msg, CallbackQuery):
         await msg.answer()
     await dialog_manager.start(MySG.main, mode=StartMode.RESET_STACK)
+
+
+async def send_request_notification(user_tg_id: int, title: str, user_login: str, request: Type[UserRequests]):
+    inline_keyboard = InlineKeyboardMarkup(row_width=1)
+    inline_keyboard.add(*[
+        InlineKeyboardButton(text="Одобрить", callback_data="approve"),
+        InlineKeyboardButton(text="Отклонить", callback_data="reject")
+    ])
+    msg = await bot.send_message(user_tg_id, f"Поступил запрос на *{title}*\n"
+                                       f"От: *{user_login}*\n"
+                                       f"Для: *{request.purpose}*\n"
+                                       f"Одобрить?", reply_markup=inline_keyboard, parse_mode='Markdown')
+
+    db.add_tg_message(msg.chat.id, request.id, msg.message_id)
+
+
+@dp.callback_query_handler(text="approve")
+async def approve_request(c: CallbackQuery):
+    request = db.get_message_by_chat_and_message_id(c.message.chat.id, c.message.message_id).request
+    if not request or request.solved is True:
+        await c.answer("Решение по запросу уже приняли, простите за беспокойство")
+        await bot.delete_message(c.message.chat.id, c.message.message_id)
+    else:
+        request.solved = True
+        request.approved = True
+        db.update_user_request(request)
+        await c.answer("Запрос одобрен!")
+    await del_useless_messages()
+
+
+@dp.callback_query_handler(text="reject")
+async def reject_request(c: CallbackQuery):
+    request = db.get_message_by_chat_and_message_id(c.message.chat.id, c.message.message_id).request
+    if not request or request.solved is True:
+        await c.answer("Решение по запросу уже приняли, простите за беспокойство")
+        await bot.delete_message(c.message.chat.id, c.message.message_id)
+    else:
+        request.solved = True
+        request.approved = False
+        db.update_user_request(request)
+        await c.answer("Запрос отклонён!")
+    await del_useless_messages()
 
 
 async def send_notification(dp: Dispatcher):
@@ -296,6 +363,29 @@ async def send_notification(dp: Dispatcher):
                 db.update_user_request(i)
         except aiogram.utils.exceptions.ChatNotFound:
             pass
+    mas = db.get_unsolved_users_requests()
+    notified = db.get_all_adm_notified_requests()
+    notified = [i[0] for i in notified]
+    mas = [i for i in mas if i.id not in notified]
+    admins = db.get_all_tg_admins()
+    for i in mas:
+        equipment = db.get_equipment_by_id(i.equipment_id)
+        user = db.get_user_by_id(i.sender_id)
+        for j in admins:
+            try:
+                await send_request_notification(j.tg_id, equipment.title, user.mail, i)
+            except aiogram.utils.exceptions.ChatNotFound:
+                pass
+    await del_useless_messages()
+
+
+async def del_useless_messages():
+    mas = db.get_useless_tg_messages()
+    reqs = set([i.request_id for i in mas])
+    for i in mas:
+        await bot.delete_message(i.tg_chat_id, i.message_id)
+    for i in reqs:
+        db.del_tg_message_by_request(i)
 
 
 scheduler.add_job(send_notification, "interval", seconds=10, args=(dp,))
