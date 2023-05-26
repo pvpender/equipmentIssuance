@@ -20,6 +20,7 @@ scheduler = AsyncIOScheduler()
 # engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 # engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
 engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+#engine = create_engine("mysql+pymysql://admin:Sapr_714@192.168.43.130:3306/test")
 Base.metadata.create_all(engine)
 db = DataBase(engine)
 
@@ -73,6 +74,13 @@ async def setting_password(msg: Message, curr_dialog: Dialog, manager: DialogMan
     db.add_user_login(usr.id, usr.mail, password)
     db.add_tg_user(msg.from_user.id, usr.id)
     await msg.answer("Успех!")
+    inline_keyboard = InlineKeyboardMarkup(row_width=1)
+    inline_keyboard.add(*[
+        InlineKeyboardButton(text="Войти как новый пользователь", callback_data="login"),
+        InlineKeyboardButton(text="Запросить оборудование", callback_data="get_equipment"),
+        InlineKeyboardButton(text="Посмотреть список ваших запросов", callback_data="my_requests")
+    ])
+    await msg.answer("Вот что вы можете сделать:", reply_markup=inline_keyboard)
     await manager.done()
 
 
@@ -394,3 +402,4 @@ if __name__ == '__main__':
     registry.register(log_menu)
     scheduler.start()
     executor.start_polling(dp, skip_updates=True)
+

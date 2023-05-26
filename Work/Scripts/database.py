@@ -262,7 +262,6 @@ def for_all_methods(decorator):
     """
 
     def decorate(cls):
-        print(cls.__dict__)
         for attr in cls.__dict__:
             if callable(getattr(cls, attr)) and attr != '__init__':
                 setattr(cls, attr, decorator(getattr(cls, attr)))
@@ -447,7 +446,8 @@ class DataBase:
         self.__session.close_all()
         self.__engine.dispose()
         # self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-        self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+        #self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+        self.__engine = create_engine("mysql+pymysql://admin:Sapr_714@192.168.43.130:3306/test")
         # self.__session.close()
         self.__session = Session(self.__engine)
 
