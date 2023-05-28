@@ -9,6 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, Session, relationship, Mapped, mappe
 from users import *
 from equipment import *
 from sqlalchemy.exc import OperationalError, IntegrityError
+from pandas import DataFrame
 import request as req
 import time
 import threading
@@ -219,6 +220,15 @@ class WhatTypes(Enum):
     USER = "user"
     EQUIPMENT = "equipment"
     REQUEST = "request"
+
+
+class UserActions(Base):
+    __tablename__ = "user_actions"
+    user_id: Mapped[int] = mapped_column(ForeignKey(Users.id, ondelete="CASCADE"), primary_key=True)
+    request_id: Mapped[int] = mapped_column(ForeignKey(UserRequests.id, ondelete="CASCADE"))
+    action: Mapped[str] = mapped_column(Text)
+    action_time: Mapped[datetime.datetime] = mapped_column(DateTime, primary_key=True)
+    request: Mapped["UserRequests"] = relationship()
 
 
 def restart_if_except(function):
@@ -446,8 +456,8 @@ class DataBase:
         self.__session.close_all()
         self.__engine.dispose()
         # self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-        #self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
-        self.__engine = create_engine("mysql+pymysql://admin:Sapr_714@192.168.43.130:3306/test")
+        self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+        # self.__engine = create_engine("mysql+pymysql://admin:Sapr_714@192.168.43.130:3306/test")
         # self.__session.close()
         self.__session = Session(self.__engine)
 
@@ -1084,6 +1094,7 @@ class DataBase:
             List of all user requests
         """
         return self.__session.query(UserRequests).filter(UserRequests.sender_id == user_id).all()
+
     def update_user_request(self, request: Union[Type[UserRequests]]):
         """
 
@@ -1206,3 +1217,30 @@ class DataBase:
             ID's of requests that already has notified
         """
         return self.__session.query(NotificationMessages.request_id).group_by(NotificationMessages.request_id).all()
+
+    def get_all_users_actions(self) -> DataFrame | None:
+        """
+
+        Returns:
+            Returns all users statistics in DataFrame or None
+        """
+        data = self.__session.query(UserActions).all()
+        if not data:
+            return None
+        data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
+        return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
+
+    def get_user_actions(self, user_id: int) -> DataFrame | None:
+        """
+
+        Args:
+            user_id (int): User id
+
+        Returns:
+            DataFrame or None
+        """
+        data = self.__session.query(UserActions).filter(UserActions.user_id == user_id).all()
+        if not data:
+            return None
+        data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
+        return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
