@@ -157,7 +157,7 @@ async def switch_to_confirm(msg: Message, curr_dialog: Dialog, manager: DialogMa
 async def send_request(c: CallbackQuery, button: Button, manager: DialogManager):
     r = db.get_last_request(c.from_user.id)
     usr = db.get_tg_user(c.from_user.id)
-    adm = db.get_admin_by_id(usr.user.pass_number)
+    adm = db.get_admin_by_id(usr.id)
     eq = db.get_equipment_by_title(r.title)
     mas = [j.group_id for j in usr.user.user_groups]
     if adm:

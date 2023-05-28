@@ -723,7 +723,19 @@ class DataBase:
         self.__session.query(Users).filter(Users.id == admin.base_id).delete()
         self.__session.commit()
 
-    def get_admin_by_id(self, pass_number: int) -> Admins | None:
+
+    def get_admin_by_id(self, admin_id: int) -> Admins | None:
+        """
+
+        Args:
+            admin_id (int): Admin id in base
+
+        Returns:
+            Admin or None
+        """
+        return self.__session.query(Admins).filter(Admins.user_id == admin_id).first()
+
+    def get_admin_by_pass(self, pass_number: int) -> Admins | None:
         """
 
         Args:
@@ -1230,16 +1242,34 @@ class DataBase:
         data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
         return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
 
-    def get_user_actions(self, user_id: int) -> DataFrame | None:
+    def get_user_actions_by_id(self, user_id: int) -> DataFrame | None:
         """
 
         Args:
-            user_id (int): User id
+            user_id (int): User id in base
 
         Returns:
             DataFrame or None
         """
         data = self.__session.query(UserActions).filter(UserActions.user_id == user_id).all()
+        if not data:
+            return None
+        data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
+        return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
+
+    def get_user_actions_by_mail(self, mail: str) -> DataFrame | None:
+        """
+
+        Args:
+            mail (str): User email
+
+        Returns:
+            DataFrame or None
+        """
+        data = data = self.__session.query(UserActions).join(
+            Users,
+            UserActions.user_id == Users.id
+        ).filter(Users.mail == mail).all()
         if not data:
             return None
         data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
