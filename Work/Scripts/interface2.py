@@ -90,7 +90,7 @@ class LogWindow(QMainWindow):
         """
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
         #     if isinstance(user, Admin) and user.password == self.__password_field.text():
-        if isinstance(user, Admin):
+        if isinstance(user, Admin) and self.__db.get_user_login(user.mail).password == self.__password_field.text():
             self.__db.change_user(user.mail, self.__password_field.text())
             self.hide()
             self.__main_window = MainWindow(self.__user_list, self.__equipment_list, user, self.__db, user.access)
@@ -1559,7 +1559,7 @@ class MainWindow(QMainWindow):
         self.uschangernextPushButton.setText(_translate("MainWindow", "Следующий"))
         self.uschangerprevPushButton.setText(_translate("MainWindow", "Предыдущий"))
         self.uscommitchangesPushButton.setText(_translate("MainWindow", "Принять изменения"))
-        self.usChangeDelPushButton.setText(_translate("MainWindow", "Удалить единицу оборудования"))
+        self.usChangeDelPushButton.setText(_translate("MainWindow", "Удалить пользователя"))
         self.listLabel_4.setText(_translate("MainWindow", "Группы пользователя"))
         self.label_43.setText(_translate("MainWindow", "количество дней"))
         self.eqCreateStatsPushButton_2.setText(_translate("MainWindow", "Выгрузить статистику в файл"))
@@ -1702,8 +1702,8 @@ class MainWindow(QMainWindow):
         self.grDeletePushButton.hide()
         self.grNextPushButton.hide()
         self.grPrevPushButton.hide()
-        self.usChangeDeleteGroupsButton.hide()
-        self.eqChangeDeleteGroupsButton.hide()
+        self.usAddDeleteGroupsButton.hide()
+        self.eqAddDeleteGroupsButton.hide()
         self.usChangeDelPushButton.clicked.connect(self.del_user)
         self.grDeletePushButton.clicked.connect(self.del_group)
         self.eqChangeDelPushButton.clicked.connect(self.del_equipment)
@@ -1804,8 +1804,14 @@ class MainWindow(QMainWindow):
         self.__eqFoundTableContents.pop(self.__eqnum)
         if len(self.__eqFoundTableContents) > 0:
             self.usTableView.clearSpans()
-            data_frame = pd.DataFrame(self.__eqFoundTableContents, columns=["ID карты", "Почта"],
-                                      index=[i for i in range(len(self.__eqFoundTableContents))])
+            data_frame = pd.DataFrame(self.__eqFoundTableContents, columns=[
+                "ID",
+                "Название",
+                "Количество",
+                "Зарезервировано",
+                "От стены",
+                "От пола"
+            ], index=[i for i in range(len(self.__eqFoundTableContents))])
             model = TableModel(data_frame)
             self.setEqInfo()
             self.eqTableView.setModel(model)
@@ -1875,7 +1881,7 @@ class MainWindow(QMainWindow):
         model = TableModel(data_frame)
         self.usAddSelectedGrTableView.setModel(model)
         del self.__allGroups[to_delete]
-
+        self.__grnum = -2
         self.refresh_gr_view_table()
 
     def change_group(self):
@@ -2245,6 +2251,10 @@ class MainWindow(QMainWindow):
         self.__allGroups.clear()
         self.grTableView.clearSpans()
         self.eqAddAllGrTableView.clearSpans()
+        self.grPrevPushButton.hide()
+        self.grNextPushButton.hide()
+        self.grDeletePushButton.hide()
+        self.grAddPushButton.setText("Добавить")
         self.usAddAllGrTableView.clearSpans()
         self.eqAddAllGrTableView.clearSpans()
         self.usAddAllGrTableView.clearSpans()
@@ -2354,7 +2364,7 @@ class MainWindow(QMainWindow):
                 str(self.__equipment_list.get_equipment_by_id(i.equipment_id).title),
                 str(i.count),
                 str(i.purpose),
-                str(hex(i.sender_tg_id)),
+                str(hex(i.sender_id)),
                 str(self.__user_list.get_user_by_id(i.sender_id).mail)
             ])
         data_frame = pd.DataFrame(self.__reqTableContents,
@@ -2417,6 +2427,11 @@ class MainWindow(QMainWindow):
 
     def add_user(self):
         """For adding user"""
+        try:
+            int(self.usIdCardLineEdit.text(), 16)
+        except ValueError:
+            show_message("Ошибка", "Неверный формат пропуска!")
+            return
         self.__user_list.refresh_collection()
         code_error = -1
         add_users = False
@@ -2539,7 +2554,6 @@ class MainWindow(QMainWindow):
             self.__user_list.change_user(int(self.__usFoundTableContents[self.__usnum][0], 16),
                                          self.__usFoundTableContents[self.__usnum][1],
                                          user_to_change)
-            self.__user_list.refresh_collection()
             self.refresh_users_table()
         else:
             if code_error == 1:
@@ -2723,7 +2737,7 @@ class MainWindow(QMainWindow):
                 self.listLabel_19.show()
                 self.listLabel_4.setText("Группы пользователя")
                 self.usChangeDelPushButton.show()
-                self.eqChangeDeleteGroupsButton.show()
+                #self.eqChangeDeleteGroupsButton.show()
         else:
             show_message("Проблема", "Ничего не найдено")
 
@@ -2996,13 +3010,15 @@ class MainWindow(QMainWindow):
         if self.__reqnum < len(self.__reqs):
             a = "EMAIL: " + str(self.__user_list.get_user_by_id(
                 self.__reqs[self.__reqnum].sender_id).mail) + "\n ID запросившего: " + str(
-                self.__reqs[self.__reqnum].sender_tg_id) + "\n Что запрашивается: " + str(
+                self.__reqs[self.__reqnum].sender_id) + "\n Что запрашивается: " + str(
                 self.__equipment_list.get_equipment_by_id(
                     self.__reqs[self.__reqnum].equipment_id).title) + "\n Сколько: " + str(
                 self.__reqs[self.__reqnum].count) + "\n Цель: " + str(self.__reqs[self.__reqnum].purpose)
             self.textBrowser.setText(a)
         else:
             self.__reqnum -= 1
+            self.textBrowser.clear()
+            self.tableView2.clearSpans()
             show_message("Сообщение", "Запросов нет")
 
     def previous_request(self):
@@ -3057,6 +3073,7 @@ class MainWindow(QMainWindow):
                 self.tableView2.model().removeRow(self.__reqnum)
                 self.tableView2.update()
                 self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
+                self.get_request()
             else:
                 show_message("Ошибка синхронизации", "Запрос уже обработан!")
                 self.refresh_requests_table()

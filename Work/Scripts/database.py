@@ -12,8 +12,8 @@ from sqlalchemy.exc import OperationalError, IntegrityError
 from pandas import DataFrame
 import request as req
 import time
+from conf import *
 import threading
-
 
 def show_message(title: str, info: str):
     """
@@ -243,6 +243,10 @@ def restart_if_except(function):
 
     def check(*args, **kwargs):
         self = args[0]
+        if (time.time() - self.last_db_access_time) > 200:
+            t = threading.Thread(target=fix_died_connection, args=(self.session,))
+            t.start()
+            self.session = Session(create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base"))
         self.last_db_access_time = time.time()
         try:
             self.session.commit()
@@ -451,7 +455,7 @@ class DataBase:
         self.__session.close_all()
         self.__engine.dispose()
         # self.__engine = create_engine(f"mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-        self.__engine = create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+        self.__engine = create_engine(BASE_URL)
         # self.__engine = create_engine("mysql+pymysql://admin:Sapr_714@192.168.43.130:3306/test")
         # self.__session.close()
         self.__session = Session(self.__engine)
@@ -910,7 +914,7 @@ class DataBase:
         """
         return self.__session.query(TelegramLogins).filter(TelegramLogins.tg_id == tg_id).first()
 
-    def get_tg_user_by_id(self, user_id: int) -> TelegramLogins | None:
+    def get_tg_user_by_id(self, user_id: int) -> List[Type[TelegramLogins]]:
         """
 
         Args:
@@ -919,7 +923,7 @@ class DataBase:
         Returns:
             Telegram user
         """
-        return self.__session.query(TelegramLogins).filter(TelegramLogins.id == user_id).first()
+        return self.__session.query(TelegramLogins).filter(TelegramLogins.id == user_id).all()
 
     def add_tg_user(self, tg_id: int, user_id: int):
         """

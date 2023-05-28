@@ -11,6 +11,7 @@ from aiogram_dialog.widgets.kbd import Button, ScrollingGroup, Select
 from aiogram_dialog.widgets.text import Const, Format
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from database import *
+from conf import *
 
 storage = MemoryStorage()
 bot = Bot(token='5655746725:AAEa9x8W9pwFKIRe13rg04zz5BZ3vwUGxig')
@@ -19,7 +20,7 @@ registry = DialogRegistry(dp)
 scheduler = AsyncIOScheduler()
 # engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 # engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
-engine = create_engine("mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base")
+engine = create_engine(BASE_URL)
 #engine = create_engine("mysql+pymysql://admin:Sapr_714@192.168.43.130:3306/test")
 Base.metadata.create_all(engine)
 db = DataBase(engine)
@@ -339,14 +340,14 @@ async def approve_request(c: CallbackQuery):
 
 @dp.callback_query_handler(text="reject")
 async def reject_request(c: CallbackQuery):
-    request = db.get_message_by_chat_and_message_id(c.message.chat.id, c.message.message_id).request
-    if not request or request.solved is True:
+    request = db.get_message_by_chat_and_message_id(c.message.chat.id, c.message.message_id)
+    if not request or request.request.solved is True:
         await c.answer("Решение по запросу уже приняли, простите за беспокойство")
         await bot.delete_message(c.message.chat.id, c.message.message_id)
     else:
         request.solved = True
         request.approved = False
-        db.update_user_request(request)
+        db.update_user_request(request.request)
         await c.answer("Запрос отклонён!")
     await del_useless_messages()
 
@@ -356,17 +357,19 @@ async def send_notification(dp: Dispatcher):
     for i in mas:
         try:
             if i.approved is False:
-                await dp.bot.send_message(db.get_tg_user_by_id(i.sender_id).tg_id,
-                                          f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* отклонён!",
-                                          parse_mode='Markdown')
+                for j in db.get_tg_user_by_id(i.sender_id):
+                    await dp.bot.send_message(j.tg_id,
+                                            f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* отклонён!",
+                                            parse_mode='Markdown')
                 eq = db.get_equipment_by_id(i.equipment_id)
                 eq.reserve_count -= i.count
                 db.update_equipment(eq)
                 db.del_user_request(i.id)
             else:
-                await dp.bot.send_message(db.get_tg_user_by_id(i.sender_id).tg_id,
-                                          f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* принят! Вы можете забрать "
-                                          f"своё оборудование уже сейчас!", parse_mode='Markdown')
+                for j in db.get_tg_user_by_id(i.sender_id):
+                    await dp.bot.send_message(j.tg_id,
+                                            f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* принят! Вы можете забрать "
+                                            f"своё оборудование уже сейчас!", parse_mode='Markdown')
                 i.notified = True
                 db.update_user_request(i)
         except aiogram.utils.exceptions.ChatNotFound:
