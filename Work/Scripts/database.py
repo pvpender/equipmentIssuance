@@ -154,7 +154,6 @@ class UserRequests(Base):
     equipment_id: Mapped[int] = mapped_column(ForeignKey("equipments.id", ondelete='CASCADE'))
     count: Mapped[int] = mapped_column(default=1)
     purpose: Mapped[str] = mapped_column(Text)
-    sender_tg_id: Mapped[int] = mapped_column(BigInteger)
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete='CASCADE'))
     solved: Mapped[bool] = mapped_column(default=False)
     approved: Mapped[bool] = mapped_column(nullable=True)
@@ -244,11 +243,13 @@ def restart_if_except(function):
 
     def check(*args, **kwargs):
         self = args[0]
+        """
         if (time.time() - self.last_db_access_time) > 200:
             t = threading.Thread(target=fix_died_connection, args=(self.session,))
             t.start()
             self.session = Session(create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base"))
         self.last_db_access_time = time.time()
+        """
         try:
             self.session.commit()
             return function(*args, **kwargs)
@@ -904,7 +905,7 @@ class DataBase:
         else:
             return None
 
-    def get_tg_user(self, tg_id) -> Union[TelegramLogins, None]:
+    def get_tg_user_by_tg(self, tg_id) -> Union[TelegramLogins, None]:
         """
 
         Args:
@@ -914,6 +915,17 @@ class DataBase:
             TelegramLogins or None
         """
         return self.__session.query(TelegramLogins).filter(TelegramLogins.tg_id == tg_id).first()
+
+    def get_tg_user_by_id(self, user_id: int) -> TelegramLogins | None:
+        """
+
+        Args:
+            user_id (int): User id from base
+
+        Returns:
+            Telegram user
+        """
+        return self.__session.query(TelegramLogins).filter(TelegramLogins.id == user_id).first()
 
     def add_tg_user(self, tg_id: int, user_id: int):
         """
@@ -925,7 +937,7 @@ class DataBase:
         Returns:
 
         """
-        if self.get_tg_user(tg_id):
+        if self.get_tg_user_by_tg(tg_id):
             self.__session.query(TelegramLogins).filter(TelegramLogins.tg_id == tg_id).update(
                 {"id": user_id}
             )
@@ -943,7 +955,6 @@ class DataBase:
 
         """
         db_request = UserRequests(
-            sender_tg_id=request.sender_tg_id,
             sender_id=request.sender_id,
             equipment_id=request.equipment_id,
             count=request.count,
@@ -967,7 +978,6 @@ class DataBase:
 
         """
         db_request = UserRequests(
-            sender_tg_id=request.sender_tg_id,
             sender_id=request.sender_id,
             equipment_id=request.equipment_id,
             count=request.count,

@@ -1,11 +1,10 @@
 
 class Request:
     """User request class"""
-    def __init__(self, sender_tg_id: int, sender_id: int, equipment_id: int, count: int, purpose: str):
+    def __init__(self, sender_id: int, equipment_id: int, count: int, purpose: str):
         super().__init__()
         self.__equipment_id = equipment_id
         self.__count = count
-        self.__sender_tg_id = sender_tg_id
         self.__sender_id = sender_id
         self.__solved = False
         self.__approved = False
@@ -58,15 +57,6 @@ class Request:
             Purpose
         """
         return self.__purpose
-
-    @property
-    def sender_tg_id(self) -> int:
-        """
-
-        Returns:
-            TG id (BigInt)
-        """
-        return self.__sender_tg_id
 
     @property
     def sender_id(self) -> int:

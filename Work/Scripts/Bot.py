@@ -32,7 +32,7 @@ class LoginFilter(BoundFilter):
         self.is_login = is_login
 
     async def check(self, message: Message):
-        if db.get_tg_user(message.from_user.id):
+        if db.get_tg_user_by_tg(message.from_user.id):
             return True
         else:
             return False
@@ -156,12 +156,12 @@ async def switch_to_confirm(msg: Message, curr_dialog: Dialog, manager: DialogMa
 
 async def send_request(c: CallbackQuery, button: Button, manager: DialogManager):
     r = db.get_last_request(c.from_user.id)
-    usr = db.get_tg_user(c.from_user.id)
+    usr = db.get_tg_user_by_tg(c.from_user.id)
     adm = db.get_admin_by_id(usr.id)
     eq = db.get_equipment_by_title(r.title)
     mas = [j.group_id for j in usr.user.user_groups]
     if adm:
-        db.add_admin_request(req.Request(c.from_user.id, adm.user.id, db.get_equipment_by_title(r.title).id, 1,
+        db.add_admin_request(req.Request(adm.user.id, db.get_equipment_by_title(r.title).id, 1,
                                          c.message.text[
                                          c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
         await c.message.edit_text(
@@ -169,7 +169,7 @@ async def send_request(c: CallbackQuery, button: Button, manager: DialogManager)
             f"одобрила запрос! Вы можете забрать оборудование уже сейчас!", parse_mode='Markdown')
         await manager.done()
     elif any(x in [j.group_id for j in eq.equipment_groups] for x in mas):
-        db.add_admin_request(req.Request(c.from_user.id, usr.user.id, db.get_equipment_by_title(r.title).id, 1,
+        db.add_admin_request(req.Request(usr.user.id, db.get_equipment_by_title(r.title).id, 1,
                                          c.message.text[
                                          c.message.text.find(":") + 2: c.message.text.find("Продолжить?")]))
         await c.message.edit_text(f"Оборудование *{r.title}* заказано!\nТак как вы принадлежите к одной из групп с "
@@ -177,7 +177,7 @@ async def send_request(c: CallbackQuery, button: Button, manager: DialogManager)
                                   f"Вы можете забрать оборудование уже сейчас!", parse_mode='Markdown')
         await manager.done()
     else:
-        request = req.Request(c.from_user.id, usr.user.id, db.get_equipment_by_title(r.title).id,
+        request = req.Request(usr.user.id, db.get_equipment_by_title(r.title).id,
                               1, c.message.text[c.message.text.find(":") + 2: c.message.text.find("Продолжить?")])
         db.add_user_request(request)
         await c.message.edit_text(f"Оборудование *{r.title}* заказано!\nКак только администратор ответит на ваш запрос "
@@ -262,7 +262,7 @@ log_menu = Dialog(greetings_window, setting_password_window, input_password_wind
 
 @dp.message_handler(commands=["start"])
 async def start(msg: Message, dialog_manager: DialogManager):
-    if not db.get_tg_user(msg.from_user.id):
+    if not db.get_tg_user_by_tg(msg.from_user.id):
         await msg.answer("Добро пожаловть! Для запроса оборудования необходимо войти в систему!")
         await dialog_manager.start(LogSG.mail, mode=StartMode.NORMAL)
     else:
@@ -280,7 +280,7 @@ async def login(msg: Message, dialog_manager: DialogManager):
 @dp.message_handler(commands=['my_requests'])
 @dp.callback_query_handler(text="my_requests")
 async def my_equip(msg: Union[Message, CallbackQuery]):
-    user_id = db.get_tg_user(msg.from_user.id).id
+    user_id = db.get_tg_user_by_tg(msg.from_user.id).id
     mas = db.get_user_requests(user_id)
     answer = "*Ваши запросы*\n*Полученные:*\n"
     for i in mas:
@@ -356,7 +356,7 @@ async def send_notification(dp: Dispatcher):
     for i in mas:
         try:
             if i.approved is False:
-                await dp.bot.send_message(i.sender_tg_id,
+                await dp.bot.send_message(db.get_tg_user_by_id(i.sender_id).tg_id,
                                           f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* отклонён!",
                                           parse_mode='Markdown')
                 eq = db.get_equipment_by_id(i.equipment_id)
@@ -364,7 +364,7 @@ async def send_notification(dp: Dispatcher):
                 db.update_equipment(eq)
                 db.del_user_request(i.id)
             else:
-                await dp.bot.send_message(i.sender_tg_id,
+                await dp.bot.send_message(db.get_tg_user_by_id(i.sender_id).tg_id,
                                           f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* принят! Вы можете забрать "
                                           f"своё оборудование уже сейчас!", parse_mode='Markdown')
                 i.notified = True

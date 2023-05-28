@@ -3,6 +3,8 @@ from interface2 import LogWindow
 from equipment_collections import EquipmentCollection
 from user_collections import *
 from database import *
+from rubbish_collector import clear_connection
+from apscheduler.schedulers.background import BackgroundScheduler
 import sqlalchemy
 
 
@@ -50,6 +52,9 @@ print(user_list.get_user_by_id(1))
 
 """
 
+scheduler = BackgroundScheduler()
+scheduler.add_job(clear_connection, 'interval', seconds=200, args=(db,))
+scheduler.start()
 
 
 app = QApplication([])
