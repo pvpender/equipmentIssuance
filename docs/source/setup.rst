@@ -5,7 +5,7 @@ For setup you need 3 things:
 
 1. `Setup mysql server`_
 2. `Setup and run nginx server with api`_
-3. `Set up and run Bot.py script`_
+3. `Setup and run Bot.py script`_
 
 .. _`Setup mysql server`:
 Setup mysql server
@@ -239,8 +239,8 @@ And:
     $ sudo nginx -t
     $ sudo systemctl restart nginx
 
-.. _`Set up and run Bot.py script`:
-Set up and run Bot.py script
+.. _`Setup and run Bot.py script`:
+Setup and run Bot.py script
 ----------------------------
 
 Clone repo, next:
@@ -254,12 +254,12 @@ Clone repo, next:
 
 Set your bot token in `Bot.py`:
 
-.. code-block:: python
+.. code-block:: shell
     :caption: ~/equipmentIssuance/Work/Scripts/Bot.py
 
     bot = Bot(token='YOUR TOKEN')
 
- Start the bot:
+Start the bot:
 
 .. code-block:: shell
 
