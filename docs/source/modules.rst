@@ -1,6 +1,8 @@
 Scripts
 =======
 
+Use following pages if you want to improve this app
+
 .. toctree::
    :maxdepth: 4
 

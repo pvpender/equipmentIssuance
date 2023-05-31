@@ -11,6 +11,7 @@ Welcome to EquipmentIssuance's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   setup
    modules
 
 
