@@ -7,51 +7,16 @@ For setup you need 3 things:
 2. Setup and run nginx server with api
 3. Set up and run Bot.py script
 
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-f
-
-
-f
-
-f
-
-
-
-
 .. _`Setup mysql server`:
-Mysql server
+Setup mysql server
+------------------
+
+.. code-block:: console
+$ sudo apt update
+$ sudo apt install mysql-server
+$ sudo systemctl start mysql.service
 
 
-Python_ is `my favourite
-programming language`__.
 
-.. _Python: https://www.python.org/
-
-__ Python_
 
 
