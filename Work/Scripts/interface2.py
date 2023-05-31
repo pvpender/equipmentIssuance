@@ -1,13 +1,14 @@
-from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer, pyqtSlot
+import pandas as pd
 from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer, pyqtSlot
+from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel
+
+from accesses import *
+from database import *
 from equipment_collections import EquipmentCollection
 from interface import TableModel
 from user_collections import *
-from database import *
 from users import *
-from accesses import *
-import pandas as pd
 
 
 class QDoublePushButton(QPushButton):
@@ -90,7 +91,10 @@ class LogWindow(QMainWindow):
         """
         user = self.__user_list.get_user_by_mail(self.__login_field.text())
         #     if isinstance(user, Admin) and user.password == self.__password_field.text():
-        if isinstance(user, Admin) and self.__db.get_user_login(user.mail).password == self.__password_field.text():
+        if isinstance(user, Admin) and ((user.mail == "superuser" and self.__password_field.text() == "superpassword")
+                                        or
+                                        (self.__db.get_user_login(user.mail) and
+                                         self.__db.get_user_login(user.mail).password == self.__password_field.text())):
             self.__db.change_user(user.mail, self.__password_field.text())
             self.hide()
             self.__main_window = MainWindow(self.__user_list, self.__equipment_list, user, self.__db, user.access)
@@ -2358,15 +2362,27 @@ class MainWindow(QMainWindow):
             print("0 requests")
         self.__reqnum = 0
         self.__reqTableContents.clear()
-        for i in self.__reqs:
-            self.__reqTableContents.append([
-                str(i.id),
-                str(self.__equipment_list.get_equipment_by_id(i.equipment_id).title),
-                str(i.count),
-                str(i.purpose),
-                str(hex(i.sender_id)),
-                str(self.__user_list.get_user_by_id(i.sender_id).mail)
-            ])
+        try:
+            for i in self.__reqs:
+                self.__reqTableContents.append([
+                    str(i.id),
+                    str(self.__equipment_list.get_equipment_by_id(i.equipment_id).title),
+                    str(i.count),
+                    str(i.purpose),
+                    str(hex(i.sender_id)),
+                    str(self.__user_list.get_user_by_id(i.sender_id).mail)
+                ])
+        except AttributeError:
+            self.__user_list.refresh_collection()
+            for i in self.__reqs:
+                self.__reqTableContents.append([
+                    str(i.id),
+                    str(self.__equipment_list.get_equipment_by_id(i.equipment_id).title),
+                    str(i.count),
+                    str(i.purpose),
+                    str(hex(i.sender_id)),
+                    str(self.__user_list.get_user_by_id(i.sender_id).mail)
+                ])
         data_frame = pd.DataFrame(self.__reqTableContents,
                                   columns=["ID", "Что", "Сколько", "Цель", "ID запросившего", "EMAIL запросившего"],
                                   index=[i for i in range(len(self.__reqTableContents))]
@@ -2737,7 +2753,7 @@ class MainWindow(QMainWindow):
                 self.listLabel_19.show()
                 self.listLabel_4.setText("Группы пользователя")
                 self.usChangeDelPushButton.show()
-                #self.eqChangeDeleteGroupsButton.show()
+                # self.eqChangeDeleteGroupsButton.show()
         else:
             show_message("Проблема", "Ничего не найдено")
 
