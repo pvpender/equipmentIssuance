@@ -12,10 +12,11 @@ Setup mysql server
 ------------------
 
 .. code-block:: shell
+    :caption: console
 
-$ sudo apt update
-$ sudo apt install mysql-server
-$ sudo systemctl start mysql.service
+    $ sudo apt update
+    $ sudo apt install mysql-server
+    $ sudo systemctl start mysql.service
 
 
 
