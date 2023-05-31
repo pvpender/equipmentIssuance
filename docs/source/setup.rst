@@ -22,6 +22,7 @@ Mysql server
 
 Python_ is `my favourite
 programming language`__.
+
 .. _Python: https://www.python.org/
 
 __ Python_
