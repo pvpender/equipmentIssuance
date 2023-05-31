@@ -8,14 +8,39 @@ For setup you need 3 things:
 3. Set up and run Bot.py script
 
 f
-f
-f
-f
-f
+
 f
 
 f
+
 f
+
+f
+
+f
+
+f
+
+f
+
+f
+
+f
+
+f
+
+f
+
+f
+
+f
+
+
+f
+
+f
+
+
 
 
 .. _`Setup mysql server`:
