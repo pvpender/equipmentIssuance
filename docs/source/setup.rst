@@ -5,7 +5,7 @@ For setup you need 3 things:
 
 1. `Setup mysql server`_
 2. `Setup and run nginx server with api`_
-3. Set up and run Bot.py script
+3. `Set up and run Bot.py script`_
 
 .. _`Setup mysql server`:
 Setup mysql server
@@ -166,7 +166,7 @@ Then:
 
 .. code-block:: shell
 
-    sudo nano /etc/nginx/snippets/ssl-params.conf
+    $ sudo nano /etc/nginx/snippets/ssl-params.conf
 
 Write:
 
@@ -196,7 +196,7 @@ Now we ready for configuring:
 
 .. code-block:: shell
 
-    sudo nano /etc/nginx/sites-available/api
+    $ sudo nano /etc/nginx/sites-available/api
 
 Write:
 
@@ -230,13 +230,37 @@ Now link this file:
 
 .. code-block:: shell
 
-    sudo ln -s /etc/nginx/sites-available/api /etc/nginx/sites-enabled
+    $ sudo ln -s /etc/nginx/sites-available/api /etc/nginx/sites-enabled
 
 And:
 
 .. code-block:: shell
 
-    sudo nginx -t
-    sudo systemctl restart nginx
+    $ sudo nginx -t
+    $ sudo systemctl restart nginx
 
+.. _`Set up and run Bot.py script`:
+Set up and run Bot.py script
+----------------------------
 
+Clone repo, next:
+
+.. code-block:: shell
+
+    $ python3.11 -m venv myvenv
+    $ source myvenv/bin/activate
+    (myvenv) $ pip install -r requirements.txt
+    (myvenv) $ deactivate
+
+Set your bot token in `Bot.py`:
+
+.. code-block:: python
+    :caption: ~/equipmentIssuance/Work/Scripts/Bot.py
+
+    bot = Bot(token='YOUR TOKEN')
+
+ Start the bot:
+
+.. code-block:: shell
+
+    ./equipmentIssuance/myvenv/bin/python3 ./equipmentIssuance/Work/Scripts/Bot.py &
