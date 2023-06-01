@@ -257,13 +257,13 @@ class MainWindow(QMainWindow):
                                                "}")
         self.eqDelFromSelectedGr.setObjectName("eqDelFromSelectedGr")
         self.eqAddGroupByName = QtWidgets.QLineEdit(parent=self.addSmthBox)
-        self.eqAddGroupByName.setGeometry(QtCore.QRect(190, 300, 191, 22))
+        self.eqAddGroupByName.setGeometry(QtCore.QRect(700, 390, 231, 22))
         self.eqAddGroupByName.setObjectName("eqAddGroupByName")
         self.searchByEmailOrNameLabel_4 = QtWidgets.QLabel(parent=self.addSmthBox)
-        self.searchByEmailOrNameLabel_4.setGeometry(QtCore.QRect(30, 300, 161, 16))
+        self.searchByEmailOrNameLabel_4.setGeometry(QtCore.QRect(750, 370, 161, 16))
         self.searchByEmailOrNameLabel_4.setObjectName("searchByEmailOrNameLabel_4")
         self.eqAddRefreshGroupButton = QtWidgets.QPushButton(parent=self.addSmthBox)
-        self.eqAddRefreshGroupButton.setGeometry(QtCore.QRect(20, 380, 401, 41))
+        self.eqAddRefreshGroupButton.setGeometry(QtCore.QRect(700, 470, 231, 41))
         self.eqAddRefreshGroupButton.setStyleSheet("QPushButton{\n"
                                                    " background-color: #081f2d; \n"
                                                    " border-radius: 8px; \n"
@@ -282,11 +282,11 @@ class MainWindow(QMainWindow):
                                                    "}")
         self.eqAddRefreshGroupButton.setObjectName("eqAddRefreshGroupButton")
         self.eqAddAllGrTableView = QtWidgets.QTableView(parent=self.addSmthBox)
-        self.eqAddAllGrTableView.setGeometry(QtCore.QRect(700, 20, 421, 401))
+        self.eqAddAllGrTableView.setGeometry(QtCore.QRect(700, 20, 421, 341))
         self.eqAddAllGrTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.eqAddAllGrTableView.setObjectName("eqAddAllGrTableView")
         self.eqAddSelectedGrTableView = QtWidgets.QTableView(parent=self.addSmthBox)
-        self.eqAddSelectedGrTableView.setGeometry(QtCore.QRect(450, 20, 171, 361))
+        self.eqAddSelectedGrTableView.setGeometry(QtCore.QRect(450, 20, 171, 491))
         self.eqAddSelectedGrTableView.setSizeAdjustPolicy(
             QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.eqAddSelectedGrTableView.setObjectName("eqAddSelectedGrTableView")
@@ -310,7 +310,7 @@ class MainWindow(QMainWindow):
                                           "}")
         self.eqGrToSelected.setObjectName("eqGrToSelected")
         self.eqAddSearchGroupButton = QtWidgets.QPushButton(parent=self.addSmthBox)
-        self.eqAddSearchGroupButton.setGeometry(QtCore.QRect(20, 330, 401, 41))
+        self.eqAddSearchGroupButton.setGeometry(QtCore.QRect(700, 420, 231, 41))
         self.eqAddSearchGroupButton.setStyleSheet("QPushButton{\n"
                                                   " background-color: #081f2d; \n"
                                                   " border-radius: 8px; \n"
@@ -348,7 +348,7 @@ class MainWindow(QMainWindow):
                                                 "}")
         self.eqAddUserOrInvButton.setObjectName("eqAddUserOrInvButton")
         self.eqAddDeleteGroupsButton = QtWidgets.QPushButton(parent=self.addSmthBox)
-        self.eqAddDeleteGroupsButton.setGeometry(QtCore.QRect(450, 390, 171, 31))
+        self.eqAddDeleteGroupsButton.setGeometry(QtCore.QRect(450, 520, 171, 31))
         self.eqAddDeleteGroupsButton.setStyleSheet("QPushButton{\n"
                                                    " background-color: #081f2d; \n"
                                                    " border-radius: 8px; \n"
@@ -366,6 +366,12 @@ class MainWindow(QMainWindow):
                                                    " transition: 0.9s; \n"
                                                    "}")
         self.eqAddDeleteGroupsButton.setObjectName("eqAddDeleteGroupsButton")
+        self.listLabel_5 = QtWidgets.QLabel(parent=self.addSmthBox)
+        self.listLabel_5.setGeometry(QtCore.QRect(450, 0, 161, 20))
+        self.listLabel_5.setObjectName("listLabel_5")
+        self.listLabel_6 = QtWidgets.QLabel(parent=self.addSmthBox)
+        self.listLabel_6.setGeometry(QtCore.QRect(700, 0, 161, 20))
+        self.listLabel_6.setObjectName("listLabel_6")
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
@@ -437,13 +443,13 @@ class MainWindow(QMainWindow):
         self.rightsLabel_4.setGeometry(QtCore.QRect(20, 10, 101, 16))
         self.rightsLabel_4.setObjectName("rightsLabel_4")
         self.searchByEmailOrNameLabel_3 = QtWidgets.QLabel(parent=self.addSmthBox_2)
-        self.searchByEmailOrNameLabel_3.setGeometry(QtCore.QRect(40, 390, 161, 16))
+        self.searchByEmailOrNameLabel_3.setGeometry(QtCore.QRect(740, 440, 161, 16))
         self.searchByEmailOrNameLabel_3.setObjectName("searchByEmailOrNameLabel_3")
         self.usAddGroupByName = QtWidgets.QLineEdit(parent=self.addSmthBox_2)
-        self.usAddGroupByName.setGeometry(QtCore.QRect(200, 390, 191, 22))
+        self.usAddGroupByName.setGeometry(QtCore.QRect(740, 460, 221, 22))
         self.usAddGroupByName.setObjectName("usAddGroupByName")
         self.usAddSearchGroupButton = QtWidgets.QPushButton(parent=self.addSmthBox_2)
-        self.usAddSearchGroupButton.setGeometry(QtCore.QRect(30, 420, 401, 41))
+        self.usAddSearchGroupButton.setGeometry(QtCore.QRect(730, 490, 231, 41))
         self.usAddSearchGroupButton.setStyleSheet("QPushButton{\n"
                                                   " background-color: #081f2d; \n"
                                                   " border-radius: 8px; \n"
@@ -462,7 +468,7 @@ class MainWindow(QMainWindow):
                                                   "}")
         self.usAddSearchGroupButton.setObjectName("usAddSearchGroupButton")
         self.usAddRefreshGroupButton = QtWidgets.QPushButton(parent=self.addSmthBox_2)
-        self.usAddRefreshGroupButton.setGeometry(QtCore.QRect(30, 470, 401, 41))
+        self.usAddRefreshGroupButton.setGeometry(QtCore.QRect(730, 540, 231, 41))
         self.usAddRefreshGroupButton.setStyleSheet("QPushButton{\n"
                                                    " background-color: #081f2d; \n"
                                                    " border-radius: 8px; \n"
@@ -519,12 +525,12 @@ class MainWindow(QMainWindow):
                                           "}")
         self.usGrToSelected.setObjectName("usGrToSelected")
         self.usAddSelectedGrTableView = QtWidgets.QTableView(parent=self.addSmthBox_2)
-        self.usAddSelectedGrTableView.setGeometry(QtCore.QRect(480, 30, 171, 441))
+        self.usAddSelectedGrTableView.setGeometry(QtCore.QRect(480, 30, 171, 541))
         self.usAddSelectedGrTableView.setSizeAdjustPolicy(
             QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.usAddSelectedGrTableView.setObjectName("usAddSelectedGrTableView")
         self.usAddAllGrTableView = QtWidgets.QTableView(parent=self.addSmthBox_2)
-        self.usAddAllGrTableView.setGeometry(QtCore.QRect(730, 30, 431, 481))
+        self.usAddAllGrTableView.setGeometry(QtCore.QRect(730, 30, 431, 401))
         self.usAddAllGrTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.usAddAllGrTableView.setObjectName("usAddAllGrTableView")
         self.usAddUserOrInvButton = QtWidgets.QPushButton(parent=self.addSmthBox_2)
@@ -547,7 +553,7 @@ class MainWindow(QMainWindow):
                                                 "}")
         self.usAddUserOrInvButton.setObjectName("usAddUserOrInvButton")
         self.usAddDeleteGroupsButton = QtWidgets.QPushButton(parent=self.addSmthBox_2)
-        self.usAddDeleteGroupsButton.setGeometry(QtCore.QRect(480, 480, 171, 31))
+        self.usAddDeleteGroupsButton.setGeometry(QtCore.QRect(480, 580, 171, 31))
         self.usAddDeleteGroupsButton.setStyleSheet("QPushButton{\n"
                                                    " background-color: #081f2d; \n"
                                                    " border-radius: 8px; \n"
@@ -565,6 +571,12 @@ class MainWindow(QMainWindow):
                                                    " transition: 0.9s; \n"
                                                    "}")
         self.usAddDeleteGroupsButton.setObjectName("usAddDeleteGroupsButton")
+        self.listLabel_8 = QtWidgets.QLabel(parent=self.addSmthBox_2)
+        self.listLabel_8.setGeometry(QtCore.QRect(480, 10, 161, 20))
+        self.listLabel_8.setObjectName("listLabel_8")
+        self.listLabel_7 = QtWidgets.QLabel(parent=self.addSmthBox_2)
+        self.listLabel_7.setGeometry(QtCore.QRect(730, 10, 161, 20))
+        self.listLabel_7.setObjectName("listLabel_7")
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_16 = QtWidgets.QWidget()
         self.tab_16.setObjectName("tab_16")
@@ -1525,6 +1537,8 @@ class MainWindow(QMainWindow):
         self.eqAddSearchGroupButton.setText(_translate("MainWindow", "Поиск групп"))
         self.eqAddUserOrInvButton.setText(_translate("MainWindow", "Добавить инвентарь"))
         self.eqAddDeleteGroupsButton.setText(_translate("MainWindow", "Удалить все группы"))
+        self.listLabel_5.setText(_translate("MainWindow", "Группы оборудования"))
+        self.listLabel_6.setText(_translate("MainWindow", "Все доступные группы"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Добавление инвентаря"))
         self.nameOrEmailLabel_3.setText(_translate("MainWindow", "Email"))
         self.label_9.setText(_translate("MainWindow", "ID карты сотрудника"))
@@ -1543,6 +1557,8 @@ class MainWindow(QMainWindow):
         self.usGrToSelected.setText(_translate("MainWindow", "<=="))
         self.usAddUserOrInvButton.setText(_translate("MainWindow", "Добавить пользователя"))
         self.usAddDeleteGroupsButton.setText(_translate("MainWindow", "Удалить все группы"))
+        self.listLabel_8.setText(_translate("MainWindow", "Группы пользователя"))
+        self.listLabel_7.setText(_translate("MainWindow", "Все доступные группы"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2),
                                   _translate("MainWindow", "Добавление пользователей"))
         self.nameOrEmailLabel_8.setText(_translate("MainWindow", "Название"))
@@ -1563,11 +1579,11 @@ class MainWindow(QMainWindow):
         self.uschangernextPushButton.setText(_translate("MainWindow", "Следующий"))
         self.uschangerprevPushButton.setText(_translate("MainWindow", "Предыдущий"))
         self.uscommitchangesPushButton.setText(_translate("MainWindow", "Принять изменения"))
-        self.usChangeDelPushButton.setText(_translate("MainWindow", "Удалить пользователя"))
+        self.usChangeDelPushButton.setText(_translate("MainWindow", "Удалить единицу оборудования"))
         self.listLabel_4.setText(_translate("MainWindow", "Группы пользователя"))
         self.label_43.setText(_translate("MainWindow", "количество дней"))
         self.eqCreateStatsPushButton_2.setText(_translate("MainWindow", "Выгрузить статистику в файл"))
-        self.listLabel_2.setText(_translate("MainWindow", "Все/найденные элементы оборудования в базе"))
+        self.listLabel_2.setText(_translate("MainWindow", "Все пользователи в базе"))
         self.usSearchGrToSelected.setText(_translate("MainWindow", "<=="))
         self.usSearchDelFromSelectedGr.setText(_translate("MainWindow", "==>"))
         self.listLabel_19.setText(_translate("MainWindow", "Все группы"))
@@ -1580,7 +1596,7 @@ class MainWindow(QMainWindow):
                                   _translate("MainWindow", "Просмотр пользователей"))
         self.eqsearchByIdLabel.setText(_translate("MainWindow", "ID"))
         self.searchByEmailOrNameLabel.setText(_translate("MainWindow", "Название"))
-        self.listLabel.setText(_translate("MainWindow", "Все/найденные элементы оборудования в базе"))
+        self.listLabel.setText(_translate("MainWindow", "Все элементы оборудования в базе"))
         self.searchByPosGroupBox.setTitle(_translate("MainWindow", "Поиск по расположению в шкафу"))
         self.label_36.setText(_translate("MainWindow", "Высота(от пола)"))
         self.label_37.setText(_translate("MainWindow", "Номер от левого края"))
@@ -1719,6 +1735,8 @@ class MainWindow(QMainWindow):
         self.refresh_selected_us_groups()
         self.refresh_selected_us_search_groups()
         self.refresh_selected_eq_search_groups()
+        self.usAddRefreshGroupButton.hide()
+        self.eqAddRefreshGroupButton.hide()
         self.show()
 
     def search_groups_in_groups(self):
@@ -1962,12 +1980,14 @@ class MainWindow(QMainWindow):
             for i in self.__allGroups.keys():
                 if i.find(self.eqChangeGroupByName.text()) >= 0 or i == self.eqChangeGroupByName.text():
                     new_table.append(i)
-            data_frame = pd.DataFrame(new_table,
-                                      columns=["Название группы"],
-                                      index=[i for i in range(len(new_table))])
-            model = TableModel(data_frame)
-            self.eqSearchAllGrTableView.setModel(model)
-
+            if len(new_table)!=0:
+                data_frame = pd.DataFrame(new_table,
+                                          columns=["Название группы"],
+                                          index=[i for i in range(len(new_table))])
+                model = TableModel(data_frame)
+                self.eqSearchAllGrTableView.setModel(model)
+            else:
+                show_message("Проблема", "Ничего не найдено")
     def refresh_groups_in_eq_search_groups(self):
         """
 
@@ -1992,12 +2012,14 @@ class MainWindow(QMainWindow):
             for i in self.__allGroups.keys():
                 if i.find(self.usChangeGroupByName.text()) >= 0 or i == self.usChangeGroupByName.text():
                     new_table.append(i)
-            data_frame = pd.DataFrame(new_table,
-                                      columns=["Название группы"],
-                                      index=[i for i in range(len(new_table))])
-            model = TableModel(data_frame)
-            self.usSearchAllGrTableView.setModel(model)
-
+            if len(new_table)!=0:
+                data_frame = pd.DataFrame(new_table,
+                                          columns=["Название группы"],
+                                          index=[i for i in range(len(new_table))])
+                model = TableModel(data_frame)
+                self.usSearchAllGrTableView.setModel(model)
+            else:
+                show_message("Проблема", "Ничего не найдено")
     def refresh_groups_in_us_search_groups(self):
         """
 
@@ -2022,11 +2044,16 @@ class MainWindow(QMainWindow):
             for i in self.__allGroups.keys():
                 if i.find(self.eqAddGroupByName.text()) >= 0 or i == self.eqAddGroupByName.text():
                     new_table.append(i)
-            data_frame = pd.DataFrame(new_table,
-                                      columns=["Название группы"],
-                                      index=[i for i in range(len(new_table))])
-            model = TableModel(data_frame)
-            self.eqAddAllGrTableView.setModel(model)
+            if len(new_table)!=0:
+                data_frame = pd.DataFrame(new_table,
+                                          columns=["Название группы"],
+                                          index=[i for i in range(len(new_table))])
+                model = TableModel(data_frame)
+                self.eqAddAllGrTableView.setModel(model)
+                self.listLabel_6.setText("Найденные группы")
+                self.eqAddRefreshGroupButton.show()
+            else:
+                show_message("Проблема", "Ничего не найдено")
 
     def refresh_groups_in_eq_add_groups(self):
         """
@@ -2039,6 +2066,8 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(sorted(self.__allGroups)))])
         model = TableModel(data_frame)
         self.eqAddAllGrTableView.setModel(model)
+        self.listLabel_6.setText("Все группы")
+        self.eqAddRefreshGroupButton.hide()
 
     def search_groups_in_us_add_groups(self):
         """
@@ -2052,11 +2081,16 @@ class MainWindow(QMainWindow):
             for i in self.__allGroups.keys():
                 if i.find(self.usAddGroupByName.text()) >= 0 or i == self.usAddGroupByName.text():
                     new_table.append(i)
-            data_frame = pd.DataFrame(new_table,
-                                      columns=["Название группы"],
-                                      index=[i for i in range(len(new_table))])
-            model = TableModel(data_frame)
-            self.usAddAllGrTableView.setModel(model)
+            if len(new_table)!=0:
+                data_frame = pd.DataFrame(new_table,
+                                          columns=["Название группы"],
+                                          index=[i for i in range(len(new_table))])
+                model = TableModel(data_frame)
+                self.usAddAllGrTableView.setModel(model)
+                self.listLabel_7.setText("Найденные группы")
+                self.usAddRefreshGroupButton.show()
+            else:
+                show_message("Проблема", "Ничего не найдено")
 
     def refresh_groups_in_us_add_groups(self):
         """
@@ -2069,6 +2103,9 @@ class MainWindow(QMainWindow):
                                   index=[i for i in range(len(sorted(self.__allGroups)))])
         model = TableModel(data_frame)
         self.usAddAllGrTableView.setModel(model)
+        self.listLabel_7.setText("Все группы")
+        self.usAddRefreshGroupButton.hide()
+
 
     def selected_to_us_groups(self):
         """To adding selected group to user groups"""
@@ -2753,7 +2790,6 @@ class MainWindow(QMainWindow):
                 self.listLabel_19.show()
                 self.listLabel_4.setText("Группы пользователя")
                 self.usChangeDelPushButton.show()
-                # self.eqChangeDeleteGroupsButton.show()
         else:
             show_message("Проблема", "Ничего не найдено")
 
@@ -2772,13 +2808,11 @@ class MainWindow(QMainWindow):
             for i in self.__eqTableContents:
                 if i[0] == str(id):
                     found.append(i)
-                    break
         if self.eqsearchByEmailOrNameLineEdit.text() != "":
             name = self.eqsearchByEmailOrNameLineEdit.text()
             for i in self.__eqTableContents:
                 if i[1] == name or i[1].find(name) >= 0:
                     found2.append(i)
-                    break
         if self.eqsearchByGroupLineEdit.text() != "" and self.eqsearchByGroupLineEdit.text() in self.__allGroups.keys():
             for i in self.__equipment_list.get_equipment_by_group(
                     self.__allGroups[self.eqsearchByGroupLineEdit.text()]):
