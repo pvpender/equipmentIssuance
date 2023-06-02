@@ -156,6 +156,7 @@ class MainWindow(QMainWindow):
         self.__allGroups = {}  #
         self.__admin_access = admin_access  # Права админа, зашедшего в приложение
         self.__reqs = self.__db.get_unsolved_users_requests()
+        self.__reqsFound=[]
         self.__reqnum = 0
         self.__eqnum = -1
         self.__usnum = -1
@@ -2268,6 +2269,7 @@ class MainWindow(QMainWindow):
         self.eqChangeDelPushButton.hide()
         self.eqChangeDeleteGroupsButton.hide()
         self.eqCreateStatsPushButton.hide()
+        self.listLabel.setText("Все элементы оборудования в базе")
     def refresh_users_table(self):
         """For refreshing users table"""
         self.__user_list.refresh_collection()
@@ -2448,7 +2450,7 @@ class MainWindow(QMainWindow):
         self.tableView2.setModel(model)
         self.label_8.setText("Необработанных: " + str(len(self.__reqs)))
         self.get_request()
-
+        self.tableView2.selectRow(0)
     def add_equipment(self):
         """For adding equipment"""
         code_error = -1
@@ -2944,6 +2946,7 @@ class MainWindow(QMainWindow):
             self.__eqnum = 0
             self.setEqInfo()
             self.eqCreateStatsPushButton.show()
+            self.listLabel.setText("Найденное оборудование")
             if self.__admin_access.can_change_inventory:
                 self.eqchangerGroupBox.show()
                 self.eqTableView.setGeometry(QtCore.QRect(840, 40, 781, 721))
@@ -2958,6 +2961,7 @@ class MainWindow(QMainWindow):
         else:
             show_message("Проблема", "Ничего не найдено")
             self.eqCreateStatsPushButton_2.hide()
+            self.listLabel.setText("Все элементы оборудования в базе")
 
 
     def search_request(self):
@@ -3042,6 +3046,15 @@ class MainWindow(QMainWindow):
                                       )
             model = TableModel(data_frame)
             self.tableView2.setModel(model)
+            reqs_id=[]
+            for i in foundres:
+                if i[0] not in reqs_id:
+                    reqs_id.append(i[0])
+            for i in self.__reqs:
+                if str(i.id) not in reqs_id:
+                    self.__reqs.remove(i)
+            self.__reqnum=0
+            self.tableView2.selectRow(0)
         else:
             show_message("Проблема", "Ничего не найдено")
 
@@ -3091,11 +3104,11 @@ class MainWindow(QMainWindow):
                     self.__reqs[self.__reqnum].equipment_id).title) + "\n Сколько: " + str(
                 self.__reqs[self.__reqnum].count) + "\n Цель: " + str(self.__reqs[self.__reqnum].purpose)
             self.textBrowser.setText(a)
+            self.tableView2.selectRow(self.__reqnum)
         else:
             self.__reqnum -= 1
-            self.textBrowser.clear()
-            self.tableView2.clearSpans()
             show_message("Сообщение", "Запросов нет")
+            self.get_request()
 
     def previous_request(self):
         """
@@ -3174,7 +3187,6 @@ class MainWindow(QMainWindow):
                 print(data)
             else:
                 show_message("Ошибка", "У данного пользователя нет истории действий")
-
     class TableModel(QtCore.QAbstractTableModel):
         """Table model for showing data"""
 
