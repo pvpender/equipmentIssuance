@@ -229,7 +229,6 @@ class UserActions(Base):
     action_time: Mapped[datetime.datetime] = mapped_column(DateTime, primary_key=True)
     request: Mapped["UserRequests"] = relationship()
 
-
 def restart_if_except(function):
     """
     Decorator for reconnecting
@@ -246,7 +245,7 @@ def restart_if_except(function):
         if (time.time() - self.last_db_access_time) > 200:
             t = threading.Thread(target=fix_died_connection, args=(self.session,))
             t.start()
-            self.session = Session(create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base"))
+            self.session = Session(create_engine(f"BASE_URL))
         self.last_db_access_time = time.time()
         try:
             self.session.commit()
@@ -1274,11 +1273,34 @@ class DataBase:
         Returns:
             DataFrame or None
         """
-        data = data = self.__session.query(UserActions).join(
+        data = self.__session.query(UserActions).join(
             Users,
             UserActions.user_id == Users.id
         ).filter(Users.mail == mail).all()
         if not data:
             return None
         data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
+        return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
+
+    def get_equipment_actions(self, equipment_id: id) -> DataFrame | None:
+        """
+
+        Args:
+            equipment_id (int): Equipment id in base
+
+        Returns:
+            DataFrame or None
+        """
+        base_data = self.__session.query(EquipmentBackUp).filter(EquipmentBackUp.id == equipment_id).all()
+        data = self.__session.query(UserActions).join(
+            UserRequests,
+            UserRequests.id == UserActions.request_id
+        ).filter(UserRequests.equipment_id == equipment_id).all()
+        if not data and not base_data:
+            return None
+        if base_data:
+            base_data = [[i.user, i.id_in_table, i.action, i.action_time] for i in base_data]
+        if data:
+            data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
+        data += base_data
         return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
