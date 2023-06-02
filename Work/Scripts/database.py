@@ -245,7 +245,7 @@ def restart_if_except(function):
         if (time.time() - self.last_db_access_time) > 200:
             t = threading.Thread(target=fix_died_connection, args=(self.session,))
             t.start()
-            self.session = Session(create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base"))
+            self.session = Session(create_engine(f"BASE_URL))
         self.last_db_access_time = time.time()
         try:
             self.session.commit()
