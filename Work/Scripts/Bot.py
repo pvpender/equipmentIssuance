@@ -220,7 +220,7 @@ preview_window = Window(
 )
 
 purpose_window = Window(
-    Const("Для какой цели вы запрашиваете оборудование"),
+    Const("Для какой цели вы запрашиваете оборудование ?"),
     MessageInput(switch_to_confirm),
     Button(Const("Отмена"), id="cancel", on_click=switch_to_choice),
     getter=get_equipment_user_data,
@@ -282,18 +282,18 @@ async def login(msg: Message, dialog_manager: DialogManager):
 async def my_equip(msg: Union[Message, CallbackQuery]):
     user_id = db.get_tg_user_by_tg(msg.from_user.id).id
     mas = db.get_user_requests(user_id)
-    answer = "*Ваши запросы*\n*Полученные:*\n"
+    answer = "*Ваши запросы*\n*Полученные:*\n "
     for i in mas:
         if i.taken:
-            answer += f"__{i.equipment.title}__\n"
+            answer += f"__{i.equipment.title}__\n "
     answer += "*Ожидающие получения:*\n"
     for i in mas:
         if i.approved is True and not i.taken:
-            answer += f"__{i.equipment.title}__\n"
+            answer += f"__{i.equipment.title}__\n "
     answer += "*Ожидающие решения администратора:*\n"
     for i in mas:
         if not i.solved:
-            answer += f"__{i.equipment.title}__"
+            answer += f"__{i.equipment.title}__ "
     if isinstance(msg, CallbackQuery):
         await msg.answer()
         await bot.send_message(msg.message.chat.id, answer, parse_mode='Markdown')
