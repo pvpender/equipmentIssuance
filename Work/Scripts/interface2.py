@@ -1580,11 +1580,11 @@ class MainWindow(QMainWindow):
         self.uschangernextPushButton.setText(_translate("MainWindow", "Следующий"))
         self.uschangerprevPushButton.setText(_translate("MainWindow", "Предыдущий"))
         self.uscommitchangesPushButton.setText(_translate("MainWindow", "Принять изменения"))
-        self.usChangeDelPushButton.setText(_translate("MainWindow", "Удалить единицу оборудования"))
+        self.usChangeDelPushButton.setText(_translate("MainWindow", "Удалить пользователя"))
         self.listLabel_4.setText(_translate("MainWindow", "Группы пользователя"))
         self.label_43.setText(_translate("MainWindow", "количество дней"))
         self.eqCreateStatsPushButton_2.setText(_translate("MainWindow", "Выгрузить статистику в файл"))
-        self.listLabel_2.setText(_translate("MainWindow", "Все пользователи в базе"))
+        self.listLabel_2.setText(_translate("MainWindow", "Найденные пользователи"))
         self.usSearchGrToSelected.setText(_translate("MainWindow", "<=="))
         self.usSearchDelFromSelectedGr.setText(_translate("MainWindow", "==>"))
         self.listLabel_19.setText(_translate("MainWindow", "Все группы"))
@@ -1739,8 +1739,11 @@ class MainWindow(QMainWindow):
         self.usAddRefreshGroupButton.hide()
         self.eqAddRefreshGroupButton.hide()
         self.eqCreateStatsPushButton_2.clicked.connect(self.user_stats_to_file)
-        #self.eqCreateStatsPushButton_2.hide()
-        #self.eqCreateStatsPushButton.hide()
+        self.eqCreateStatsPushButton.clicked.connect(self.eq_stats_to_file)
+        self.eqCreateStatsPushButton_2.hide()
+        self.eqCreateStatsPushButton.hide()
+        self.label_43.hide()
+        self.label_42.hide()
         self.eqCreateStatsSpinBox.hide()
         self.eqCreateStatsSpinBox_2.hide()
         self.show()
@@ -2264,7 +2267,7 @@ class MainWindow(QMainWindow):
         self.eqsearchByGroupLineEdit.setText("")
         self.eqChangeDelPushButton.hide()
         self.eqChangeDeleteGroupsButton.hide()
-
+        self.eqCreateStatsPushButton.hide()
     def refresh_users_table(self):
         """For refreshing users table"""
         self.__user_list.refresh_collection()
@@ -2297,7 +2300,7 @@ class MainWindow(QMainWindow):
         self.ussearchByGroupLineEdit.setText("")
         self.usChangeDelPushButton.hide()
         self.usChangeDeleteGroupsButton.hide()
-
+        self.eqCreateStatsPushButton_2.hide()
     def refresh_gr_view_table(self):
         """For refreshing group view table"""
         self.__allGroups.clear()
@@ -2795,6 +2798,7 @@ class MainWindow(QMainWindow):
             model = TableModel(data_frame)
             self.usTableView.setModel(model)
             self.setUsInfo()
+            self.eqCreateStatsPushButton_2.show()
             if self.__admin_access.can_change_users:
                 self.uschangerGroupBox.show()
                 self.usGroupsTableView.show()
@@ -2809,6 +2813,8 @@ class MainWindow(QMainWindow):
                 self.usChangeDelPushButton.show()
         else:
             show_message("Проблема", "Ничего не найдено")
+            self.eqCreateStatsPushButton_2.hide()
+
 
     def searchEq(self):
         """For searching equipment"""
@@ -2937,6 +2943,7 @@ class MainWindow(QMainWindow):
             self.eqTableView.setModel(model)
             self.__eqnum = 0
             self.setEqInfo()
+            self.eqCreateStatsPushButton.show()
             if self.__admin_access.can_change_inventory:
                 self.eqchangerGroupBox.show()
                 self.eqTableView.setGeometry(QtCore.QRect(840, 40, 781, 721))
@@ -2950,6 +2957,8 @@ class MainWindow(QMainWindow):
                 self.eqChangeDeleteGroupsButton.show()
         else:
             show_message("Проблема", "Ничего не найдено")
+            self.eqCreateStatsPushButton_2.hide()
+
 
     def search_request(self):
         """For searching request"""
@@ -3151,14 +3160,20 @@ class MainWindow(QMainWindow):
     def user_stats_to_file(self):
         if self.__usnum>=0:
             data=self.__db.get_user_actions_by_mail(self.__usFoundTableContents[self.__usnum][1])
-            data.to_excel('stats.xlsx', engine='xlsxwriter')
-            print(data)
+            if data is not None:
+                data.to_excel('stats.xlsx', engine='xlsxwriter')
+                print(data)
+            else:
+                show_message("Ошибка", "У данного пользователя нет истории действий")
 
     def eq_stats_to_file(self):
         if self.__eqnum >= 0:
             data = self.__db.get_equipment_actions(int(self.__eqFoundTableContents[self.__eqnum][0]))
-            data.to_excel('stats.xlsx', engine='xlsxwriter')
-            print(data)
+            if data is not None:
+                data.to_excel('stats.xlsx', engine='xlsxwriter')
+                print(data)
+            else:
+                show_message("Ошибка", "У данного пользователя нет истории действий")
 
     class TableModel(QtCore.QAbstractTableModel):
         """Table model for showing data"""
