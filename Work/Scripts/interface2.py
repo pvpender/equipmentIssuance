@@ -1767,6 +1767,7 @@ class MainWindow(QMainWindow):
                 self.grDeletePushButton.show()
                 self.grAddPushButton.setText("Принять изменения")
                 self.set_gr_info()
+                self.listLabel_13.setText("найденные группы")
             else:
                 show_message('Проблема', 'Ничего не найдено')
                 self.__grnum = -2
@@ -2325,6 +2326,7 @@ class MainWindow(QMainWindow):
         self.usSearchAllGrTableView.setModel(model)
         self.eqSearchAllGrTableView.setModel(model)
         self.__grnum=-2
+        self.listLabel_13.setText("Все группы")
 
     def refresh_only_groups_table(self):
         """For refreshing only groups table"""
@@ -2340,7 +2342,7 @@ class MainWindow(QMainWindow):
         self.grPrevPushButton.hide()
         self.grAddPushButton.setText("Добавить")
         self.__grnum = -2
-
+        self.listLabel_13.setText("Все группы")
     def refresh_selected_us_groups(self):
         """For refreshing selected user groups table"""
         self.usAddSelectedGrTableView.clearSpans()
