@@ -1738,9 +1738,9 @@ class MainWindow(QMainWindow):
         self.refresh_selected_eq_search_groups()
         self.usAddRefreshGroupButton.hide()
         self.eqAddRefreshGroupButton.hide()
-        self.eqCreateStatsPushButton.clicked.connect(self.user_stats_to_file)
-        self.eqCreateStatsPushButton_2.hide()
-        self.eqCreateStatsPushButton.hide()
+        self.eqCreateStatsPushButton_2.clicked.connect(self.user_stats_to_file)
+        #self.eqCreateStatsPushButton_2.hide()
+        #self.eqCreateStatsPushButton.hide()
         self.eqCreateStatsSpinBox.hide()
         self.eqCreateStatsSpinBox_2.hide()
         self.show()
@@ -1989,7 +1989,7 @@ class MainWindow(QMainWindow):
                 if i.find(self.eqChangeGroupByName.text()) >= 0 or i == self.eqChangeGroupByName.text():
                     new_table.append(i)
             if len(new_table)!=0:
-                data_frame = pd.DataFrame(new_table,
+                data_frame = pd.DataFrame(sorted(new_table),
                                           columns=["Название группы"],
                                           index=[i for i in range(len(new_table))])
                 model = TableModel(data_frame)
@@ -2004,7 +2004,7 @@ class MainWindow(QMainWindow):
         """
         self.eqSearchAllGrTableView.clearSpans()
         data_frame = pd.DataFrame(sorted(self.__allGroups), columns=["Название группы"],
-                                  index=[i for i in range(len(sorted(self.__allGroups)))])
+                                  index=[i for i in range(len(self.__allGroups))])
         model = TableModel(data_frame)
         self.eqSearchAllGrTableView.setModel(model)
 
@@ -2021,7 +2021,7 @@ class MainWindow(QMainWindow):
                 if i.find(self.usChangeGroupByName.text()) >= 0 or i == self.usChangeGroupByName.text():
                     new_table.append(i)
             if len(new_table)!=0:
-                data_frame = pd.DataFrame(new_table,
+                data_frame = pd.DataFrame(sorted(new_table),
                                           columns=["Название группы"],
                                           index=[i for i in range(len(new_table))])
                 model = TableModel(data_frame)
@@ -2036,7 +2036,7 @@ class MainWindow(QMainWindow):
         """
         self.usSearchAllGrTableView.clearSpans()
         data_frame = pd.DataFrame(sorted(self.__allGroups), columns=["Название группы"],
-                                  index=[i for i in range(len(sorted(self.__allGroups)))])
+                                  index=[i for i in range(len(self.__allGroups))])
         model = TableModel(data_frame)
         self.usSearchAllGrTableView.setModel(model)
 
@@ -2053,7 +2053,7 @@ class MainWindow(QMainWindow):
                 if i.find(self.eqAddGroupByName.text()) >= 0 or i == self.eqAddGroupByName.text():
                     new_table.append(i)
             if len(new_table)!=0:
-                data_frame = pd.DataFrame(new_table,
+                data_frame = pd.DataFrame(sorted(new_table),
                                           columns=["Название группы"],
                                           index=[i for i in range(len(new_table))])
                 model = TableModel(data_frame)
@@ -2090,7 +2090,7 @@ class MainWindow(QMainWindow):
                 if i.find(self.usAddGroupByName.text()) >= 0 or i == self.usAddGroupByName.text():
                     new_table.append(i)
             if len(new_table)!=0:
-                data_frame = pd.DataFrame(new_table,
+                data_frame = pd.DataFrame(sorted(new_table),
                                           columns=["Название группы"],
                                           index=[i for i in range(len(new_table))])
                 model = TableModel(data_frame)
@@ -2108,7 +2108,7 @@ class MainWindow(QMainWindow):
         """
         self.usAddAllGrTableView.clearSpans()
         data_frame = pd.DataFrame(sorted(self.__allGroups), columns=["Название группы"],
-                                  index=[i for i in range(len(sorted(self.__allGroups)))])
+                                  index=[i for i in range(len(self.__allGroups))])
         model = TableModel(data_frame)
         self.usAddAllGrTableView.setModel(model)
         self.listLabel_7.setText("Все группы")
@@ -2239,6 +2239,7 @@ class MainWindow(QMainWindow):
                 str(i.reserve_count),
                 x,
                 y])
+            self.__eqTableContents=sorted(self.__eqTableContents, key=lambda x: x[1])
         data_frame = pd.DataFrame(self.__eqTableContents,
                                   columns=["ID", "Название", "Количество", "Зарезервировано", "От стены", "От пола"],
                                   index=[i for i in range(len(self.__eqTableContents))])
@@ -2278,6 +2279,7 @@ class MainWindow(QMainWindow):
                 str(hex(i.pass_number)),
                 i.mail,
             ])
+            self.__usTableContents= sorted(self.__usTableContents, key = lambda x: x[1])
         data_frame = pd.DataFrame(self.__usTableContents, columns=["ID карты", "Почта"],
                                   index=[i for i in range(len(self.__usTableContents))])
         model = TableModel(data_frame)
@@ -2311,7 +2313,7 @@ class MainWindow(QMainWindow):
         self.eqSearchAllGrTableView.clearSpans()
         for i in self.__db.get_all_groups():
             self.__allGroups[i.group_name] = i.id
-        data_frame = pd.DataFrame(self.__allGroups.keys(),
+        data_frame = pd.DataFrame(sorted(self.__allGroups.keys()),
                                   columns=["Название группы"],
                                   index=[i for i in range(len(self.__allGroups.keys()))])
         model = TableModel(data_frame)
@@ -2322,11 +2324,12 @@ class MainWindow(QMainWindow):
         self.usAddAllGrTableView.setModel(model)
         self.usSearchAllGrTableView.setModel(model)
         self.eqSearchAllGrTableView.setModel(model)
+        self.__grnum=-2
 
     def refresh_only_groups_table(self):
         """For refreshing only groups table"""
         self.grTableView.clearSpans()
-        data_frame = pd.DataFrame(self.__allGroups.keys(),
+        data_frame = pd.DataFrame(sorted(self.__allGroups.keys()),
                                   columns=["Название группы"],
                                   index=[i for i in range(len(self.__allGroups.keys()))])
         model = TableModel(data_frame)
@@ -2341,6 +2344,7 @@ class MainWindow(QMainWindow):
     def refresh_selected_us_groups(self):
         """For refreshing selected user groups table"""
         self.usAddSelectedGrTableView.clearSpans()
+        self.__addUsTableContents=sorted(self.__addUsTableContents)
         data_frame = pd.DataFrame(self.__addUsTableContents,
                                   columns=["Название групп"],
                                   index=[i for i in range(len(self.__addUsTableContents))])
@@ -2356,6 +2360,7 @@ class MainWindow(QMainWindow):
     def refresh_selected_eq_groups(self):
         """For refreshing selected equipment groups table"""
         self.eqAddSelectedGrTableView.clearSpans()
+        self.__addEqTableContents=sorted(self.__addEqTableContents)
         data_frame = pd.DataFrame(self.__addEqTableContents,
                                   columns=["Название групп"],
                                   index=[i for i in range(len(self.__addEqTableContents))])
@@ -2371,6 +2376,7 @@ class MainWindow(QMainWindow):
     def refresh_selected_eq_search_groups(self):
         """For refreshing selected equipment search groups table"""
         self.eqGroupsTableView.clearSpans()
+        self.__currEqGroupsTableContents=sorted(self.__currEqGroupsTableContents)
         data_frame = pd.DataFrame(self.__currEqGroupsTableContents,
                                   columns=["Название групп"],
                                   index=[i for i in range(len(self.__currEqGroupsTableContents))])
@@ -2386,6 +2392,7 @@ class MainWindow(QMainWindow):
     def refresh_selected_us_search_groups(self):
         """For refreshing selected user search groups table"""
         self.usGroupsTableView.clearSpans()
+        self.__currUsGroupsTableContents
         data_frame = pd.DataFrame(self.__currUsGroupsTableContents,
                                   columns=["Название групп"],
                                   index=[i for i in range(len(self.__currUsGroupsTableContents))])
@@ -2779,9 +2786,9 @@ class MainWindow(QMainWindow):
             foundres = found4
         if len(foundres) != 0:
             self.usTableView.clearSpans()
-            self.__usFoundTableContents = foundres
+            self.__usFoundTableContents = sorted(foundres, key=lambda x: x[1])
             self.__usnum = 0
-            data_frame = pd.DataFrame(foundres, columns=["ID карты", "Почта"],
+            data_frame = pd.DataFrame(sorted(foundres, key=lambda x: x[1]), columns=["ID карты", "Почта"],
                                       index=[i for i in range(len(foundres))])
             model = TableModel(data_frame)
             self.usTableView.setModel(model)
@@ -2918,9 +2925,9 @@ class MainWindow(QMainWindow):
                 found5) == 0 and len(found6) == 0:
             foundres = found7
         if len(foundres) != 0:
-            self.__eqFoundTableContents = foundres
+            self.__eqFoundTableContents = sorted(foundres, key=lambda x: x[1])
             self.eqTableView.clearSpans()
-            data_frame = pd.DataFrame(foundres,
+            data_frame = pd.DataFrame(sorted(foundres, key=lambda x: x[1]),
                                       columns=["ID", "Название", "Количество", "Зарезервировано", "От стены",
                                                "От пола"],
                                       index=[i for i in range(len(foundres))])
@@ -3140,8 +3147,17 @@ class MainWindow(QMainWindow):
             show_message("Ошибка", "Запросов нет")
 
     def user_stats_to_file(self):
-        data=self.__db.get_user_actions_by_mail(self.__currUsGroupsTableContents[self.__usnum][1])
-        data.to_excel('stats.xlsx', engine='xlsxwriter')
+        if self.__usnum>=0:
+            data=self.__db.get_user_actions_by_mail(self.__usFoundTableContents[self.__usnum][1])
+            data.to_excel('stats.xlsx', engine='xlsxwriter')
+            print(data)
+
+    def eq_stats_to_file(self):
+        if self.__eqnum >= 0:
+            data = self.__db.get_equipment_actions(int(self.__eqFoundTableContents[self.__eqnum][0]))
+            data.to_excel('stats.xlsx', engine='xlsxwriter')
+            print(data)
+
     class TableModel(QtCore.QAbstractTableModel):
         """Table model for showing data"""
 
