@@ -9,6 +9,7 @@ from equipment_collections import EquipmentCollection
 from interface import TableModel
 from user_collections import *
 from users import *
+import xlsxwriter
 
 
 class QDoublePushButton(QPushButton):
@@ -1715,7 +1716,7 @@ class MainWindow(QMainWindow):
         self.usAddRefreshGroupButton.clicked.connect(self.refresh_groups_in_us_add_groups)
         self.eqAddSearchGroupButton.clicked.connect(self.search_groups_in_eq_add_groups)
         self.eqAddRefreshGroupButton.clicked.connect(self.refresh_groups_in_eq_add_groups)
-        self.grRefreshPushButton.clicked.connect(self.refresh_gr_view_table)
+        self.grRefreshPushButton.clicked.connect(self.refresh_only_groups_table)
         self.grSearchPushButton.clicked.connect(self.search_groups_in_groups)
         self.grPrevPushButton.clicked.connect(self.prevGr)
         self.grNextPushButton.clicked.connect(self.nextGr)
@@ -1737,6 +1738,11 @@ class MainWindow(QMainWindow):
         self.refresh_selected_eq_search_groups()
         self.usAddRefreshGroupButton.hide()
         self.eqAddRefreshGroupButton.hide()
+        self.eqCreateStatsPushButton.clicked.connect(self.user_stats_to_file)
+        self.eqCreateStatsPushButton_2.hide()
+        self.eqCreateStatsPushButton.hide()
+        self.eqCreateStatsSpinBox.hide()
+        self.eqCreateStatsSpinBox_2.hide()
         self.show()
 
     def search_groups_in_groups(self):
@@ -1912,61 +1918,63 @@ class MainWindow(QMainWindow):
         For changing group
 
         """
-        if self.grAddLineEdit.text() != '' and len(self.__currGroupsTableContents) > 0:
-            if self.grAddLineEdit.text() in self.__allGroups.keys() and self.grAddLineEdit.text() != \
-                    self.__currGroupsTableContents[self.__grnum]:
-                show_message("Ошибка", "группа с таким названием уже существует")
-            elif self.grAddLineEdit.text() == self.__currGroupsTableContents[self.__grnum]:
-                show_message("Ошибка", "группа уже имееь такое название")
-            elif self.grAddLineEdit.text() not in self.__allGroups.keys():
-                self.__db.rename_group(self.__allGroups[self.__currGroupsTableContents[self.__grnum]],
-                                       self.grAddLineEdit.text())
-                old_name = self.__currGroupsTableContents[self.__grnum]
-                new_name = self.grAddLineEdit.text()
-                if old_name in self.__currGroupsTableContents:
-                    self.__currGroupsTableContents[self.__currGroupsTableContents.index(old_name)] = new_name
-                self.grTableView.clearSpans()
-                data_frame = pd.DataFrame(self.__currGroupsTableContents, columns=["Название группы"],
-                                          index=[i for i in range(len(self.__currGroupsTableContents))])
-                model = TableModel(data_frame)
-                self.grTableView.setModel(model)
+        if self.__grnum!=2:
+            if self.grAddLineEdit.text() != '' and len(self.__currGroupsTableContents) > 0:
+                if self.grAddLineEdit.text() in self.__allGroups.keys() and self.grAddLineEdit.text() != \
+                        self.__currGroupsTableContents[self.__grnum]:
+                    show_message("Ошибка", "группа с таким названием уже существует")
+                elif self.grAddLineEdit.text() == self.__currGroupsTableContents[self.__grnum]:
+                    show_message("Ошибка", "группа уже имееь такое название")
+                elif self.grAddLineEdit.text() not in self.__allGroups.keys():
+                    self.__db.rename_group(self.__allGroups[self.__currGroupsTableContents[self.__grnum]],
+                                           self.grAddLineEdit.text())
+                    old_name = self.__currGroupsTableContents[self.__grnum]
+                    new_name = self.grAddLineEdit.text()
+                    if old_name in self.__currGroupsTableContents:
+                        self.__currGroupsTableContents[self.__currGroupsTableContents.index(old_name)] = new_name
+                    self.grTableView.clearSpans()
+                    data_frame = pd.DataFrame(self.__currGroupsTableContents, columns=["Название группы"],
+                                              index=[i for i in range(len(self.__currGroupsTableContents))])
+                    model = TableModel(data_frame)
+                    self.grTableView.setModel(model)
 
-                if old_name in self.__currEqGroupsTableContents:
-                    self.__currEqGroupsTableContents[self.__currEqGroupsTableContents.index(old_name)] = new_name
-                self.eqGroupsTableView.clearSpans()
-                data_frame = pd.DataFrame(self.__currEqGroupsTableContents, columns=["Название группы"],
-                                          index=[i for i in range(len(self.__currEqGroupsTableContents))])
-                model = TableModel(data_frame)
-                self.eqGroupsTableView.setModel(model)
+                    if old_name in self.__currEqGroupsTableContents:
+                        self.__currEqGroupsTableContents[self.__currEqGroupsTableContents.index(old_name)] = new_name
+                    self.eqGroupsTableView.clearSpans()
+                    data_frame = pd.DataFrame(self.__currEqGroupsTableContents, columns=["Название группы"],
+                                              index=[i for i in range(len(self.__currEqGroupsTableContents))])
+                    model = TableModel(data_frame)
+                    self.eqGroupsTableView.setModel(model)
 
-                if old_name in self.__currUsGroupsTableContents:
-                    self.__currUsGroupsTableContents[self.__currUsGroupsTableContents.index(old_name)] = new_name
-                self.usGroupsTableView.clearSpans()
-                data_frame = pd.DataFrame(self.__currUsGroupsTableContents, columns=["Название группы"],
-                                          index=[i for i in range(len(self.__currUsGroupsTableContents))])
-                model = TableModel(data_frame)
-                self.usGroupsTableView.setModel(model)
+                    if old_name in self.__currUsGroupsTableContents:
+                        self.__currUsGroupsTableContents[self.__currUsGroupsTableContents.index(old_name)] = new_name
+                    self.usGroupsTableView.clearSpans()
+                    data_frame = pd.DataFrame(self.__currUsGroupsTableContents, columns=["Название группы"],
+                                              index=[i for i in range(len(self.__currUsGroupsTableContents))])
+                    model = TableModel(data_frame)
+                    self.usGroupsTableView.setModel(model)
 
-                if old_name in self.__addUsTableContents:
-                    self.__addUsTableContents[self.__addUsTableContents.index(old_name)] = new_name
-                self.usAddSelectedGrTableView.clearSpans()
-                data_frame = pd.DataFrame(self.__addUsTableContents, columns=["Название группы"],
-                                          index=[i for i in range(len(self.__addUsTableContents))])
-                model = TableModel(data_frame)
-                self.usAddSelectedGrTableView.setModel(model)
+                    if old_name in self.__addUsTableContents:
+                        self.__addUsTableContents[self.__addUsTableContents.index(old_name)] = new_name
+                    self.usAddSelectedGrTableView.clearSpans()
+                    data_frame = pd.DataFrame(self.__addUsTableContents, columns=["Название группы"],
+                                              index=[i for i in range(len(self.__addUsTableContents))])
+                    model = TableModel(data_frame)
+                    self.usAddSelectedGrTableView.setModel(model)
 
-                if old_name in self.__addUsTableContents:
-                    self.__addUsTableContents[self.__addUsTableContents.index(old_name)] = new_name
-                self.usAddSelectedGrTableView.clearSpans()
-                data_frame = pd.DataFrame(self.__addUsTableContents, columns=["Название группы"],
-                                          index=[i for i in range(len(self.__addUsTableContents))])
-                model = TableModel(data_frame)
-                self.usAddSelectedGrTableView.setModel(model)
+                    if old_name in self.__addUsTableContents:
+                        self.__addUsTableContents[self.__addUsTableContents.index(old_name)] = new_name
+                    self.usAddSelectedGrTableView.clearSpans()
+                    data_frame = pd.DataFrame(self.__addUsTableContents, columns=["Название группы"],
+                                              index=[i for i in range(len(self.__addUsTableContents))])
+                    model = TableModel(data_frame)
+                    self.usAddSelectedGrTableView.setModel(model)
 
-                self.__allGroups[self.grAddLineEdit.text()] = self.__allGroups[old_name]
-                show_message("успех", "Группа переименована")
-                del self.__allGroups[old_name]
-                self.refresh_gr_view_table()
+                    self.__allGroups[self.grAddLineEdit.text()] = self.__allGroups[old_name]
+                    show_message("успех", "Группа переименована")
+                    del self.__allGroups[old_name]
+                    self.refresh_gr_view_table()
+                    self.refresh_only_groups_table()
 
     def search_groups_in_eq_search_groups(self):
         """
@@ -3131,6 +3139,9 @@ class MainWindow(QMainWindow):
         else:
             show_message("Ошибка", "Запросов нет")
 
+    def user_stats_to_file(self):
+        data=self.__db.get_user_actions_by_mail(self.__currUsGroupsTableContents[self.__usnum][1])
+        data.to_excel('stats.xlsx', engine='xlsxwriter')
     class TableModel(QtCore.QAbstractTableModel):
         """Table model for showing data"""
 
