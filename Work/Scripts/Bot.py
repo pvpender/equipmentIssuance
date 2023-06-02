@@ -220,8 +220,7 @@ preview_window = Window(
 )
 
 purpose_window = Window(
-    Format("Оборудование: {title}\nОписание: {description}\n{possible}"),
-    Const("Последний шаг: введите для какой цели вы запрашиваете оборудование"),
+    Const("Для какой цели вы запрашиваете оборудование"),
     MessageInput(switch_to_confirm),
     Button(Const("Отмена"), id="cancel", on_click=switch_to_choice),
     getter=get_equipment_user_data,

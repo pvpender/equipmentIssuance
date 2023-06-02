@@ -3096,7 +3096,7 @@ class MainWindow(QMainWindow):
         """
         Draw all requests
         """
-        if self.__reqnum < len(self.__reqs):
+        if self.__reqnum < len(self.__reqs) and self.__reqnum>=0:
             a = "EMAIL: " + str(self.__user_list.get_user_by_id(
                 self.__reqs[self.__reqnum].sender_id).mail) + "\n ID запросившего: " + str(
                 self.__reqs[self.__reqnum].sender_id) + "\n Что запрашивается: " + str(
@@ -3105,7 +3105,7 @@ class MainWindow(QMainWindow):
                 self.__reqs[self.__reqnum].count) + "\n Цель: " + str(self.__reqs[self.__reqnum].purpose)
             self.textBrowser.setText(a)
             self.tableView2.selectRow(self.__reqnum)
-        else:
+        elif self.__reqnum:
             self.__reqnum -= 1
             show_message("Сообщение", "Запросов нет")
             self.get_request()
