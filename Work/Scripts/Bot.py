@@ -81,8 +81,8 @@ async def setting_password(msg: Message, curr_dialog: Dialog, manager: DialogMan
         InlineKeyboardButton(text="Запросить оборудование", callback_data="get_equipment"),
         InlineKeyboardButton(text="Посмотреть список ваших запросов", callback_data="my_requests")
     ])
-    await msg.answer("Вот что вы можете сделать:", reply_markup=inline_keyboard)
     await manager.done()
+    await msg.answer("Вот что вы можете сделать:", reply_markup=inline_keyboard)
 
 
 async def input_password(msg: Message, curr_dialog: Dialog, manager: DialogManager):
@@ -265,7 +265,7 @@ log_menu = Dialog(greetings_window, setting_password_window, input_password_wind
 async def start(msg: Message, dialog_manager: DialogManager):
     if not db.get_tg_user_by_tg(msg.from_user.id):
         await msg.answer("Добро пожаловть! Для запроса оборудования необходимо войти в систему!")
-        await dialog_manager.start(LogSG.mail, mode=StartMode.NORMAL)
+        await dialog_manager.start(LogSG.mail, mode=StartMode.RESET_STACK)
     else:
         await msg.answer("Вы уже вошли! Для смена аккаунта используйте комманду /login")
 
