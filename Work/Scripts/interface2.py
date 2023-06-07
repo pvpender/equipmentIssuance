@@ -3191,6 +3191,7 @@ class MainWindow(QMainWindow):
                 name=str(self.__eqFoundTableContents[self.__eqnum][1])+'_stats_for_'+str(datetime.datetime.now())+'.xlsx'
                 while " " in name:
                         name = name.replace(" ", "_")
+
                 data.to_excel(name, engine='xlsxwriter')
 
             else:
