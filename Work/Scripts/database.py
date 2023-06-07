@@ -4,7 +4,7 @@ from typing import List
 from PyQt6.QtWidgets import QMessageBox
 from sqlalchemy import ForeignKey
 from sqlalchemy import BigInteger
-from sqlalchemy import Text, DateTime, Engine, create_engine
+from sqlalchemy import Text, DateTime, Engine, create_engine, VARCHAR
 from sqlalchemy.orm import DeclarativeBase, Session, relationship, Mapped, mapped_column
 from users import *
 from equipment import *
@@ -207,6 +207,13 @@ class NotificationMessages(Base):
     request: Mapped["UserRequests"] = relationship()
 
 
+class CurrentRequests(Base):
+    __tablename__ = "current_requests"
+    user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    action: Mapped[str] = mapped_column(VARCHAR(7), nullable=True)
+    requests: Mapped[str] = mapped_column(Text, nullable=True)
+
+
 class ActionTypes(Enum):
     INSERT = "insert"
     UPDATE = "update"
@@ -246,7 +253,7 @@ def restart_if_except(function):
         if (time.time() - self.last_db_access_time) > 200:
             t = threading.Thread(target=fix_died_connection, args=(self.session,))
             t.start()
-            self.session = Session(create_engine(f"mysql+pymysql://admin:testPass@194.67.206.233:3306/test_base"))
+            self.session = Session(create_engine(f"BASE_URL"))
         self.last_db_access_time = time.time()
         try:
             self.session.commit()
@@ -277,6 +284,7 @@ def for_all_methods(decorator):
         return cls
 
     return decorate
+
 
 class DataBase:
     """Class for working with database"""
@@ -1272,7 +1280,7 @@ class DataBase:
         Returns:
             DataFrame or None
         """
-        data = data = self.__session.query(UserActions).join(
+        data = self.__session.query(UserActions).join(
             Users,
             UserActions.user_id == Users.id
         ).filter(Users.mail == mail).all()
@@ -1280,3 +1288,42 @@ class DataBase:
             return None
         data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
         return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
+
+    def get_equipment_actions(self, equipment_id: id) -> DataFrame | None:
+        """
+
+        Args:
+            equipment_id (int): Equipment id in base
+
+        Returns:
+            DataFrame or None
+        """
+        base_data = self.__session.query(EquipmentBackUp).filter(EquipmentBackUp.id == equipment_id).all()
+        data = self.__session.query(UserActions).join(
+            UserRequests,
+            UserRequests.id == UserActions.request_id
+        ).filter(UserRequests.equipment_id == equipment_id).all()
+        if not data and not base_data:
+            return None
+        if base_data:
+            base_data = [[i.user, i.id_in_table, i.action, i.action_time] for i in base_data]
+        if data:
+            data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
+        data += base_data
+        return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
+
+    def get_current_action(self) -> CurrentRequests | None:
+        return self.__session.query(CurrentRequests).first()
+
+    def update_current_action(self, action: str = None, requests: str = None):
+        """
+
+        Args:
+            action (str): Action
+            requests (str): Id's in str, for example: 0_1_2_3
+
+        Returns:
+
+        """
+        new_data = {"action": action} if action else {"requests": requests}
+        self.__session.query(CurrentRequests).update(new_data)
