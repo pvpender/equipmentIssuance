@@ -1,3 +1,4 @@
+import cmath
 import operator
 import aiogram.utils.exceptions
 from aiogram import Bot, Dispatcher, executor
@@ -7,7 +8,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram_dialog import Window, Dialog, DialogRegistry, DialogManager, StartMode
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Button, ScrollingGroup, Select
+from aiogram_dialog.widgets.kbd import Button, ScrollingGroup, Select, Multiselect
 from aiogram_dialog.widgets.text import Const, Format
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from database import *
@@ -21,7 +22,7 @@ scheduler = AsyncIOScheduler()
 # engine = create_engine("mysql+pymysql://freedb_testadminuser:#q4UD$mVTfVrscM@sql.freedb.tech/freedb_Testbase")
 # engine = create_engine("mysql+pymysql://developer:deVpass@194.67.206.233:3306/dev_base")
 engine = create_engine(BASE_URL)
-#engine = create_engine("mysql+pymysql://admin:Sapr_714@192.168.43.130:3306/test")
+# engine = create_engine("mysql+pymysql://admin:Sapr_714@192.168.43.130:3306/test")
 Base.metadata.create_all(engine)
 db = DataBase(engine)
 
@@ -53,6 +54,11 @@ class LogSG(StatesGroup):
     mail = State()
     setting_password = State()
     password = State()
+
+
+class GetReturnSG(StatesGroup):
+    action_choosing = State()
+    equipment_choosing = State()
 
 
 async def on_input(msg: Message, curr_dialog: Dialog, manager: DialogManager):
@@ -93,10 +99,10 @@ async def input_password(msg: Message, curr_dialog: Dialog, manager: DialogManag
         await msg.answer("Успех!")
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
         inline_keyboard.add(*[
-                InlineKeyboardButton(text="Войти как новый пользователь", callback_data="login"),
-                InlineKeyboardButton(text="Запросить оборудование", callback_data="get_equipment"),
-                InlineKeyboardButton(text="Посмотреть список ваших запросов", callback_data="my_requests")
-             ])
+            InlineKeyboardButton(text="Войти как новый пользователь", callback_data="login"),
+            InlineKeyboardButton(text="Запросить оборудование", callback_data="get_equipment"),
+            InlineKeyboardButton(text="Посмотреть список ваших запросов", callback_data="my_requests")
+        ])
         await msg.answer("Вот что вы можете сделать:", reply_markup=inline_keyboard)
         await manager.done()
     else:
@@ -190,6 +196,43 @@ async def switch_to_input(c: CallbackQuery, button: Button, manager: DialogManag
     await manager.dialog().switch_to(MySG.purpose)
 
 
+async def chose_action(c: CallbackQuery, button: Button, manager: DialogManager):
+    db.update_current_action(button.widget_id)
+    await manager.dialog().switch_to(GetReturnSG.equipment_choosing)
+
+
+async def cancel_system_interaction(c: CallbackQuery, button: Button, manager: DialogManager):
+    db.update_current_action(button.widget_id)
+    await end(c, button, manager)
+    scheduler.resume_job("check_for_interaction")
+
+
+async def switch_back(c: CallbackQuery, button: Button, manager: DialogManager):
+    await manager.dialog().back()
+
+
+async def get_current_requests(**kwargs):
+    current = db.get_current_action()
+    requests = db.get_user_requests(current.user_id)
+    requests = [
+        (i.equipment.title, i.id) for i in requests
+        if i.taken is (False if current.action == "get" else True) and i.approved is True
+    ]
+    return {
+        "requests": requests,
+        "count": len(requests)
+    }
+
+
+async def confirm_choice(c: CallbackQuery, button: Button, manager: DialogManager):
+    mas = manager.dialog().find("m_requests").get_checked()
+    requests = "_".join(mas)
+    db.update_current_action(requests=requests)
+    await bot.edit_message_text("Готово!", c.message.chat.id, c.message.message_id)
+    await manager.done()
+    scheduler.resume_job("check_for_interaction")
+
+
 scrolling_group = ScrollingGroup(
     Select(
         Format("{item[0]}"),
@@ -200,7 +243,21 @@ scrolling_group = ScrollingGroup(
     ),
     id="numbers",
     width=1,
-    height=6,
+    height=6
+)
+
+requests_multi_scrolling_group = ScrollingGroup(
+    Multiselect(
+        Format("✓ {item[0]}"),
+        Format("{item[0]}"),
+        id="m_requests",
+        item_id_getter=operator.itemgetter(1),
+        items="requests",
+        min_selected=1,
+    ),
+    id="request",
+    width=1,
+    height=6
 )
 
 main_window = Window(
@@ -256,8 +313,26 @@ input_password_window = Window(
     state=LogSG.password
 )
 
+choosing_action_window = Window(
+    Const("Выберите действие, которое хотите выполнить"),
+    Button(Const("Получить"), id="get", on_click=chose_action),
+    Button(Const("Вернуть"), id="return", on_click=chose_action),
+    Button(Const("Отмена"), id="cancel", on_click=cancel_system_interaction),
+    state=GetReturnSG.action_choosing
+)
+
+request_window = Window(
+    Const("Выберите оборудование:"),
+    requests_multi_scrolling_group,
+    Button(Const("Подтвердить"), id="accept", when="count", on_click=confirm_choice),
+    Button(Const("Назад"), id="dined", on_click=switch_back),
+    getter=get_current_requests,
+    state=GetReturnSG.equipment_choosing
+)
+
 dialog = Dialog(main_window, preview_window, purpose_window, confirm_input_window)
 log_menu = Dialog(greetings_window, setting_password_window, input_password_window)
+get_return_menu = Dialog(choosing_action_window, request_window)
 
 
 @dp.message_handler(commands=["start"])
@@ -267,6 +342,12 @@ async def start(msg: Message, dialog_manager: DialogManager):
         await dialog_manager.start(LogSG.mail, mode=StartMode.RESET_STACK)
     else:
         await msg.answer("Вы уже вошли! Для смена аккаунта используйте комманду /login")
+
+
+@dp.callback_query_handler(text="start_interaction")
+async def start_interaction(c: CallbackQuery, dialog_manager: DialogManager):
+    await c.answer()
+    await dialog_manager.start(GetReturnSG.action_choosing, mode=StartMode.RESET_STACK)
 
 
 @dp.message_handler(commands=["login"])
@@ -316,9 +397,9 @@ async def send_request_notification(user_tg_id: int, title: str, user_login: str
         InlineKeyboardButton(text="Отклонить", callback_data="reject")
     ])
     msg = await bot.send_message(user_tg_id, f"Поступил запрос на *{title}*\n"
-                                       f"От: *{user_login}*\n"
-                                       f"Для: *{request.purpose}*\n"
-                                       f"Одобрить?", reply_markup=inline_keyboard, parse_mode='Markdown')
+                                             f"От: *{user_login}*\n"
+                                             f"Для: *{request.purpose}*\n"
+                                             f"Одобрить?", reply_markup=inline_keyboard, parse_mode='Markdown')
 
     db.add_tg_message(msg.chat.id, request.id, msg.message_id)
 
@@ -358,8 +439,8 @@ async def send_notification(dp: Dispatcher):
             if i.approved is False:
                 for j in db.get_tg_user_by_id(i.sender_id):
                     await dp.bot.send_message(j.tg_id,
-                                            f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* отклонён!",
-                                            parse_mode='Markdown')
+                                              f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* отклонён!",
+                                              parse_mode='Markdown')
                 eq = db.get_equipment_by_id(i.equipment_id)
                 eq.reserve_count -= i.count
                 db.update_equipment(eq)
@@ -367,8 +448,8 @@ async def send_notification(dp: Dispatcher):
             else:
                 for j in db.get_tg_user_by_id(i.sender_id):
                     await dp.bot.send_message(j.tg_id,
-                                            f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* принят! Вы можете забрать "
-                                            f"своё оборудование уже сейчас!", parse_mode='Markdown')
+                                              f"Ваш запрос на выдачу *{db.get_equipment_by_id(i.equipment_id).title}* принят! Вы можете забрать "
+                                              f"своё оборудование уже сейчас!", parse_mode='Markdown')
                 i.notified = True
                 db.update_user_request(i)
         except aiogram.utils.exceptions.ChatNotFound:
@@ -398,10 +479,23 @@ async def del_useless_messages():
         db.del_tg_message_by_request(i)
 
 
+async def start_get_or_ret_procedure():
+    action = db.get_current_action()
+    if action and action.action is None:
+        scheduler.pause_job("check_for_interaction")
+        tg_id = db.get_tg_user_by_id(action.user_id)[0].tg_id
+        inline_keyboard = InlineKeyboardMarkup(row_width=1)
+        inline_keyboard.add(*[
+            InlineKeyboardButton(text="Вперёд!", callback_data="start_interaction")
+        ])
+        await bot.send_message(tg_id, "Готов начать работу со шкафом!", reply_markup=inline_keyboard)
+
+
 scheduler.add_job(send_notification, "interval", seconds=10, args=(dp,))
+scheduler.add_job(start_get_or_ret_procedure, "interval", seconds=5, id="check_for_interaction")
 if __name__ == '__main__':
     registry.register(dialog)
     registry.register(log_menu)
+    registry.register(get_return_menu)
     scheduler.start()
     executor.start_polling(dp, skip_updates=True)
-

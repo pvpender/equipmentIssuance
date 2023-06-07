@@ -4,7 +4,7 @@ from typing import List
 from PyQt6.QtWidgets import QMessageBox
 from sqlalchemy import ForeignKey
 from sqlalchemy import BigInteger
-from sqlalchemy import Text, DateTime, Engine, create_engine
+from sqlalchemy import Text, DateTime, Engine, create_engine, VARCHAR
 from sqlalchemy.orm import DeclarativeBase, Session, relationship, Mapped, mapped_column
 from users import *
 from equipment import *
@@ -207,6 +207,13 @@ class NotificationMessages(Base):
     request: Mapped["UserRequests"] = relationship()
 
 
+class CurrentRequests(Base):
+    __tablename__ = "current_requests"
+    user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
+    action: Mapped[str] = mapped_column(VARCHAR(7), nullable=True)
+    requests: Mapped[str] = mapped_column(Text, nullable=True)
+
+
 class ActionTypes(Enum):
     INSERT = "insert"
     UPDATE = "update"
@@ -228,6 +235,7 @@ class UserActions(Base):
     action: Mapped[str] = mapped_column(Text)
     action_time: Mapped[datetime.datetime] = mapped_column(DateTime, primary_key=True)
     request: Mapped["UserRequests"] = relationship()
+
 
 def restart_if_except(function):
     """
@@ -1304,3 +1312,19 @@ class DataBase:
             data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
         data += base_data
         return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
+
+    def get_current_action(self) -> CurrentRequests | None:
+        return self.__session.query(CurrentRequests).first()
+
+    def update_current_action(self, action: str = None, requests: str = None):
+        """
+
+        Args:
+            action (str): Action
+            requests (str): Id's in str, for example: 0_1_2_3
+
+        Returns:
+
+        """
+        new_data = {"action": action} if action else {"requests": requests}
+        self.__session.query(CurrentRequests).update(new_data)
