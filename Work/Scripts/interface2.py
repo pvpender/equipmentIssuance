@@ -9,6 +9,7 @@ from equipment_collections import EquipmentCollection
 from interface import TableModel
 from user_collections import *
 from users import *
+import datetime
 import xlsxwriter
 
 
@@ -3174,7 +3175,11 @@ class MainWindow(QMainWindow):
         if self.__usnum>=0:
             data=self.__db.get_user_actions_by_mail(self.__usFoundTableContents[self.__usnum][1])
             if data is not None:
-                data.to_excel('stats.xlsx', engine='xlsxwriter')
+                name=str(self.__usFoundTableContents[self.__eqnum][0]) + '_stats_for_' + str(
+                    datetime.datetime.now()) + '.xlsx'
+                while " " in name:
+                        name = name.replace(" ", "_")
+                data.to_excel(name, engine='xlsxwriter')
                 print(data)
             else:
                 show_message("Ошибка", "У данного пользователя нет истории действий")
@@ -3183,8 +3188,11 @@ class MainWindow(QMainWindow):
         if self.__eqnum >= 0:
             data = self.__db.get_equipment_actions(int(self.__eqFoundTableContents[self.__eqnum][0]))
             if data is not None:
-                data.to_excel('stats.xlsx', engine='xlsxwriter')
-                print(data)
+                name=str(self.__eqFoundTableContents[self.__eqnum][1])+'_stats_for_'+str(datetime.datetime.now())+'.xlsx'
+                while " " in name:
+                        name = name.replace(" ", "_")
+                data.to_excel(name, engine='xlsxwriter')
+
             else:
                 show_message("Ошибка", "У данного пользователя нет истории действий")
     class TableModel(QtCore.QAbstractTableModel):
