@@ -1,7 +1,7 @@
 import pandas as pd
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer, pyqtSlot
-from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel
+from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QLabel, QFileDialog
 
 from accesses import *
 from database import *
@@ -3175,12 +3175,16 @@ class MainWindow(QMainWindow):
         if self.__usnum>=0:
             data=self.__db.get_user_actions_by_mail(self.__usFoundTableContents[self.__usnum][1])
             if data is not None:
+                dirlist = QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
                 name=str(self.__usFoundTableContents[self.__eqnum][0]) + '_stats_for_' + str(
                     datetime.datetime.now()) + '.xlsx'
                 while " " in name:
                         name = name.replace(" ", "_")
+                while ":" in name:
+                    name = name.replace(":", "-")
+                name=str(dirlist) + '/' +name
                 data.to_excel(name, engine='xlsxwriter')
-                print(data)
+                show_message("Успех", "Файл сохранен!")
             else:
                 show_message("Ошибка", "У данного пользователя нет истории действий")
 
@@ -3188,12 +3192,15 @@ class MainWindow(QMainWindow):
         if self.__eqnum >= 0:
             data = self.__db.get_equipment_actions(int(self.__eqFoundTableContents[self.__eqnum][0]))
             if data is not None:
+                dirlist = QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
                 name=str(self.__eqFoundTableContents[self.__eqnum][1])+'_stats_for_'+str(datetime.datetime.now())+'.xlsx'
                 while " " in name:
                         name = name.replace(" ", "_")
-
+                while ":" in name:
+                        name = name.replace(":", "-")
+                name=str(dirlist) + '/' +name
                 data.to_excel(name, engine='xlsxwriter')
-
+                show_message("Успех", "Файл сохранен!")
             else:
                 show_message("Ошибка", "У данного пользователя нет истории действий")
     class TableModel(QtCore.QAbstractTableModel):
