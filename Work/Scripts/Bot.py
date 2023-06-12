@@ -455,7 +455,7 @@ async def send_notification(dp: Dispatcher):
         except aiogram.utils.exceptions.ChatNotFound:
             pass
     mas = db.get_unsolved_users_requests()
-    notified = db.get_all_adm_notified_requests()
+    notified = db.get_all_adm_notified_requests
     notified = [i[0] for i in notified]
     mas = [i for i in mas if i.id not in notified]
     admins = db.get_all_tg_admins()

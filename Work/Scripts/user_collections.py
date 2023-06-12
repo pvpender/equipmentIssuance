@@ -36,7 +36,7 @@ class UserCollection:
         """
         return self.__count
 
-    def append_user(self, user: CommonUser | Admin):
+    def append_user(self, user: Union[CommonUser, Admin]):
         """
 
         Args:
@@ -58,7 +58,7 @@ class UserCollection:
         except ValueError:
             return -1
 
-    def get_user_by_id(self, user_id: int) -> CommonUser | Admin | None:
+    def get_user_by_id(self, user_id: int) -> Union[CommonUser, Admin, None]:
         """
 
         Args:
@@ -72,7 +72,7 @@ class UserCollection:
                 return i
         return None
 
-    def get_user_by_pass(self, pass_number: int) -> CommonUser | Admin | None:
+    def get_user_by_pass(self, pass_number: int) -> Union[CommonUser, Admin, None]:
         """
 
         Args:
@@ -98,7 +98,7 @@ class UserCollection:
             else:
                 return False
 
-    def get_user_by_mail(self, user_mail: str) -> CommonUser | Admin | None:
+    def get_user_by_mail(self, user_mail: str) -> Union[CommonUser, Admin, None]:
         """
 
         Args:
@@ -125,7 +125,7 @@ class UserCollection:
                 return True
         return False
 
-    def change_user(self, pass_number: int, mail: str, user: CommonUser | Admin):
+    def change_user(self, pass_number: int, mail: str, user: Union[CommonUser, Admin]):
         """
 
         Args:

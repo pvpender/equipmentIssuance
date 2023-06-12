@@ -9,6 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, Session, relationship, Mapped, mappe
 from users import *
 from equipment import *
 from sqlalchemy.exc import OperationalError, IntegrityError
+from typing import Union
 from pandas import DataFrame
 import request as req
 import time
@@ -369,7 +370,7 @@ class DataBase:
         """
         return self.__session.query(Groups).all()
 
-    def get_group_by_id(self, group_id: int) -> Groups | None:
+    def get_group_by_id(self, group_id: int) -> Union[Groups, None]:
         """
 
         Args:
@@ -380,7 +381,7 @@ class DataBase:
         """
         return self.__session.query(Groups).filter(Groups.id == group_id).first()
 
-    def get_group_by_name(self, group_name: str) -> Groups | None:
+    def get_group_by_name(self, group_name: str) -> Union[Groups, None]:
         """
 
         Args:
@@ -543,7 +544,7 @@ class DataBase:
             self.__session.query(Users).filter_by(mail=user.mail, pass_number=user.pass_number).delete()
         self.__session.commit()
 
-    def get_user_by_id(self, user_id: int) -> Users | None:
+    def get_user_by_id(self, user_id: int) -> Union[Users, None]:
         """
         Args:
             user_id (int): User id
@@ -552,7 +553,7 @@ class DataBase:
         """
         return self.__session.query(Users).filter(Users.id == user_id).first()
 
-    def get_user_by_pass(self, pass_number: int) -> Users | None:
+    def get_user_by_pass(self, pass_number: int) -> Union[Users, None]:
         """
 
         Args:
@@ -730,7 +731,7 @@ class DataBase:
         self.__session.commit()
 
 
-    def get_admin_by_id(self, admin_id: int) -> Admins | None:
+    def get_admin_by_id(self, admin_id: int) -> Union[Admins, None]:
         """
 
         Args:
@@ -741,7 +742,7 @@ class DataBase:
         """
         return self.__session.query(Admins).filter(Admins.user_id == admin_id).first()
 
-    def get_admin_by_pass(self, pass_number: int) -> Admins | None:
+    def get_admin_by_pass(self, pass_number: int) -> Union[Admins, None]:
         """
 
         Args:
@@ -854,7 +855,7 @@ class DataBase:
         self.__session.query(Equipments).filter(Equipments.title == equipment.title).delete()
         self.__session.commit()
 
-    def get_equipment_by_id(self, eq_id: int) -> Equipments | None:
+    def get_equipment_by_id(self, eq_id: int) -> Union[Equipments, None]:
         """
 
         Args:
@@ -895,7 +896,7 @@ class DataBase:
         """
         return self.__session.query(Equipments).all()
 
-    def get_equipment_by_coordinates(self, x: int, y: int) -> Equipments | None:
+    def get_equipment_by_coordinates(self, x: int, y: int) -> Union[Equipments, None]:
         """
 
         Args:
@@ -968,7 +969,7 @@ class DataBase:
         )
         eq = self.get_equipment_by_id(request.equipment_id)
         eq.reserve_count += 1
-        if isinstance(eq, Union[Equipments, Equipments]):
+        if isinstance(eq, Equipments):
             self.update_equipment(eq)
         self.__session.add(db_request)
         self.__session.commit()
@@ -993,7 +994,7 @@ class DataBase:
         )
         eq = self.get_equipment_by_id(request.equipment_id)
         eq.reserve_count += 1
-        if isinstance(eq, Union[Equipments, Equipments]):
+        if isinstance(eq, Equipments):
             self.update_equipment(eq)
         self.__session.add(db_request)
         self.__session.commit()
@@ -1237,7 +1238,8 @@ class DataBase:
             NotificationMessages.message_id == message_id
         ).first()
 
-    def get_all_adm_notified_requests(self) -> List[NotificationMessages.request_id]:
+    @property
+    def get_all_adm_notified_requests(self) -> NotificationMessages.request_id:
         """
 
         Returns:
@@ -1245,7 +1247,7 @@ class DataBase:
         """
         return self.__session.query(NotificationMessages.request_id).group_by(NotificationMessages.request_id).all()
 
-    def get_all_users_actions(self) -> DataFrame | None:
+    def get_all_users_actions(self) -> Union[DataFrame, None]:
         """
 
         Returns:
@@ -1257,7 +1259,7 @@ class DataBase:
         data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
         return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
 
-    def get_user_actions_by_id(self, user_id: int) -> DataFrame | None:
+    def get_user_actions_by_id(self, user_id: int) -> Union[DataFrame, None]:
         """
 
         Args:
@@ -1272,7 +1274,7 @@ class DataBase:
         data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
         return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
 
-    def get_user_actions_by_mail(self, mail: str) -> DataFrame | None:
+    def get_user_actions_by_mail(self, mail: str) -> Union[DataFrame, None]:
         """
 
         Args:
@@ -1290,7 +1292,7 @@ class DataBase:
         data = [[i.user_id, i.request.equipment_id, i.action, i.action_time] for i in data]
         return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
 
-    def get_equipment_actions(self, equipment_id: id) -> DataFrame | None:
+    def get_equipment_actions(self, equipment_id: id) -> Union[DataFrame, None]:
         """
 
         Args:
@@ -1313,7 +1315,7 @@ class DataBase:
         data += base_data
         return DataFrame(data, columns=["User id", "Equipment id", "Action", "Time"])
 
-    def get_current_action(self) -> CurrentRequests | None:
+    def get_current_action(self) -> Union[CurrentRequests, None]:
         return self.__session.query(CurrentRequests).first()
 
     def update_current_action(self, action: str = None, requests: str = None):

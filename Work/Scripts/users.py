@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Union
-
 from accesses import *
 
 
@@ -61,8 +60,8 @@ class User(ABC):
 
 class Admin(User):
     """Admin class"""
-    def __init__(self, pass_nuber, mail, access: AdminAccess, base_id=None):
-        super().__init__(pass_nuber, mail, base_id)
+    def __init__(self, pass_number, mail, access: AdminAccess, base_id=None):
+        super().__init__(pass_number, mail, base_id)
         self.__access = access
 
     @property
